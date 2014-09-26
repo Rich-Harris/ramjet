@@ -21,14 +21,23 @@
 			display: inline-block;
 		}
 
-		#from {
+		#one {
 			color: blue;
 		}
 
-		#to {
+		#two {
 			color: white;
 			background-color: red;
-			font-size: 3em;
+			font-size: 2em;
+			visibility: hidden;
+		}
+
+		#three {
+			position: absolute;
+			right: 50px;
+			top: 50px;
+			visibility: hidden;
+			width: 400px;
 		}
 	</style>
 </head>
@@ -36,25 +45,40 @@
 <body>
 
 	<div class='upper-container'>
-		<p id='from'>this is the element we're transitioning from</p>
+		<p id='one'>this is the first element</p>
 	</div>
 
 	<div class='lower-container'>
-		<p id='to'>this is the element we're transitioning to</p>
+		<p id='two'>this is the second element,<br> which is a completely different shape</p>
 	</div>
+
+	<img id='three' src='llama.jpg'>
 
 	<script src='../src/mogrify.js'></script>
 
 	<script>
-		to.style.visibility = 'hidden';
-
-		setTimeout( function () {
-			to.style.visibility = 'visible';
-
-			mogrify( from, to, {
-				duration: 400
+		function oneToTwo () {
+			two.style.visibility = 'visible';
+			mogrify( one, two , { duration: 400 }).then( function () {
+				setTimeout( twoToThree, 1000 );
 			});
-		}, 500 );
+		}
+
+		function twoToThree () {
+			three.style.visibility = 'visible';
+			mogrify( two, three, { duration: 400 }).then( function () {
+				setTimeout( threeToOne, 1000 );
+			});
+		}
+
+		function threeToOne () {
+			one.style.visibility = 'visible';
+			mogrify( three, one, { duration: 400 }).then( function () {
+				setTimeout( oneToTwo, 1000 );
+			});
+		}
+
+		setTimeout( oneToTwo, 1000 );
 	</script>
 </body>
 </html>

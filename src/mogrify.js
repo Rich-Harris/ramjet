@@ -1,11 +1,28 @@
-(function () {
+(function ( global ) {
 
 	'use strict';
 
-	var mogrify;
+	if ( typeof define === 'function' && define.amd ) {
+		define( function () { return mogrify; });
+	} else if ( typeof module !== 'undefined' && module.exports ) {
+		module.exports = mogrify;
+	} else {
+		global.mogrify = mogrify;
+	}
 
-	mogrify = function ( fromNode, toNode, options ) {
-		var from, to, dx, dy, dsxf, dsyf, dsxt, dsyt, startTime, duration;
+	var missingPromise = { then: promiseError, catch: promiseError };
+
+	function mogrify ( fromNode, toNode, options ) {
+		var promise, fulfil, reject, from, to, dx, dy, dsxf, dsyf, dsxt, dsyt, startTime, duration, easing;
+
+		options = options || {};
+
+		if ( typeof mogrify.Promise === 'function' ) {
+			promise = new mogrify.Promise( function ( f, r ) {
+				fulfil = f;
+				reject = r;
+			});
+		}
 
 		from = process( fromNode );
 		to = process( toNode );
@@ -19,17 +36,9 @@
 		dsxt = ( from.width / to.width ) - 1;
 		dsyt = ( from.height / to.height ) - 1;
 
-		console.log( 'from, to', from, to );
-		console.log( 'dx, dy', dx, dy );
-
-		fromNode.parentNode.insertBefore( from.clone, fromNode.nextSibling );
-		toNode.parentNode.insertBefore( to.clone, toNode.nextSibling );
-
-		toNode.style.visibility = 'hidden';
-		fromNode.style.visibility = 'hidden';
-
 		startTime = Date.now();
 		duration = options.duration || 400;
+		easing = getEasing( options.easing );
 
 		function tick () {
 			var timeNow, elapsed, t, transform;
@@ -43,10 +52,18 @@
 
 				to.node.style.visibility = 'visible';
 
+				if ( fulfil ) {
+					fulfil();
+				}
+
+				if ( options.done ) {
+					options.done();
+				}
+
 				return;
 			}
 
-			t = elapsed / duration;
+			t = easing( elapsed / duration );
 
 			from.clone.style.opacity = 1 - t;
 			to.clone.style.opacity = t;
@@ -61,6 +78,20 @@
 		}
 
 		tick();
+
+		return promise || missingPromise;
+	}
+
+	mogrify.Promise = global.Promise;
+
+	mogrify.easing = {
+		linear: function ( pos ) { return pos; },
+		easeIn: function ( pos ) { return Math.pow( pos, 3 ); },
+		easeOut: function ( pos ) { return ( Math.pow( ( pos - 1 ), 3 ) + 1 ); },
+		easeInOut: function ( pos ) {
+			if ( ( pos /= 0.5 ) < 1 ) { return ( 0.5 * Math.pow( pos, 3 ) ); }
+			return ( 0.5 * ( Math.pow( ( pos - 2 ), 3 ) + 2 ) );
+		}
 	};
 
 	function process ( node ) {
@@ -89,6 +120,9 @@
 		clone.style.top = ( bcr.top - parseInt( style.marginTop, 10 ) ) + 'px';
 		clone.style.left = ( bcr.left - parseInt( style.marginLeft, 10 ) ) + 'px';
 
+		node.parentNode.insertBefore( clone, node.nextSibling );
+		node.style.visibility = 'hidden';
+
 		return target;
 	}
 
@@ -96,6 +130,24 @@
 		return 'translate(' + ( t * dx ) + 'px,' + ( t * dy ) + 'px) scale(' + ( 1 + ( t * dsx ) ) + ',' + ( 1 + ( t * dsy ) ) + ')';
 	}
 
-	window.mogrify = mogrify;
+	function getEasing ( easing ) {
+		if ( !easing ) {
+			return mogrify.easing.easeOut;
+		}
 
-}());
+		if ( typeof easing === 'function' ) {
+			return easing;
+		}
+
+		if ( typeof easing === 'string' && mogrify.easing[ easing ] ) {
+			return mogrify.easing[ easing ];
+		}
+
+		throw new Error( 'Could not find easing function' );
+	}
+
+	function promiseError () {
+		throw new Error( 'Promises are not natively supported in this browser. You must use a polyfill, e.g. https://github.com/jakearchibald/es6-promise, and make it available to mogrify as mogrify.Promise' );
+	}
+
+}( typeof window !== 'undefined' ? window : this ));
