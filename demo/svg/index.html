@@ -22,9 +22,7 @@
 		}
 
 		svg {
-			width: 100%;
-			height: 300px;
-			overflow: visible;
+			border: 1px solid #aaa;
 		}
 
 		#one {
@@ -55,9 +53,11 @@
 	</div>
 
 	<div class='lower-container'>
-		<svg>
-			<rect id='two' x='200' y='50' width='50' height='100' fill='green'></rect>
-			<rect id='three' x='400' y='150' width='100' height='50' fill='purple'></rect>
+		<svg style='width: 400px; height: 200px;' viewBox='0 0 400 200'>
+			<circle cx='100' cy='100' r='100' fill='grey'></circle>
+
+			<rect id='two' x='200' y='0' width='50' height='100' fill='green'></rect>
+			<rect id='three' x='300' y='150' width='100' height='50' fill='purple'></rect>
 		</svg>
 	</div>
 
@@ -69,11 +69,13 @@
 			three = document.getElementById( 'three' );
 
 		function oneToTwo () {
+			console.group( 'one to two' );
 			two.style.visibility = 'visible';
 			mogrify( one, two, {
 				duration: 4000,
 				done: function () {
 					two.style.visibility = 'visible';
+					console.groupEnd();
 					setTimeout( twoToThree, 1000 );
 				}
 			});
@@ -82,11 +84,13 @@
 		}
 
 		function twoToThree () {
+			console.group( 'two to three' );
 			three.style.visibility = 'visible';
 			mogrify( two, three, {
 				duration: 4000,
 				done: function () {
 					three.style.visibility = 'visible';
+					console.groupEnd();
 					setTimeout( threeToOne, 1000 );
 				}
 			});
@@ -95,12 +99,14 @@
 		}
 
 		function threeToOne () {
+			console.group( 'three to one' );
 			one.style.visibility = 'visible';
 			mogrify( three, one, {
 				duration: 4000,
 				done: function () {
+					console.groupEnd();
 					one.style.visibility = 'visible';
-					setTimeout( oneToTwo, 1000 );
+					//setTimeout( oneToTwo, 1000 );
 				}
 			});
 			three.style.visibility = 'hidden';

@@ -10,7 +10,16 @@
 		global.mogrify = mogrify;
 	}
 
-	var styleKeys;
+	var styleKeys, svg;
+
+	svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
+	svg.style.position = 'fixed';
+	svg.style.top = svg.style.left = '0';
+	svg.style.width = svg.style.height = '100%';
+	svg.style.overflow = 'visible';
+	svg.style.pointerEvents = 'none';
+
+	document.body.appendChild( svg );
 
 	function mogrify ( fromNode, toNode, options ) {
 		var fulfil, reject, from, to, dx, dy, dsxf, dsyf, dsxt, dsyt, startTime, duration, easing;
@@ -38,7 +47,7 @@
 		easing = getEasing( options.easing );
 
 		function tick () {
-			var timeNow, elapsed, t, fromTransform, toTransform;
+			var timeNow, elapsed, t, cx, cy, fromTransform, toTransform;
 
 			timeNow = Date.now();
 			elapsed = timeNow - startTime;
@@ -59,8 +68,11 @@
 			from.clone.style.opacity = 1 - t;
 			to.clone.style.opacity = t;
 
-			fromTransform = getTransform( dx, dy, dsxf, dsyf, t );
-			toTransform = getTransform( -dx, -dy, dsxt, dsyt, 1 - t );
+			cx = from.cx + ( dx * t );
+			cy = from.cy + ( dy * t );
+
+			fromTransform = getTransform( from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
+			toTransform = getTransform( to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
 
 			from.clone.style.transform = from.clone.style.webkitTransform = fromTransform;
 			from.clone.style.transform = to.clone.style.webkitTransform = toTransform;
@@ -82,7 +94,7 @@
 	};
 
 	function process ( node ) {
-		var target, style, bcr, clone, i, len, child;
+		var target, style, bcr, clone, i, len, child, isSvg, ctm;
 
 		bcr = node.getBoundingClientRect();
 		style = window.getComputedStyle( node );
@@ -111,15 +123,28 @@
 			cx: ( bcr.left + bcr.right ) / 2,
 			cy: ( bcr.top + bcr.bottom ) / 2,
 			width: bcr.right - bcr.left,
-			height: bcr.bottom - bcr.top
+			height: bcr.bottom - bcr.top,
+			isSvg: node.namespaceURI === svg.namespaceURI
 		};
 
-		node.parentNode.insertBefore( clone, node.nextSibling );
+		if ( target.isSvg ) {
+			ctm = node.getScreenCTM();
+			target.transform = 'matrix(' + [ ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f ].join( ',' ) + ')';
+
+			svg.appendChild( clone );
+		} else {
+			target.transform = ''; // TODO...?
+			document.body.appendChild( clone );
+		}
 
 		return target;
 	}
 
-	function getTransform ( dx, dy, dsx, dsy, t ) {
+	function getTransform ( isSvg, cx, cy, dx, dy, dsx, dsy, t ) {
+		if ( isSvg ) {
+			return 'translate(' + cx + 'px,' + cy + 'px) scale(' + ( 1 + ( t * dsx ) ) + ',' + ( 1 + ( t * dsy ) ) + ') translate(-' + cx + 'px,-' + cy + 'px) translate(' + ( t * dx ) + 'px,' + ( t * dy ) + 'px)';
+		}
+
 		return 'translate(' + ( t * dx ) + 'px,' + ( t * dy ) + 'px) scale(' + ( 1 + ( t * dsx ) ) + ',' + ( 1 + ( t * dsy ) ) + ')';
 	}
 
