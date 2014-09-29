@@ -10,18 +10,15 @@
 		global.mogrify = mogrify;
 	}
 
-	var missingPromise = { then: promiseError, catch: promiseError };
+	var styleKeys;
 
 	function mogrify ( fromNode, toNode, options ) {
-		var promise, fulfil, reject, from, to, dx, dy, dsxf, dsyf, dsxt, dsyt, startTime, duration, easing;
+		var fulfil, reject, from, to, dx, dy, dsxf, dsyf, dsxt, dsyt, startTime, duration, easing;
 
 		options = options || {};
 
-		if ( typeof mogrify.Promise === 'function' ) {
-			promise = new mogrify.Promise( function ( f, r ) {
-				fulfil = f;
-				reject = r;
-			});
+		if ( typeof options === 'function' ) {
+			options = { done: options };
 		}
 
 		from = process( fromNode );
@@ -41,7 +38,7 @@
 		easing = getEasing( options.easing );
 
 		function tick () {
-			var timeNow, elapsed, t, transform;
+			var timeNow, elapsed, t, fromTransform, toTransform;
 
 			timeNow = Date.now();
 			elapsed = timeNow - startTime;
@@ -49,12 +46,6 @@
 			if ( elapsed > duration ) {
 				from.clone.parentNode.removeChild( from.clone );
 				to.clone.parentNode.removeChild( to.clone );
-
-				to.node.style.visibility = 'visible';
-
-				if ( fulfil ) {
-					fulfil();
-				}
 
 				if ( options.done ) {
 					options.done();
@@ -68,21 +59,17 @@
 			from.clone.style.opacity = 1 - t;
 			to.clone.style.opacity = t;
 
-			from.clone.style.transform = getTransform( dx, dy, dsxf, dsyf, t );
-			to.clone.style.transform = getTransform( -dx, -dy, dsxt, dsyt, 1 - t );
+			fromTransform = getTransform( dx, dy, dsxf, dsyf, t );
+			toTransform = getTransform( -dx, -dy, dsxt, dsyt, 1 - t );
 
-			from.clone.style.webkitTransform = getTransform( dx, dy, dsxf, dsyf, t );
-			to.clone.style.webkitTransform = getTransform( -dx, -dy, dsxt, dsyt, 1 - t );
+			from.clone.style.transform = from.clone.style.webkitTransform = fromTransform;
+			from.clone.style.transform = to.clone.style.webkitTransform = toTransform;
 
 			requestAnimationFrame( tick );
 		}
 
 		tick();
-
-		return promise || missingPromise;
 	}
-
-	mogrify.Promise = global.Promise;
 
 	mogrify.easing = {
 		linear: function ( pos ) { return pos; },
@@ -95,12 +82,27 @@
 	};
 
 	function process ( node ) {
-		var target, style, bcr, clone;
+		var target, style, bcr, clone, i, len, child;
 
 		bcr = node.getBoundingClientRect();
 		style = window.getComputedStyle( node );
 
-		clone = node.cloneNode( true );
+		clone = node.cloneNode();
+		( styleKeys || ( styleKeys = Object.keys( style ) ) ).forEach( function ( prop ) {
+			clone.style[ prop ] = style[ prop ];
+		});
+
+		clone.style.position = 'fixed';
+		clone.style.top = ( bcr.top - parseInt( style.marginTop, 10 ) ) + 'px';
+		clone.style.left = ( bcr.left - parseInt( style.marginLeft, 10 ) ) + 'px';
+
+		// clone children recursively. We don't do this at the top level, because we want
+		// to use the reference to `style`
+		len = node.childNodes.length;
+		for ( i = 0; i < len; i += 1 ) {
+			child = cloneNode( node.childNodes[i] );
+			clone.appendChild( child );
+		}
 
 		target = {
 			node: node,
@@ -112,16 +114,7 @@
 			height: bcr.bottom - bcr.top
 		};
 
-		Object.keys( style ).forEach( function ( prop ) {
-			clone.style[ prop ] = style[ prop ];
-		});
-
-		clone.style.position = 'fixed';
-		clone.style.top = ( bcr.top - parseInt( style.marginTop, 10 ) ) + 'px';
-		clone.style.left = ( bcr.left - parseInt( style.marginLeft, 10 ) ) + 'px';
-
 		node.parentNode.insertBefore( clone, node.nextSibling );
-		node.style.visibility = 'hidden';
 
 		return target;
 	}
@@ -146,8 +139,31 @@
 		throw new Error( 'Could not find easing function' );
 	}
 
-	function promiseError () {
-		throw new Error( 'Promises are not natively supported in this browser. You must use a polyfill, e.g. https://github.com/jakearchibald/es6-promise, and make it available to mogrify as mogrify.Promise' );
+	function cloneNode ( node ) {
+		var node, style, clone, len, i, attr;
+
+		clone = node.cloneNode();
+
+		if ( node.nodeType === 1 ) {
+			style = getComputedStyle( node );
+
+			styleKeys.forEach( function ( prop ) {
+				clone.style[ prop ] = style[ prop ];
+			});
+
+			len = node.attributes.length;
+			for ( i = 0; i < len; i += 1 ) {
+				attr = node.attributes[i];
+				clone.setAttribute( attr.name, attr.value );
+			}
+
+			len = node.childNodes.length;
+			for ( i = 0; i < len; i += 1 ) {
+				clone.appendChild( cloneNode( node.childNodes[i] ) );
+			}
+		}
+
+		return clone;
 	}
 
 }( typeof window !== 'undefined' ? window : this ));

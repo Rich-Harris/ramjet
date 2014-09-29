@@ -21,6 +21,12 @@
 			display: inline-block;
 		}
 
+		svg {
+			width: 100%;
+			height: 300px;
+			overflow: visible;
+		}
+
 		#one {
 			color: blue;
 		}
@@ -49,12 +55,13 @@
 	</div>
 
 	<div class='lower-container'>
-		<p id='two'>this is the second element,<br data-foo='foo' data-bar='bar'> which is a completely different shape</p>
+		<svg>
+			<rect id='two' x='200' y='50' width='50' height='100' fill='green'></rect>
+			<rect id='three' x='400' y='150' width='100' height='50' fill='purple'></rect>
+		</svg>
 	</div>
 
-	<img id='three' src='llama.jpg'>
-
-	<script src='../mogrify.js'></script>
+	<script src='../../mogrify.js'></script>
 
 	<script>
 		var one = document.getElementById( 'one' ),
