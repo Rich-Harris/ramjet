@@ -18,6 +18,7 @@
 	svg.style.width = svg.style.height = '100%';
 	svg.style.overflow = 'visible';
 	svg.style.pointerEvents = 'none';
+	svg.setAttribute( 'class', 'mogrify-svg' );
 
 	document.body.appendChild( svg );
 
