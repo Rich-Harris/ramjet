@@ -10,7 +10,7 @@
 		global.mogrify = mogrify;
 	}
 
-	var styleKeys, svg;
+	var _styleKeys, svg;
 
 	svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
 	svg.style.position = 'fixed';
@@ -33,6 +33,9 @@
 
 		from = process( fromNode );
 		to = process( toNode );
+
+		console.log( 'from.bcr', from.bcr );
+		console.log( 'to.bcr', to.bcr );
 
 		dx = to.cx - from.cx;
 		dy = to.cy - from.cy;
@@ -101,7 +104,7 @@
 		style = window.getComputedStyle( node );
 
 		clone = node.cloneNode();
-		( styleKeys || ( styleKeys = Object.keys( style ) ) ).forEach( function ( prop ) {
+		styleKeys( style ).forEach( function ( prop ) {
 			clone.style[ prop ] = style[ prop ];
 		});
 
@@ -135,7 +138,7 @@
 			svg.appendChild( clone );
 		} else {
 			target.transform = ''; // TODO...?
-			document.body.appendChild( clone );
+			node.parentNode.appendChild( clone );
 		}
 
 		return target;
@@ -173,7 +176,7 @@
 		if ( node.nodeType === 1 ) {
 			style = getComputedStyle( node );
 
-			styleKeys.forEach( function ( prop ) {
+			styleKeys().forEach( function ( prop ) {
 				clone.style[ prop ] = style[ prop ];
 			});
 
@@ -190,6 +193,22 @@
 		}
 
 		return clone;
+	}
+
+	function styleKeys () {
+		var keys;
+
+		if ( !_styleKeys ) {
+			if ( typeof CSS2Properties !== 'undefined' ) {
+				// why hello Firefox
+				_styleKeys = Object.keys( CSS2Properties.prototype );
+			} else {
+				_styleKeys = Object.keys( document.createElement( 'div' ).style );
+			}
+
+		}
+
+		return _styleKeys;
 	}
 
 }( typeof window !== 'undefined' ? window : this ));
