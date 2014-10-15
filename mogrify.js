@@ -34,9 +34,6 @@
 		from = process( fromNode );
 		to = process( toNode );
 
-		console.log( 'from.bcr', from.bcr );
-		console.log( 'to.bcr', to.bcr );
-
 		dx = to.cx - from.cx;
 		dy = to.cy - from.cy;
 
@@ -79,7 +76,7 @@
 			toTransform = getTransform( to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
 
 			from.clone.style.transform = from.clone.style.webkitTransform = fromTransform;
-			from.clone.style.transform = to.clone.style.webkitTransform = toTransform;
+			to.clone.style.transform = to.clone.style.webkitTransform = toTransform;
 
 			requestAnimationFrame( tick );
 		}
