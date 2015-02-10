@@ -1,0 +1,12 @@
+{
+	"esnext": true,
+	"undef": true,
+	"unused": true,
+
+	"globals": {
+		"window": true,
+		"document": true,
+		"requestAnimationFrame": true,
+		"CSS2Properties": true
+	}
+}
