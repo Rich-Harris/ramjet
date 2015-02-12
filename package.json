@@ -1,7 +1,7 @@
 {
   "name": "mogrify",
   "description": "Morph DOM elements from one state to another with smooth transitions",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "Rich Harris",
   "license": "MIT",
   "repository": "https://github.com/rich-harris/mogrify",
@@ -13,10 +13,14 @@
     "README.md"
   ],
   "scripts": {
-    "build": "esperanto -b -i src/mogrify.js -o dist/mogrify.js -t umd -n mogrify",
+    "build": "gobble build -f dist",
     "prepublish": "npm run build"
   },
   "devDependencies": {
-    "esperanto": "^0.6.11"
+    "esperanto": "^0.6.11",
+    "gobble": "^0.7.2",
+    "gobble-6to5": "^3.0.0",
+    "gobble-cli": "^0.3.5",
+    "gobble-esperanto-bundle": "^0.1.7"
   }
 }

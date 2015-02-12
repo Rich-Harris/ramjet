@@ -1,0 +1,53 @@
+import getTransform from './utils/getTransform';
+import { getEasing } from './easing';
+
+export default function mogrifyWithTimer ( from, to, options ) {
+	var dx = to.cx - from.cx;
+	var dy = to.cy - from.cy;
+
+	var dsxf = ( to.width / from.width ) - 1;
+	var dsyf = ( to.height / from.height ) - 1;
+
+	var dsxt = ( from.width / to.width ) - 1;
+	var dsyt = ( from.height / to.height ) - 1;
+
+	var startTime = Date.now();
+	var duration = options.duration || 400;
+	var easing = getEasing( options.easing );
+
+	function tick () {
+		var timeNow, elapsed, t, cx, cy, fromTransform, toTransform;
+
+		timeNow = Date.now();
+		elapsed = timeNow - startTime;
+
+		if ( elapsed > duration ) {
+			from.clone.parentNode.removeChild( from.clone );
+			to.clone.parentNode.removeChild( to.clone );
+
+			if ( options.done ) {
+				options.done();
+			}
+
+			return;
+		}
+
+		t = easing( elapsed / duration );
+
+		from.clone.style.opacity = 1 - t;
+		to.clone.style.opacity = t;
+
+		cx = from.cx + ( dx * t );
+		cy = from.cy + ( dy * t );
+
+		fromTransform = getTransform( from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
+		toTransform = getTransform( to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
+
+		from.clone.style.transform = from.clone.style.webkitTransform = fromTransform;
+		to.clone.style.transform = to.clone.style.webkitTransform = toTransform;
+
+		requestAnimationFrame( tick );
+	}
+
+	tick();
+}
