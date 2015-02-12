@@ -1,12 +1,10 @@
 import processNode from './utils/processNode';
-import getTransform from './utils/getTransform';
 import mogrifyWithTimer from './mogrifyWithTimer';
 import mogrifyWithKeyframes from './mogrifyWithKeyframes';
 import { easing } from './easing';
+import { keyframesSupported } from './utils/detect';
 
 export default mogrify;
-
-const USE_TIMER = false;
 
 function mogrify ( fromNode, toNode, options = {} ) {
 	var from, to;
@@ -18,7 +16,7 @@ function mogrify ( fromNode, toNode, options = {} ) {
 	from = processNode( fromNode );
 	to = processNode( toNode );
 
-	if ( USE_TIMER || options.useTimer ) {
+	if ( !keyframesSupported || options.useTimer ) {
 		mogrifyWithTimer( from, to, options );
 	} else {
 		mogrifyWithKeyframes( from, to, options );

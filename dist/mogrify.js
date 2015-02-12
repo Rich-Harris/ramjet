@@ -192,16 +192,42 @@
 		tick();
 	}
 
-	var TRANSFORM = "transform";
-	var KEYFRAMES = "@-webkit-keyframes";
+	var div = document.createElement("div");
+	var keyframesSupported = true;
 
-	var ANIMATION_DIRECTION = "-webkit-animation-direction";
-	var ANIMATION_DURATION = "-webkit-animation-duration";
-	var ANIMATION_ITERATION_COUNT = "-webkit-animation-iteration-count";
-	var ANIMATION_NAME = "-webkit-animation-name";
-	var ANIMATION_TIMING_FUNCTION = "-webkit-animation-timing-function";
+	var TRANSFORM, KEYFRAMES, ANIMATION_DIRECTION, ANIMATION_DURATION, ANIMATION_ITERATION_COUNT, ANIMATION_NAME, ANIMATION_TIMING_FUNCTION, ANIMATION_END;
 
-	var ANIMATION_END = "webkitAnimationEnd";function mogrifyWithKeyframes(from, to, options) {
+	if (("transform" in div.style || "webkitTransform" in div.style) && ("animation" in div.style || "webkitAnimation" in div.style)) {
+		keyframesSupported = true;
+
+		TRANSFORM = "transform" in div.style ? "transform" : "webkitTransform";
+
+		if ("animation" in div.style) {
+			KEYFRAMES = "@keyframes";
+
+			ANIMATION_DIRECTION = "animation-direction";
+			ANIMATION_DURATION = "animation-duration";
+			ANIMATION_ITERATION_COUNT = "animation-iteration-count";
+			ANIMATION_NAME = "animation-name";
+			ANIMATION_TIMING_FUNCTION = "animation-timing-function";
+
+			ANIMATION_END = "animationend";
+		} else {
+			KEYFRAMES = "@-webkit-keyframes";
+
+			ANIMATION_DIRECTION = "-webkit-animation-direction";
+			ANIMATION_DURATION = "-webkit-animation-duration";
+			ANIMATION_ITERATION_COUNT = "-webkit-animation-iteration-count";
+			ANIMATION_NAME = "-webkit-animation-name";
+			ANIMATION_TIMING_FUNCTION = "-webkit-animation-timing-function";
+
+			ANIMATION_END = "webkitAnimationEnd";
+		}
+	} else {
+		keyframesSupported = false;
+	}
+
+	function mogrifyWithKeyframes(from, to, options) {
 		var _getKeyframes = getKeyframes(from, to, options);
 
 		var fromKeyframes = _getKeyframes.fromKeyframes;
@@ -230,7 +256,8 @@
 				from.clone.parentNode.removeChild(from.clone);
 				to.clone.parentNode.removeChild(to.clone);
 
-				options.done && options.done();
+				if (options.done) options.done();
+
 				dispose();
 			}
 		}
@@ -314,8 +341,6 @@
 		return { fromKeyframes: fromKeyframes, toKeyframes: toKeyframes };
 	}
 
-	var USE_TIMER = false;
-
 	function mogrify(fromNode, toNode) {
 		var options = arguments[2] === undefined ? {} : arguments[2];
 		var from, to;
@@ -327,7 +352,7 @@
 		from = processNode(fromNode);
 		to = processNode(toNode);
 
-		if (USE_TIMER || options.useTimer) {
+		if (!keyframesSupported || options.useTimer) {
 			mogrifyWithTimer(from, to, options);
 		} else {
 			mogrifyWithKeyframes(from, to, options);

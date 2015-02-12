@@ -1,16 +1,6 @@
 import getTransform from './utils/getTransform';
 import { getEasing } from './easing';
-
-var TRANSFORM = 'transform';
-var KEYFRAMES = '@-webkit-keyframes';
-
-var ANIMATION_DIRECTION       = '-webkit-animation-direction';
-var ANIMATION_DURATION        = '-webkit-animation-duration';
-var ANIMATION_ITERATION_COUNT = '-webkit-animation-iteration-count';
-var ANIMATION_NAME            = '-webkit-animation-name';
-var ANIMATION_TIMING_FUNCTION = '-webkit-animation-timing-function';
-
-var ANIMATION_END             = 'webkitAnimationEnd';
+import { TRANSFORM, KEYFRAMES, ANIMATION_DIRECTION, ANIMATION_DURATION, ANIMATION_ITERATION_COUNT, ANIMATION_NAME, ANIMATION_TIMING_FUNCTION, ANIMATION_END } from './utils/detect';
 
 export default function mogrifyWithKeyframes ( from, to, options ) {
 	var { fromKeyframes, toKeyframes } = getKeyframes( from, to, options );
@@ -37,7 +27,8 @@ export default function mogrifyWithKeyframes ( from, to, options ) {
 			from.clone.parentNode.removeChild( from.clone );
 			to.clone.parentNode.removeChild( to.clone );
 
-			options.done && options.done();
+			if ( options.done ) options.done();
+
 			dispose();
 		}
 	}
