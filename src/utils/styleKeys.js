@@ -1,10 +1,17 @@
+// for the sake of Safari, may it burn in hell
+const BLACKLIST = [ 'length', 'parentRule' ];
+
 var styleKeys = ( function () {
+	var keys;
+
 	if ( typeof CSS2Properties !== 'undefined' ) {
 		// why hello Firefox
-		return Object.keys( CSS2Properties.prototype );
+		keys = Object.keys( CSS2Properties.prototype );
+	} else {
+		keys = Object.keys( document.createElement( 'div' ).style ).filter( k => !~BLACKLIST.indexOf( k ) );
 	}
 
-	return Object.keys( document.createElement( 'div' ).style );
+	return keys;
 })();
 
 export default styleKeys;

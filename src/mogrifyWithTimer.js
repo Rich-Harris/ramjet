@@ -1,5 +1,6 @@
 import getTransform from './utils/getTransform';
 import { getEasing } from './easing';
+import { rAF } from './utils/rAF';
 
 export default function mogrifyWithTimer ( from, to, options ) {
 	var dx = to.cx - from.cx;
@@ -46,7 +47,7 @@ export default function mogrifyWithTimer ( from, to, options ) {
 		from.clone.style.transform = from.clone.style.webkitTransform = fromTransform;
 		to.clone.style.transform = to.clone.style.webkitTransform = toTransform;
 
-		requestAnimationFrame( tick );
+		rAF( tick );
 	}
 
 	tick();

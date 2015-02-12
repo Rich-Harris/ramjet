@@ -1,366 +1,383 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-	typeof define === 'function' && define.amd ? define(factory) :
-	global.mogrify = factory()
+          typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+          typeof define === 'function' && define.amd ? define(factory) :
+          global.mogrify = factory()
 }(this, function () { 'use strict';
 
-	var styleKeys = (function () {
-		if (typeof CSS2Properties !== "undefined") {
-			// why hello Firefox
-			return Object.keys(CSS2Properties.prototype);
-		}
-
-		return Object.keys(document.createElement("div").style);
-	})();
-
-	function cloneNode(node) {
-		var style, clone, len, i, attr;
-
-		clone = node.cloneNode();
-
-		if (node.nodeType === 1) {
-			style = window.getComputedStyle(node);
-
-			styleKeys.forEach(function (prop) {
-				clone.style[prop] = style[prop];
-			});
-
-			len = node.attributes.length;
-			for (i = 0; i < len; i += 1) {
-				attr = node.attributes[i];
-				clone.setAttribute(attr.name, attr.value);
-			}
-
-			len = node.childNodes.length;
-			for (i = 0; i < len; i += 1) {
-				clone.appendChild(cloneNode(node.childNodes[i]));
-			}
-		}
-
-		return clone;
-	}
-
-	var svgns = "http://www.w3.org/2000/svg";
-	var svg = document.createElementNS(svgns, "svg");
-
-	svg.style.position = "fixed";
-	svg.style.top = svg.style.left = "0";
-	svg.style.width = svg.style.height = "100%";
-	svg.style.overflow = "visible";
-	svg.style.pointerEvents = "none";
-	svg.setAttribute("class", "mogrify-svg");
-
-	document.body.appendChild(svg);
-
-	function processNode(node) {
-		var target, style, bcr, clone, i, len, child, ctm;
-
-		bcr = node.getBoundingClientRect();
-		style = window.getComputedStyle(node);
-
-		clone = node.cloneNode();
-		styleKeys.forEach(function (prop) {
-			clone.style[prop] = style[prop];
-		});
-
-		clone.style.position = "fixed";
-		clone.style.top = bcr.top - parseInt(style.marginTop, 10) + "px";
-		clone.style.left = bcr.left - parseInt(style.marginLeft, 10) + "px";
-
-		// clone children recursively. We don't do this at the top level, because we want
-		// to use the reference to `style`
-		len = node.childNodes.length;
-		for (i = 0; i < len; i += 1) {
-			child = cloneNode(node.childNodes[i]);
-			clone.appendChild(child);
-		}
-
-		target = {
-			node: node,
-			bcr: bcr,
-			clone: clone,
-			cx: (bcr.left + bcr.right) / 2,
-			cy: (bcr.top + bcr.bottom) / 2,
-			width: bcr.right - bcr.left,
-			height: bcr.bottom - bcr.top,
-			isSvg: node.namespaceURI === svgns
-		};
-
-		if (target.isSvg) {
-			ctm = node.getScreenCTM();
-			target.transform = "matrix(" + [ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f].join(",") + ")";
-
-			svg.appendChild(clone);
-		} else {
-			target.transform = ""; // TODO...?
-			node.parentNode.appendChild(clone);
-		}
-
-		return target;
-	}
-
-	function getTransform(isSvg, cx, cy, dx, dy, dsx, dsy, t) {
-		if (isSvg) {
-			return "translate(" + cx + "px," + cy + "px) scale(" + (1 + t * dsx) + "," + (1 + t * dsy) + ") translate(-" + cx + "px,-" + cy + "px) translate(" + t * dx + "px," + t * dy + "px)";
-		}
-
-		return "translate(" + t * dx + "px," + t * dy + "px) scale(" + (1 + t * dsx) + "," + (1 + t * dsy) + ")";
-	}
+          // for the sake of Safari, may it burn in hell
+          var BLACKLIST = ["length", "parentRule"];
+
+          var styleKeys = (function () {
+          	var keys;
+
+          	if (typeof CSS2Properties !== "undefined") {
+          		// why hello Firefox
+          		keys = Object.keys(CSS2Properties.prototype);
+          	} else {
+          		keys = Object.keys(document.createElement("div").style).filter(function (k) {
+          			return ! ~BLACKLIST.indexOf(k);
+          		});
+          	}
+
+          	return keys;
+          })();
+
+          function cloneNode(node) {
+          	var style, clone, len, i, attr;
+
+          	clone = node.cloneNode();
+
+          	if (node.nodeType === 1) {
+          		style = window.getComputedStyle(node);
+
+          		styleKeys.forEach(function (prop) {
+          			clone.style[prop] = style[prop];
+          		});
+
+          		len = node.attributes.length;
+          		for (i = 0; i < len; i += 1) {
+          			attr = node.attributes[i];
+          			clone.setAttribute(attr.name, attr.value);
+          		}
+
+          		len = node.childNodes.length;
+          		for (i = 0; i < len; i += 1) {
+          			clone.appendChild(cloneNode(node.childNodes[i]));
+          		}
+          	}
+
+          	return clone;
+          }
+
+          var svgns = "http://www.w3.org/2000/svg";
+          var svg = document.createElementNS(svgns, "svg");
+
+          svg.style.position = "fixed";
+          svg.style.top = svg.style.left = "0";
+          svg.style.width = svg.style.height = "100%";
+          svg.style.overflow = "visible";
+          svg.style.pointerEvents = "none";
+          svg.setAttribute("class", "mogrify-svg");
+
+          document.body.appendChild(svg);
+
+          function processNode(node) {
+          	var target, style, bcr, clone, i, len, child, ctm;
+
+          	bcr = node.getBoundingClientRect();
+          	style = window.getComputedStyle(node);
+
+          	clone = node.cloneNode();
+          	styleKeys.forEach(function (prop) {
+          		clone.style[prop] = style[prop];
+          	});
+
+          	clone.style.position = "fixed";
+          	clone.style.top = bcr.top - parseInt(style.marginTop, 10) + "px";
+          	clone.style.left = bcr.left - parseInt(style.marginLeft, 10) + "px";
+
+          	// clone children recursively. We don't do this at the top level, because we want
+          	// to use the reference to `style`
+          	len = node.childNodes.length;
+          	for (i = 0; i < len; i += 1) {
+          		child = cloneNode(node.childNodes[i]);
+          		clone.appendChild(child);
+          	}
+
+          	target = {
+          		node: node,
+          		bcr: bcr,
+          		clone: clone,
+          		cx: (bcr.left + bcr.right) / 2,
+          		cy: (bcr.top + bcr.bottom) / 2,
+          		width: bcr.right - bcr.left,
+          		height: bcr.bottom - bcr.top,
+          		isSvg: node.namespaceURI === svgns
+          	};
+
+          	if (target.isSvg) {
+          		ctm = node.getScreenCTM();
+          		target.transform = "matrix(" + [ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f].join(",") + ")";
+
+          		svg.appendChild(clone);
+          	} else {
+          		target.transform = ""; // TODO...?
+          		node.parentNode.appendChild(clone);
+          	}
+
+          	return target;
+          }
 
-	var easing = {
-		linear: function (pos) {
-			return pos;
-		},
-		easeIn: function (pos) {
-			return Math.pow(pos, 3);
-		},
-		easeOut: function (pos) {
-			return Math.pow(pos - 1, 3) + 1;
-		},
-		easeInOut: function (pos) {
-			if ((pos /= 0.5) < 1) {
-				return 0.5 * Math.pow(pos, 3);
-			}
-			return 0.5 * (Math.pow(pos - 2, 3) + 2);
-		}
-	};
+          function getTransform(isSvg, cx, cy, dx, dy, dsx, dsy, t) {
+          	if (isSvg) {
+          		return "translate(" + cx + "px," + cy + "px) scale(" + (1 + t * dsx) + "," + (1 + t * dsy) + ") translate(-" + cx + "px,-" + cy + "px) translate(" + t * dx + "px," + t * dy + "px)";
+          	}
 
-	function getEasing(nameOrFn) {
-		if (!nameOrFn) {
-			return easing.easeOut;
-		}
-
-		if (typeof nameOrFn === "function") {
-			return nameOrFn;
-		}
+          	return "translate(" + t * dx + "px," + t * dy + "px) scale(" + (1 + t * dsx) + "," + (1 + t * dsy) + ")";
+          }
 
-		if (typeof nameOrFn === "string" && easing[nameOrFn]) {
-			return easing[nameOrFn];
-		}
+          var easing = {
+          	linear: function (pos) {
+          		return pos;
+          	},
+          	easeIn: function (pos) {
+          		return Math.pow(pos, 3);
+          	},
+          	easeOut: function (pos) {
+          		return Math.pow(pos - 1, 3) + 1;
+          	},
+          	easeInOut: function (pos) {
+          		if ((pos /= 0.5) < 1) {
+          			return 0.5 * Math.pow(pos, 3);
+          		}
+          		return 0.5 * (Math.pow(pos - 2, 3) + 2);
+          	}
+          };
 
-		throw new Error("Could not find easing function");
-	}
+          function getEasing(nameOrFn) {
+          	if (!nameOrFn) {
+          		return easing.easeOut;
+          	}
 
-	function mogrifyWithTimer(from, to, options) {
-		var dx = to.cx - from.cx;
-		var dy = to.cy - from.cy;
+          	if (typeof nameOrFn === "function") {
+          		return nameOrFn;
+          	}
 
-		var dsxf = to.width / from.width - 1;
-		var dsyf = to.height / from.height - 1;
+          	if (typeof nameOrFn === "string" && easing[nameOrFn]) {
+          		return easing[nameOrFn];
+          	}
 
-		var dsxt = from.width / to.width - 1;
-		var dsyt = from.height / to.height - 1;
+          	throw new Error("Could not find easing function");
+          }
 
-		var startTime = Date.now();
-		var duration = options.duration || 400;
-		var easing = getEasing(options.easing);
+          var rAF = window.requestAnimationFrame || window.webkitRequestAnimationFrame || function (fn) {
+                    return setTimeout(fn, 16);
+          };
 
-		function tick() {
-			var timeNow, elapsed, t, cx, cy, fromTransform, toTransform;
+          function mogrifyWithTimer(from, to, options) {
+          	var dx = to.cx - from.cx;
+          	var dy = to.cy - from.cy;
 
-			timeNow = Date.now();
-			elapsed = timeNow - startTime;
+          	var dsxf = to.width / from.width - 1;
+          	var dsyf = to.height / from.height - 1;
 
-			if (elapsed > duration) {
-				from.clone.parentNode.removeChild(from.clone);
-				to.clone.parentNode.removeChild(to.clone);
+          	var dsxt = from.width / to.width - 1;
+          	var dsyt = from.height / to.height - 1;
 
-				if (options.done) {
-					options.done();
-				}
+          	var startTime = Date.now();
+          	var duration = options.duration || 400;
+          	var easing = getEasing(options.easing);
 
-				return;
-			}
+          	function tick() {
+          		var timeNow, elapsed, t, cx, cy, fromTransform, toTransform;
 
-			t = easing(elapsed / duration);
-
-			from.clone.style.opacity = 1 - t;
-			to.clone.style.opacity = t;
+          		timeNow = Date.now();
+          		elapsed = timeNow - startTime;
 
-			cx = from.cx + dx * t;
-			cy = from.cy + dy * t;
+          		if (elapsed > duration) {
+          			from.clone.parentNode.removeChild(from.clone);
+          			to.clone.parentNode.removeChild(to.clone);
 
-			fromTransform = getTransform(from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t) + " " + from.transform;
-			toTransform = getTransform(to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t) + " " + to.transform;
+          			if (options.done) {
+          				options.done();
+          			}
 
-			from.clone.style.transform = from.clone.style.webkitTransform = fromTransform;
-			to.clone.style.transform = to.clone.style.webkitTransform = toTransform;
-
-			requestAnimationFrame(tick);
-		}
+          			return;
+          		}
 
-		tick();
-	}
+          		t = easing(elapsed / duration);
 
-	var div = document.createElement("div");
-	var keyframesSupported = true;
+          		from.clone.style.opacity = 1 - t;
+          		to.clone.style.opacity = t;
 
-	var TRANSFORM, KEYFRAMES, ANIMATION_DIRECTION, ANIMATION_DURATION, ANIMATION_ITERATION_COUNT, ANIMATION_NAME, ANIMATION_TIMING_FUNCTION, ANIMATION_END;
+          		cx = from.cx + dx * t;
+          		cy = from.cy + dy * t;
 
-	if (("transform" in div.style || "webkitTransform" in div.style) && ("animation" in div.style || "webkitAnimation" in div.style)) {
-		keyframesSupported = true;
+          		fromTransform = getTransform(from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t) + " " + from.transform;
+          		toTransform = getTransform(to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t) + " " + to.transform;
 
-		TRANSFORM = "transform" in div.style ? "transform" : "webkitTransform";
+          		from.clone.style.transform = from.clone.style.webkitTransform = fromTransform;
+          		to.clone.style.transform = to.clone.style.webkitTransform = toTransform;
 
-		if ("animation" in div.style) {
-			KEYFRAMES = "@keyframes";
+          		rAF(tick);
+          	}
 
-			ANIMATION_DIRECTION = "animation-direction";
-			ANIMATION_DURATION = "animation-duration";
-			ANIMATION_ITERATION_COUNT = "animation-iteration-count";
-			ANIMATION_NAME = "animation-name";
-			ANIMATION_TIMING_FUNCTION = "animation-timing-function";
+          	tick();
+          }
 
-			ANIMATION_END = "animationend";
-		} else {
-			KEYFRAMES = "@-webkit-keyframes";
+          var div = document.createElement("div");
+          var keyframesSupported = true;
 
-			ANIMATION_DIRECTION = "-webkit-animation-direction";
-			ANIMATION_DURATION = "-webkit-animation-duration";
-			ANIMATION_ITERATION_COUNT = "-webkit-animation-iteration-count";
-			ANIMATION_NAME = "-webkit-animation-name";
-			ANIMATION_TIMING_FUNCTION = "-webkit-animation-timing-function";
+          var TRANSFORM, KEYFRAMES, ANIMATION_DIRECTION, ANIMATION_DURATION, ANIMATION_ITERATION_COUNT, ANIMATION_NAME, ANIMATION_TIMING_FUNCTION, ANIMATION_END;
 
-			ANIMATION_END = "webkitAnimationEnd";
-		}
-	} else {
-		keyframesSupported = false;
-	}
+          if (("transform" in div.style || "webkitTransform" in div.style) && ("animation" in div.style || "webkitAnimation" in div.style)) {
+          	keyframesSupported = true;
 
-	function mogrifyWithKeyframes(from, to, options) {
-		var _getKeyframes = getKeyframes(from, to, options);
+          	TRANSFORM = "transform" in div.style ? "transform" : "-webkit-transform";
 
-		var fromKeyframes = _getKeyframes.fromKeyframes;
-		var toKeyframes = _getKeyframes.toKeyframes;
+          	if ("animation" in div.style) {
+          		KEYFRAMES = "@keyframes";
 
+          		ANIMATION_DIRECTION = "animation-direction";
+          		ANIMATION_DURATION = "animation-duration";
+          		ANIMATION_ITERATION_COUNT = "animation-iteration-count";
+          		ANIMATION_NAME = "animation-name";
+          		ANIMATION_TIMING_FUNCTION = "animation-timing-function";
 
-		var css = "" + KEYFRAMES + " abc { " + fromKeyframes + " } " + KEYFRAMES + " def { " + toKeyframes + " }";
-		var dispose = addCss(css);
+          		ANIMATION_END = "animationend";
+          	} else {
+          		KEYFRAMES = "@-webkit-keyframes";
 
-		from.clone.style[ANIMATION_DIRECTION] = "alternate";
-		from.clone.style[ANIMATION_DURATION] = "" + options.duration / 1000 + "s";
-		from.clone.style[ANIMATION_ITERATION_COUNT] = 1;
-		from.clone.style[ANIMATION_NAME] = "abc";
-		from.clone.style[ANIMATION_TIMING_FUNCTION] = "linear";
+          		ANIMATION_DIRECTION = "-webkit-animation-direction";
+          		ANIMATION_DURATION = "-webkit-animation-duration";
+          		ANIMATION_ITERATION_COUNT = "-webkit-animation-iteration-count";
+          		ANIMATION_NAME = "-webkit-animation-name";
+          		ANIMATION_TIMING_FUNCTION = "-webkit-animation-timing-function";
 
-		to.clone.style[ANIMATION_DIRECTION] = "alternate";
-		to.clone.style[ANIMATION_DURATION] = "" + options.duration / 1000 + "s";
-		to.clone.style[ANIMATION_ITERATION_COUNT] = 1;
-		to.clone.style[ANIMATION_NAME] = "def";
-		to.clone.style[ANIMATION_TIMING_FUNCTION] = "linear";
+          		ANIMATION_END = "webkitAnimationEnd";
+          	}
+          } else {
+          	keyframesSupported = false;
+          }
 
-		var fromDone, toDone;
+          console.log("TRANSFORM", TRANSFORM);
+          console.log("KEYFRAMES", KEYFRAMES);
+          console.log("ANIMATION_END", ANIMATION_END);
 
-		function done() {
-			if (fromDone && toDone) {
-				from.clone.parentNode.removeChild(from.clone);
-				to.clone.parentNode.removeChild(to.clone);
+          function mogrifyWithKeyframes(from, to, options) {
+          	var _getKeyframes = getKeyframes(from, to, options);
 
-				if (options.done) options.done();
+          	var fromKeyframes = _getKeyframes.fromKeyframes;
+          	var toKeyframes = _getKeyframes.toKeyframes;
 
-				dispose();
-			}
-		}
 
-		from.clone.addEventListener(ANIMATION_END, function () {
-			fromDone = true;
-			done();
-		});
+          	var css = "" + KEYFRAMES + " abc { " + fromKeyframes + " } " + KEYFRAMES + " def { " + toKeyframes + " }";
+          	var dispose = addCss(css);
 
-		to.clone.addEventListener(ANIMATION_END, function () {
-			toDone = true;
-			done();
-		});
-	}function addCss(css) {
-		var styleElement = document.createElement("style");
-		styleElement.type = "text/css";
+          	from.clone.style[ANIMATION_DIRECTION] = "alternate";
+          	from.clone.style[ANIMATION_DURATION] = "" + options.duration / 1000 + "s";
+          	from.clone.style[ANIMATION_ITERATION_COUNT] = 1;
+          	from.clone.style[ANIMATION_NAME] = "abc";
+          	from.clone.style[ANIMATION_TIMING_FUNCTION] = "linear";
 
-		var head = document.getElementsByTagName("head")[0];
+          	to.clone.style[ANIMATION_DIRECTION] = "alternate";
+          	to.clone.style[ANIMATION_DURATION] = "" + options.duration / 1000 + "s";
+          	to.clone.style[ANIMATION_ITERATION_COUNT] = 1;
+          	to.clone.style[ANIMATION_NAME] = "def";
+          	to.clone.style[ANIMATION_TIMING_FUNCTION] = "linear";
 
-		// Internet Exploder won't let you use styleSheet.innerHTML - we have to
-		// use styleSheet.cssText instead
-		var styleSheet = styleElement.styleSheet;
+          	var fromDone, toDone;
 
-		if (styleSheet) {
-			styleSheet.cssText = css;
-		} else {
-			styleElement.innerHTML = css;
-		}
+          	function done() {
+          		if (fromDone && toDone) {
+          			from.clone.parentNode.removeChild(from.clone);
+          			to.clone.parentNode.removeChild(to.clone);
 
-		head.appendChild(styleElement);
+          			if (options.done) options.done();
 
-		return function () {
-			return head.removeChild(styleElement);
-		};
-	}
+          			dispose();
+          		}
+          	}
 
-	function getKeyframes(from, to, options) {
-		var dx = to.cx - from.cx;
-		var dy = to.cy - from.cy;
+          	from.clone.addEventListener(ANIMATION_END, function () {
+          		fromDone = true;
+          		done();
+          	});
 
-		var dsxf = to.width / from.width - 1;
-		var dsyf = to.height / from.height - 1;
+          	to.clone.addEventListener(ANIMATION_END, function () {
+          		toDone = true;
+          		done();
+          	});
+          }function addCss(css) {
+          	var styleElement = document.createElement("style");
+          	styleElement.type = "text/css";
 
-		var dsxt = from.width / to.width - 1;
-		var dsyt = from.height / to.height - 1;
+          	var head = document.getElementsByTagName("head")[0];
 
-		var easing = getEasing(options.easing);
+          	// Internet Exploder won't let you use styleSheet.innerHTML - we have to
+          	// use styleSheet.cssText instead
+          	var styleSheet = styleElement.styleSheet;
 
-		var numFrames = options.duration / 50; // one keyframe per 50ms is probably enough... this may prove not to be the case though
+          	if (styleSheet) {
+          		styleSheet.cssText = css;
+          	} else {
+          		styleElement.innerHTML = css;
+          	}
 
-		var fromKeyframes = [];
-		var toKeyframes = [];
-		var i;
+          	head.appendChild(styleElement);
 
-		for (i = 0; i < numFrames; i += 1) {
-			var pc = 100 * (i / numFrames);
-			var t = easing(i / numFrames);
+          	return function () {
+          		return head.removeChild(styleElement);
+          	};
+          }
 
-			var _cx = from.cx + dx * t;
-			var _cy = from.cy + dy * t;
+          function getKeyframes(from, to, options) {
+          	var dx = to.cx - from.cx;
+          	var dy = to.cy - from.cy;
 
-			var _fromTransform = getTransform(from.isSvg, _cx, _cy, dx, dy, dsxf, dsyf, t) + " " + from.transform;
-			var _toTransform = getTransform(to.isSvg, _cx, _cy, -dx, -dy, dsxt, dsyt, 1 - t) + " " + to.transform;
+          	var dsxf = to.width / from.width - 1;
+          	var dsyf = to.height / from.height - 1;
 
-			fromKeyframes.push("" + pc + "% { opacity: " + (1 - t) + "; " + TRANSFORM + ": " + _fromTransform + "; }");
-			toKeyframes.push("" + pc + "% { opacity: " + t + "; " + TRANSFORM + ": " + _toTransform + "; }");
-		}
+          	var dsxt = from.width / to.width - 1;
+          	var dsyt = from.height / to.height - 1;
 
-		var cx = from.cx + dx;
-		var cy = from.cy + dy;
+          	var easing = getEasing(options.easing);
 
-		var fromTransform = getTransform(from.isSvg, cx, cy, dx, dy, dsxf, dsyf, 1) + " " + from.transform;
-		var toTransform = getTransform(to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 0) + " " + to.transform;
+          	var numFrames = options.duration / 50; // one keyframe per 50ms is probably enough... this may prove not to be the case though
 
-		fromKeyframes.push("100% { opacity: 0; " + TRANSFORM + ": " + fromTransform + "; }");
-		toKeyframes.push("100% { opacity: 1; " + TRANSFORM + ": " + toTransform + "; }");
+          	var fromKeyframes = [];
+          	var toKeyframes = [];
+          	var i;
 
-		fromKeyframes = fromKeyframes.join("\n");
-		toKeyframes = toKeyframes.join("\n");
+          	for (i = 0; i < numFrames; i += 1) {
+          		var pc = 100 * (i / numFrames);
+          		var t = easing(i / numFrames);
 
-		return { fromKeyframes: fromKeyframes, toKeyframes: toKeyframes };
-	}
+          		var _cx = from.cx + dx * t;
+          		var _cy = from.cy + dy * t;
 
-	function mogrify(fromNode, toNode) {
-		var options = arguments[2] === undefined ? {} : arguments[2];
-		var from, to;
+          		var _fromTransform = getTransform(from.isSvg, _cx, _cy, dx, dy, dsxf, dsyf, t) + " " + from.transform;
+          		var _toTransform = getTransform(to.isSvg, _cx, _cy, -dx, -dy, dsxt, dsyt, 1 - t) + " " + to.transform;
 
-		if (typeof options === "function") {
-			options = { done: options };
-		}
+          		fromKeyframes.push("" + pc + "% { opacity: " + (1 - t) + "; " + TRANSFORM + ": " + _fromTransform + "; }");
+          		toKeyframes.push("" + pc + "% { opacity: " + t + "; " + TRANSFORM + ": " + _toTransform + "; }");
+          	}
 
-		from = processNode(fromNode);
-		to = processNode(toNode);
+          	var cx = from.cx + dx;
+          	var cy = from.cy + dy;
 
-		if (!keyframesSupported || options.useTimer) {
-			mogrifyWithTimer(from, to, options);
-		} else {
-			mogrifyWithKeyframes(from, to, options);
-		}
-	}
+          	var fromTransform = getTransform(from.isSvg, cx, cy, dx, dy, dsxf, dsyf, 1) + " " + from.transform;
+          	var toTransform = getTransform(to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 0) + " " + to.transform;
 
-	mogrify.easing = easing; // expose this so we can add to it
+          	fromKeyframes.push("100% { opacity: 0; " + TRANSFORM + ": " + fromTransform + "; }");
+          	toKeyframes.push("100% { opacity: 1; " + TRANSFORM + ": " + toTransform + "; }");
 
-	return mogrify;
+          	fromKeyframes = fromKeyframes.join("\n");
+          	toKeyframes = toKeyframes.join("\n");
+
+          	return { fromKeyframes: fromKeyframes, toKeyframes: toKeyframes };
+          }
+
+          function mogrify(fromNode, toNode) {
+          	var options = arguments[2] === undefined ? {} : arguments[2];
+          	var from, to;
+
+          	if (typeof options === "function") {
+          		options = { done: options };
+          	}
+
+          	from = processNode(fromNode);
+          	to = processNode(toNode);
+
+          	if (!keyframesSupported || options.useTimer) {
+          		mogrifyWithTimer(from, to, options);
+          	} else {
+          		mogrifyWithKeyframes(from, to, options);
+          	}
+          }
+
+          mogrify.easing = easing; // expose this so we can add to it
+
+          return mogrify;
 
 }));
