@@ -33,8 +33,4 @@ if ( ( 'transform' in div.style || 'webkitTransform' in div.style ) && ( 'animat
 	keyframesSupported = false;
 }
 
-console.log( 'TRANSFORM', TRANSFORM );
-console.log( 'KEYFRAMES', KEYFRAMES );
-console.log( 'ANIMATION_END', ANIMATION_END );
-
 export { keyframesSupported, TRANSFORM, KEYFRAMES, ANIMATION_DIRECTION, ANIMATION_DURATION, ANIMATION_ITERATION_COUNT, ANIMATION_NAME, ANIMATION_TIMING_FUNCTION, ANIMATION_END };
