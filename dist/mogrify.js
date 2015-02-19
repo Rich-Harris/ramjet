@@ -240,10 +240,6 @@
           	keyframesSupported = false;
           }
 
-          console.log("TRANSFORM", TRANSFORM);
-          console.log("KEYFRAMES", KEYFRAMES);
-          console.log("ANIMATION_END", ANIMATION_END);
-
           function mogrifyWithKeyframes(from, to, options) {
           	var _getKeyframes = getKeyframes(from, to, options);
 
@@ -373,6 +369,40 @@
           		mogrifyWithTimer(from, to, options);
           	} else {
           		mogrifyWithKeyframes(from, to, options);
+          	}
+          }
+
+          mogrify.hide = function () {
+          	for (var _len = arguments.length, nodes = Array(_len), _key = 0; _key < _len; _key++) {
+          		nodes[_key] = arguments[_key];
+          	}
+
+          	nodes.forEach(hideNode);
+          };
+
+          function hideNode(node) {
+          	node.__mogrifyOriginalTransition__ = node.style.transition;
+          	node.style.transition = "";
+
+          	node.style.opacity = 0;
+          }
+
+          mogrify.show = function () {
+          	for (var _len = arguments.length, nodes = Array(_len), _key = 0; _key < _len; _key++) {
+          		nodes[_key] = arguments[_key];
+          	}
+
+          	nodes.forEach(showNode);
+          };
+
+          function showNode(node) {
+          	node.style.transition = "";
+          	node.style.opacity = 1;
+
+          	if (node.__mogrifyOriginalTransition__) {
+          		setTimeout(function () {
+          			node.style.transition = node.__mogrifyOriginalTransition__;
+          		});
           	}
           }
 

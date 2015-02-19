@@ -23,4 +23,30 @@ function mogrify ( fromNode, toNode, options = {} ) {
 	}
 }
 
+mogrify.hide = ( ...nodes ) => {
+	nodes.forEach( hideNode );
+};
+
+function hideNode ( node ) {
+	node.__mogrifyOriginalTransition__ = node.style.transition;
+	node.style.transition = '';
+
+	node.style.opacity = 0;
+}
+
+mogrify.show = ( ...nodes ) => {
+	nodes.forEach( showNode );
+};
+
+function showNode ( node ) {
+	node.style.transition = '';
+	node.style.opacity = 1;
+
+	if ( node.__mogrifyOriginalTransition__ ) {
+		setTimeout( () => {
+			node.style.transition = node.__mogrifyOriginalTransition__;
+		});
+	}
+}
+
 mogrify.easing = easing; // expose this so we can add to it
