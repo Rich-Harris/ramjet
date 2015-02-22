@@ -1,5 +1,9 @@
 # changelog
 
+## 0.3.2
+
+* Use camel-cased style properties (`animationName` instead of `animation-name`), for the benefit of older Firefox
+
 ## 0.3.1
 
 * Add `mogrify.show()` and `mogrify.hide()` convenience methods
