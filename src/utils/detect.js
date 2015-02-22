@@ -11,21 +11,21 @@ if ( ( 'transform' in div.style || 'webkitTransform' in div.style ) && ( 'animat
 	if ( 'animation' in div.style ) {
 		KEYFRAMES = '@keyframes';
 
-		ANIMATION_DIRECTION       = 'animation-direction';
-		ANIMATION_DURATION        = 'animation-duration';
-		ANIMATION_ITERATION_COUNT = 'animation-iteration-count';
-		ANIMATION_NAME            = 'animation-name';
-		ANIMATION_TIMING_FUNCTION = 'animation-timing-function';
+		ANIMATION_DIRECTION       = 'animationDirection';
+		ANIMATION_DURATION        = 'animationDuration';
+		ANIMATION_ITERATION_COUNT = 'animationIterationCount';
+		ANIMATION_NAME            = 'animationName';
+		ANIMATION_TIMING_FUNCTION = 'animationTimingFunction';
 
 		ANIMATION_END             = 'animationend';
 	} else {
 		KEYFRAMES = '@-webkit-keyframes';
 
-		ANIMATION_DIRECTION       = '-webkit-animation-direction';
-		ANIMATION_DURATION        = '-webkit-animation-duration';
-		ANIMATION_ITERATION_COUNT = '-webkit-animation-iteration-count';
-		ANIMATION_NAME            = '-webkit-animation-name';
-		ANIMATION_TIMING_FUNCTION = '-webkit-animation-timing-function';
+		ANIMATION_DIRECTION       = 'webkitAnimationDirection';
+		ANIMATION_DURATION        = 'webkitAnimationDuration';
+		ANIMATION_ITERATION_COUNT = 'webkitAnimationIterationCount';
+		ANIMATION_NAME            = 'webkitAnimationName';
+		ANIMATION_TIMING_FUNCTION = 'webkitAnimationTimingFunction';
 
 		ANIMATION_END             = 'webkitAnimationEnd';
 	}

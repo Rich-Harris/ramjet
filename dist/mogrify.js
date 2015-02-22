@@ -218,21 +218,21 @@
           	if ("animation" in div.style) {
           		KEYFRAMES = "@keyframes";
 
-          		ANIMATION_DIRECTION = "animation-direction";
-          		ANIMATION_DURATION = "animation-duration";
-          		ANIMATION_ITERATION_COUNT = "animation-iteration-count";
-          		ANIMATION_NAME = "animation-name";
-          		ANIMATION_TIMING_FUNCTION = "animation-timing-function";
+          		ANIMATION_DIRECTION = "animationDirection";
+          		ANIMATION_DURATION = "animationDuration";
+          		ANIMATION_ITERATION_COUNT = "animationIterationCount";
+          		ANIMATION_NAME = "animationName";
+          		ANIMATION_TIMING_FUNCTION = "animationTimingFunction";
 
           		ANIMATION_END = "animationend";
           	} else {
           		KEYFRAMES = "@-webkit-keyframes";
 
-          		ANIMATION_DIRECTION = "-webkit-animation-direction";
-          		ANIMATION_DURATION = "-webkit-animation-duration";
-          		ANIMATION_ITERATION_COUNT = "-webkit-animation-iteration-count";
-          		ANIMATION_NAME = "-webkit-animation-name";
-          		ANIMATION_TIMING_FUNCTION = "-webkit-animation-timing-function";
+          		ANIMATION_DIRECTION = "webkitAnimationDirection";
+          		ANIMATION_DURATION = "webkitAnimationDuration";
+          		ANIMATION_ITERATION_COUNT = "webkitAnimationIterationCount";
+          		ANIMATION_NAME = "webkitAnimationName";
+          		ANIMATION_TIMING_FUNCTION = "webkitAnimationTimingFunction";
 
           		ANIMATION_END = "webkitAnimationEnd";
           	}
@@ -247,19 +247,22 @@
           	var toKeyframes = _getKeyframes.toKeyframes;
 
 
-          	var css = "" + KEYFRAMES + " abc { " + fromKeyframes + " } " + KEYFRAMES + " def { " + toKeyframes + " }";
+          	var fromId = "_" + ~ ~(Math.random() * 1000000);
+          	var toId = "_" + ~ ~(Math.random() * 1000000);
+
+          	var css = "" + KEYFRAMES + " " + fromId + " { " + fromKeyframes + " } " + KEYFRAMES + " " + toId + " { " + toKeyframes + " }";
           	var dispose = addCss(css);
 
           	from.clone.style[ANIMATION_DIRECTION] = "alternate";
           	from.clone.style[ANIMATION_DURATION] = "" + options.duration / 1000 + "s";
           	from.clone.style[ANIMATION_ITERATION_COUNT] = 1;
-          	from.clone.style[ANIMATION_NAME] = "abc";
+          	from.clone.style[ANIMATION_NAME] = fromId;
           	from.clone.style[ANIMATION_TIMING_FUNCTION] = "linear";
 
           	to.clone.style[ANIMATION_DIRECTION] = "alternate";
           	to.clone.style[ANIMATION_DURATION] = "" + options.duration / 1000 + "s";
           	to.clone.style[ANIMATION_ITERATION_COUNT] = 1;
-          	to.clone.style[ANIMATION_NAME] = "def";
+          	to.clone.style[ANIMATION_NAME] = toId;
           	to.clone.style[ANIMATION_TIMING_FUNCTION] = "linear";
 
           	var fromDone, toDone;
