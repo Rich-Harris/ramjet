@@ -1,7 +1,14 @@
-var div = document.createElement( 'div' );
-var keyframesSupported = true;
+const div = document.createElement( 'div' );
 
-var TRANSFORM, KEYFRAMES, ANIMATION_DIRECTION, ANIMATION_DURATION, ANIMATION_ITERATION_COUNT, ANIMATION_NAME, ANIMATION_TIMING_FUNCTION, ANIMATION_END;
+let keyframesSupported = true;
+let TRANSFORM;
+let KEYFRAMES;
+let ANIMATION_DIRECTION;
+let ANIMATION_DURATION;
+let ANIMATION_ITERATION_COUNT;
+let ANIMATION_NAME;
+let ANIMATION_TIMING_FUNCTION;
+let ANIMATION_END;
 
 if ( ( 'transform' in div.style || 'webkitTransform' in div.style ) && ( 'animation' in div.style || 'webkitAnimation' in div.style ) ) {
 	keyframesSupported = true;
@@ -33,4 +40,14 @@ if ( ( 'transform' in div.style || 'webkitTransform' in div.style ) && ( 'animat
 	keyframesSupported = false;
 }
 
-export { keyframesSupported, TRANSFORM, KEYFRAMES, ANIMATION_DIRECTION, ANIMATION_DURATION, ANIMATION_ITERATION_COUNT, ANIMATION_NAME, ANIMATION_TIMING_FUNCTION, ANIMATION_END };
+export {
+	keyframesSupported,
+	TRANSFORM,
+	KEYFRAMES,
+	ANIMATION_DIRECTION,
+	ANIMATION_DURATION,
+	ANIMATION_ITERATION_COUNT,
+	ANIMATION_NAME,
+	ANIMATION_TIMING_FUNCTION,
+	ANIMATION_END
+};

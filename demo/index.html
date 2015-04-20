@@ -2,107 +2,190 @@
 <html>
 <head>
 	<meta charset='utf8'>
-	<title>mogrify</title>
+	<title>ramjet</title>
 
 	<style>
-		.upper-container {
-			width: 100%;
-			height: 200px;
+		body {
+			font-family: 'Helvetica Neue', arial;
 		}
 
-		.lower-container {
-			width: 100%;
-			height: 200px;
-			padding: 0 0 0 200px;
-			box-sizing: border-box;
+		h1 {
+			font-weight: 200;
 		}
 
-		p {
-			display: inline-block;
+		ul {
+			padding: 0;
+			list-style: none;
 		}
 
-		#one {
-			color: blue;
-		}
-
-		#two {
+		li {
 			color: white;
-			background-color: red;
-			font-size: 2em;
-			visibility: hidden;
-			border-radius: 20px;
-			padding: 20px;
+			display: inline-block;
+			text-align: center;
+			padding: 0.5em;
+			width: 1em;
+			height: 1em;
+			line-height: 1;
+			font-weight: bold;
+			border: 1px solid;
+			cursor: pointer;
 		}
 
-		#three {
-			position: absolute;
-			right: 50px;
-			top: 50px;
-			visibility: hidden;
-			width: 400px;
+		.detail {
+			max-width: 40em;
+			height: 20em;
+		}
+
+		article {
+			background-color: #e6e6e6;
+			font-weight: 200;
+			padding: 1em;
+			display: none;
+			color: white;
 		}
 	</style>
 </head>
 
 <body>
 
-	<div class='upper-container'>
-		<p id='one'>this is the first element</p>
-	</div>
+	<h1>ramjet</h1>
 
-	<div class='lower-container'>
-		<p id='two'>this is the second element,<br data-foo='foo' data-bar='bar'> which is a completely different shape</p>
-	</div>
+	<label>
+		<input type='checkbox'>
+		slow motion
+	</label>
 
-	<img id='three' src='llama.jpg'>
+	<main>
+		<ul>
+			<li data-id='1' data-color='rgb(24, 188, 156)'>1</li>
+			<li data-id='2' data-color='rgb(52, 152, 219)'>2</li>
+			<li data-id='3' data-color='rgb(243, 156, 18)'>3</li>
+			<li data-id='4' data-color='rgb(231, 76, 60)'>4</li>
+			<li data-id='5' data-color='rgb(44, 62, 80)'>5</li>
+		</ul>
 
-	<script src='/dist/mogrify.js'></script>
+		<section class='detail'>
+			<article data-id='1'>
+				<strong>ramjet</strong> allows you to seamlessly transform one element into another, no matter where they sit in relation to each other in the DOM.
+			</article>
+
+			<article data-id='2'>
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+			</article>
+
+			<article data-id='3'>
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+			</article>
+
+			<article data-id='4'>
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+			</article>
+
+			<article data-id='5'>
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+			</article>
+		</section>
+	</main>
+
+	<script src='/dist/ramjet.js'></script>
 
 	<script>
-		var one = document.getElementById( 'one' ),
-			two = document.getElementById( 'two' ),
-			three = document.getElementById( 'three' );
+		[].slice.call( document.querySelectorAll( 'li' ) ).forEach( function ( li ) {
+			var article = $( 'article[data-id="' + li.getAttribute( 'data-id' ) + '"]' );
 
-		function oneToTwo () {
-			two.style.visibility = 'visible';
-			mogrify( one, two, {
-				duration: 4000,
+			li.style.backgroundColor = li.style.borderColor = article.style.backgroundColor = li.getAttribute( 'data-color' );
+		});
+
+		var selected = null;
+		var checkbox = $( 'input' );
+
+		function $ ( selector ) {
+			return document.querySelector( selector );
+		};
+
+		function select ( li ) {
+			var article = $( 'article[data-id="' + li.getAttribute( 'data-id' ) + '"]' );
+
+			article.style.display = 'block';
+
+			var transformation = ramjet.transform( li, article, {
+				duration: checkbox.checked ? 2000 : 400,
+				easing: ramjet.easeOut,
 				done: function () {
-					two.style.visibility = 'visible';
-					setTimeout( twoToThree, 1000 );
+					console.log( 'done' );
+					ramjet.show( article );
 				}
 			});
-			one.style.visibility = 'hidden';
-			two.style.visibility = 'hidden';
+
+			console.log( 'transformation', transformation );
+
+			ramjet.hide( article );
+
+			li.style.backgroundColor = 'white';
+
+			selected = li;
 		}
 
-		function twoToThree () {
-			three.style.visibility = 'visible';
-			mogrify( two, three, {
-				duration: 4000,
+		function deselect ( li ) {
+			var article = $( 'article[data-id="' + li.getAttribute( 'data-id' ) + '"]' );
+
+			li.style.backgroundColor = li.getAttribute( 'data-color' );
+
+			ramjet.transform( article, li, {
+				duration: checkbox.checked ? 2000 : 200,
+				easing: ramjet.easeOut,
 				done: function () {
-					three.style.visibility = 'visible';
-					setTimeout( threeToOne, 1000 );
+					li.style.backgroundColor = li.getAttribute( 'data-color' );
 				}
 			});
-			two.style.visibility = 'hidden';
-			three.style.visibility = 'hidden';
+
+			article.style.display = 'none';
+
+			li.style.backgroundColor = 'white';
 		}
 
-		function threeToOne () {
-			one.style.visibility = 'visible';
-			mogrify( three, one, {
-				duration: 4000,
-				done: function () {
-					one.style.visibility = 'visible';
-					setTimeout( oneToTwo, 1000 );
+		function findParent ( target, tagName ) {
+			do {
+				if ( target.tagName === tagName ) {
+					return target;
 				}
-			});
-			three.style.visibility = 'hidden';
-			one.style.visibility = 'hidden';
+
+				target = target.parentNode;
+			} while ( target );
+
+			return null;
 		}
 
-		setTimeout( oneToTwo, 1000 );
+		window.addEventListener( 'click', function ( event ) {
+			var li = findParent( event.target, 'LI' );
+
+			// special case
+			if ( li && ( li === selected ) ) {
+				deselect( li );
+				selected = null;
+				return;
+			}
+
+			if ( selected ) {
+				deselect( selected );
+
+				if ( li ) {
+					setTimeout( function () {
+						select( selected );
+					}, checkbox.checked ? 2000 : 200 );
+				}
+			}
+
+			else if ( li ) {
+				select( li );
+			}
+
+			selected = li;
+		});
+
+		setTimeout( function () {
+			select( document.querySelector( 'li' ) );
+		}, 1000 );
 	</script>
 </body>
 </html>

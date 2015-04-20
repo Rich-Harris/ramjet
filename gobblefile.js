@@ -8,8 +8,8 @@ module.exports = gobble( 'src' )
 	sourceMap: false
 })
 .transform( 'esperanto-bundle', {
-	entry: 'mogrify',
+	entry: 'ramjet',
 	type: 'umd',
-	name: 'mogrify',
+	name: 'ramjet',
 	sourceMap: false
 });
