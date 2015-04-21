@@ -1,0 +1,66 @@
+<section>
+	<h1>The illusion of movement</h1>
+
+	<p>By changing the display of the elements immediately before and after the transition, we can create the illusion that a single element is moving across the screen and into a different part of the DOM.</p>
+
+	<button on-tap='start' disabled='{{transitioning}}'>start</button>
+
+	<div class='a'><span>a</span></div>
+	<div class='b hidden'><span>b</span></div>
+</section>
+
+<style>
+	.a.hidden {
+		background: white;
+	}
+
+	.b.hidden {
+		background: white;
+	}
+</style>
+
+<script>
+	const ramjet = require( './ramjet' );
+	const tap = require( 'ractive-events-tap' );
+
+	component.exports = {
+		data: () => ({
+			transitioning: false
+		}),
+
+		onrender: function () {
+			const a = this.find( '.a' );
+			const b = this.find( '.b' );
+
+			let reverse = false;
+
+			this.on( 'start', () => {
+				if ( this.get( 'transitioning' ) ) return;
+
+				this.set( 'transitioning', true );
+
+				const from = reverse ? b : a;
+				const to = reverse ? a : b;
+
+				from.classList.remove( 'hidden' );
+				to.classList.remove( 'hidden' );
+
+				ramjet.transform( from, to, {
+					done: () => {
+						this.set( 'transitioning', false );
+
+						to.classList.remove( 'hidden' );
+						reverse = !reverse;
+					}
+				});
+
+				from.classList.add( 'hidden' );
+				to.classList.add( 'hidden' );
+			});
+		},
+
+		events: {
+			tap
+		}
+	};
+</script>

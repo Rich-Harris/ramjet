@@ -1,0 +1,85 @@
+<link rel='ractive' href='./BasicTransformation.html'>
+<link rel='ractive' href='./MovementIllusion.html'>
+<link rel='ractive' href='./Timing.html'>
+
+<BasicTransformation/>
+<MovementIllusion/>
+<Timing/>
+
+<style>
+	section h1 {
+		font-size: 2em;
+	}
+
+	section {
+		margin: 0 0 2em 0;
+	}
+
+	/* clearfix */
+	section:before,
+	section:after {
+		content: " ";
+		display: table;
+	}
+
+	section:after {
+		clear: both;
+	}
+
+	.a, .b {
+		position: relative;
+		width: 100px;
+		height: 100px;
+		border: 1px solid;
+		border-radius: 0.2rem;
+	}
+
+	.a span, .b span {
+		position: absolute;
+		display: block;
+		text-align: center;
+		width: 100%;
+		top: 50%;
+		color: white;
+		-webkit-transform: translate(0,-50%);
+		transform: translate(0,-50%);
+		font-size: 2em;
+	}
+
+	.a {
+		float: left;
+		background-color: #0074D9;
+		border-color: #0074D9;
+		background-image: url(noise.png);
+	}
+
+	.b {
+		float: right;
+		background-color: #01FF70;
+		border-color: #01FF70;
+		background-image: url(noise.png);
+	}
+
+	button {
+		display: block;
+		background-color: #999;
+		color: white;
+		border: none;
+		outline: none;
+		cursor: pointer;
+		font-family: inherit;
+		font-size: 1.2em;
+		padding: 0.5em 1em;
+		margin: 0 0.5em 0.5em 0;
+		border-radius: 0.2rem;
+		-webkit-transition: opacity 0.2s;
+		transition: opacity 0.2s;
+	}
+
+	button:disabled {
+		opacity: 0.2;
+		cursor: default;
+		-webkit-transition: none;
+		transition: none;
+	}
+</style>

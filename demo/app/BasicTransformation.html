@@ -1,0 +1,43 @@
+<section>
+	<h1>Transform your DOM elements</h1>
+
+	<p>Ramjet makes it looks as though one DOM element is capable of transforming into another, no matter where the two elements sit in the DOM tree.</p>
+
+	<p>It does so by making copies of the two elements (and all their children), setting a fixed position on each, then using CSS transforms to morph the two elements in sync.</p>
+
+	<button on-tap='start' disabled='{{transitioning}}'>start</button>
+	<div class='a'><span>a</span></div>
+	<div class='b'><span>b</span></div>
+</section>
+
+<script>
+	const ramjet = require( './ramjet' );
+	const tap = require( 'ractive-events-tap' );
+
+	component.exports = {
+		data: () => ({
+			transitioning: false
+		}),
+
+		onrender: function () {
+			const a = this.find( '.a' );
+			const b = this.find( '.b' );
+
+			this.on( 'start', () => {
+				if ( this.get( 'transitioning' ) ) return;
+
+				this.set( 'transitioning', true );
+
+				ramjet.transform( a, b, {
+					done: () => {
+						this.set( 'transitioning', false );
+					}
+				});
+			});
+		},
+
+		events: {
+			tap
+		}
+	};
+</script>
