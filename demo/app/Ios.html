@@ -1,6 +1,4 @@
 <section>
-	<h1>Size doesn't matter</h1>
-
 	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
 
 	<div class='container'>
@@ -84,6 +82,99 @@
 		url: 'https://creativecommons.org/licenses/by-nd/2.0/'
 	};
 
+	let images = [
+		{
+			color: '#001f3f',
+			id: '7863279376_fdfc66dee5_z',
+			url: 'https://www.flickr.com/photos/43428526@N03/7863279376',
+			license: BY
+		},
+		{
+			color: '#0074D9',
+			id: '6527537485_a10d95332a_z',
+			url: 'https://www.flickr.com/photos/25507134@N00/6527537485',
+			license: BY
+		},
+		{
+			color: '#7FDBFF',
+			id: '3354331318_a8764c5c6b_z',
+			url: 'https://www.flickr.com/photos/37707866@N00/3354331318',
+			license: BY
+		},
+		// {
+		// 	color: '#7FDBFF',
+		// 	id: '7050378839_a5ddebf64c_z',
+		// 	url: 'https://www.flickr.com/photos/12719710@N00/7050378839',
+		// 	license: {
+		// 		name: 'CC BY-SA 2.0',
+		// 		url: 'https://creativecommons.org/licenses/by-sa/2.0/'
+		// 	}
+		// },
+		{
+			color: '#39CCCC',
+			id: '4608886209_b00e405171_z',
+			url: 'https://www.flickr.com/photos/32751486@N00/4608886209',
+			license: BY_SA
+		},
+		{
+			color: '#3D9970',
+			id: '5548569010_bdb0623140_z',
+			url: 'https://www.flickr.com/photos/25483059@N08/5548569010',
+			license: BY
+		},
+		{
+			color: '#2ECC40',
+			id: '2447470760_53844a0359_o',
+			url: 'https://www.flickr.com/photos/8404611@N06/2447470760',
+			license: BY
+		},
+		{
+			color: '#01FF70',
+			id: '114428206_b7e5e87d2a_z',
+			url: 'https://www.flickr.com/photos/33917831@N00/114428206',
+			license: BY_SA
+		},
+		{
+			color: '#FFDC00',
+			id: '4818617089_bb60293550_z',
+			url: 'https://www.flickr.com/photos/46417125@N04/4818617089',
+			license: BY_ND
+		},
+		{
+			color: '#FF851B',
+			id: '3945496657_470f924759_z',
+			url: 'https://www.flickr.com/photos/56068058@N00/3945496657',
+			license: BY
+		},
+		{
+			color: '#FF4136',
+			id: '4216820032_9f2470f41b_z',
+			url: 'https://www.flickr.com/photos/31883499@N05/4216820032',
+			license: BY
+		},
+		{
+			color: '#85144b',
+			id: '2625506561_e3753e0fa8_z',
+			url: 'https://www.flickr.com/photos/8484971@N07/2625506561',
+			license: BY_ND
+		},
+		{
+			color: '#B10DC9',
+			id: '5385464371_c33ed491f6_z',
+			url: 'https://www.flickr.com/photos/58028312@N00/5385464371',
+			license: BY_ND
+		}
+	];
+
+	images.forEach( image => {
+		image.src = `images/${image.id}.jpg`;
+
+		// preload
+		new Image().src = image.src;
+	});
+
+
+
 	component.exports = {
 		data: () => ({
 			easingFunctions: Object.keys( eases ),
@@ -92,89 +183,7 @@
 			reverse: false,
 
 			// via http://labs.tineye.com/multicolr
-			items: [
-				{
-					color: '#001f3f',
-					id: '7863279376_fdfc66dee5_z',
-					url: 'https://www.flickr.com/photos/43428526@N03/7863279376',
-					license: BY
-				},
-				{
-					color: '#0074D9',
-					id: '6527537485_a10d95332a_z',
-					url: 'https://www.flickr.com/photos/25507134@N00/6527537485',
-					license: BY
-				},
-				{
-					color: '#7FDBFF',
-					id: '3354331318_a8764c5c6b_z',
-					url: 'https://www.flickr.com/photos/37707866@N00/3354331318',
-					license: BY
-				},
-				// {
-				// 	color: '#7FDBFF',
-				// 	id: '7050378839_a5ddebf64c_z',
-				// 	url: 'https://www.flickr.com/photos/12719710@N00/7050378839',
-				// 	license: {
-				// 		name: 'CC BY-SA 2.0',
-				// 		url: 'https://creativecommons.org/licenses/by-sa/2.0/'
-				// 	}
-				// },
-				{
-					color: '#39CCCC',
-					id: '4608886209_b00e405171_z',
-					url: 'https://www.flickr.com/photos/32751486@N00/4608886209',
-					license: BY_SA
-				},
-				{
-					color: '#3D9970',
-					id: '5548569010_bdb0623140_z',
-					url: 'https://www.flickr.com/photos/25483059@N08/5548569010',
-					license: BY
-				},
-				{
-					color: '#2ECC40',
-					id: '2447470760_53844a0359_o',
-					url: 'https://www.flickr.com/photos/8404611@N06/2447470760',
-					license: BY
-				},
-				{
-					color: '#01FF70',
-					id: '114428206_b7e5e87d2a_z',
-					url: 'https://www.flickr.com/photos/33917831@N00/114428206',
-					license: BY_SA
-				},
-				{
-					color: '#FFDC00',
-					id: '4818617089_bb60293550_z',
-					url: 'https://www.flickr.com/photos/46417125@N04/4818617089',
-					license: BY_ND
-				},
-				{
-					color: '#FF851B',
-					id: '3945496657_470f924759_z',
-					url: 'https://www.flickr.com/photos/56068058@N00/3945496657',
-					license: BY
-				},
-				{
-					color: '#FF4136',
-					id: '4216820032_9f2470f41b_z',
-					url: 'https://www.flickr.com/photos/31883499@N05/4216820032',
-					license: BY
-				},
-				{
-					color: '#85144b',
-					id: '2625506561_e3753e0fa8_z',
-					url: 'https://www.flickr.com/photos/8484971@N07/2625506561',
-					license: BY_ND
-				},
-				{
-					color: '#B10DC9',
-					id: '5385464371_c33ed491f6_z',
-					url: 'https://www.flickr.com/photos/58028312@N00/5385464371',
-					license: BY_ND
-				}
-			]
+			items: images
 		}),
 
 		select ( item ) {

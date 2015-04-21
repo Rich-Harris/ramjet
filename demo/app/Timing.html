@@ -5,7 +5,9 @@
 
 	<p>In supported browsers, ramjet uses CSS animations to make the transformation buttery smooth, even on mobile. It precalculates keyframes so that you can use any timing function you like, not just the limited ones built in to CSS.</p>
 
-	<pre><code>ramjet.transform({{from}}, {{to}}, {
+	<pre><code>var eases = require('eases');
+
+ramjet.transform({{from}}, {{to}}, {
   easing: eases.{{easing}},
   duration: {{duration}}
 });</code></pre>
@@ -45,8 +47,8 @@
 	component.exports = {
 		data: () => ({
 			easingFunctions: Object.keys( eases ),
-			easing: 'cubicOut',
-			duration: 400,
+			easing: 'elasticOut',
+			duration: 800,
 			reverse: false
 		}),
 
