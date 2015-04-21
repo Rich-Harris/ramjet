@@ -1,0 +1,29 @@
+@import 'fonts';
+
+body {
+	font-family: 'Source Sans Pro', 'Helvetica Neue', arial;
+	color: #333;
+	padding: 0 1em;
+	max-width: 48em;
+	margin: 0 auto;
+}
+
+h1 {
+	font-weight: 700;
+	font-size: 4em;
+	margin: 0 0 0.5em 0;
+}
+
+pre, code {
+	font-family: 'Inconsolata';
+}
+
+pre {
+	background-color: #f4f4f4;
+	background-image: url(noise.png);
+	padding: 1em;
+}
+
+main {
+
+}

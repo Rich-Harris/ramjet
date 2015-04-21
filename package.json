@@ -18,13 +18,14 @@
   },
   "devDependencies": {
     "eases": "^1.0.6",
-    "gobble": "^0.8.0",
+    "gobble": "^0.9.0",
     "gobble-babel": "^5.0.0",
     "gobble-browserify": "^0.3.0",
     "gobble-cli": "^0.3.5",
     "gobble-derequire": "^0.1.1",
     "gobble-esperanto-bundle": "^0.1.7",
     "gobble-ractive": "^0.2.0",
+    "gobble-sass": "^0.4.0",
     "ractive": "^0.7.2",
     "ractive-events-tap": "^0.2.0",
     "ractive-transitions-fade": "^0.2.0"

@@ -5,9 +5,14 @@
 
 	<p>It does so by making copies of the two elements (and all their children), setting a fixed position on each, then using CSS transforms to morph the two elements in sync.</p>
 
-	<button on-tap='start' disabled='{{transitioning}}'>start</button>
-	<div class='a'><span>a</span></div>
-	<div class='b'><span>b</span></div>
+	<pre><code>ramjet.transform( a, b );</code></pre>
+
+	<div class='demo' on-tap='start'>
+		<div class='a'><span>a</span></div>
+		<div class='b'><span>b</span></div>
+
+		<StartButton duration='400' paused='{{!transitioning}}'/>
+	</div>
 </section>
 
 <script>
