@@ -10,6 +10,10 @@ export default {
 			options = { done: options };
 		}
 
+		if ( !( 'duration' in options ) ) {
+			options.duration = 400;
+		}
+
 		const from = processNode( fromNode );
 		const to = processNode( toNode );
 
