@@ -17,7 +17,7 @@ export default {
 		const from = processNode( fromNode );
 		const to = processNode( toNode );
 
-		if ( !keyframesSupported || options.useTimer ) {
+		if ( !keyframesSupported || options.useTimer || from.isSvg || to.isSvg ) {
 			return new TimerTransformer( from, to, options );
 		} else {
 			return new KeyframeTransformer( from, to, options );

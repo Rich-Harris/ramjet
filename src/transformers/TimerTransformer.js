@@ -45,8 +45,17 @@ export default class TimerTransformer {
 			fromTransform = getTransform( from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
 			toTransform = getTransform( to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
 
-			from.clone.style.transform = from.clone.style.webkitTransform = fromTransform;
-			to.clone.style.transform = to.clone.style.webkitTransform = toTransform;
+			if ( from.isSvg ) {
+				from.clone.setAttribute( 'transform', fromTransform );
+			} else {
+				from.clone.style.transform = from.clone.style.webkitTransform = fromTransform;
+			}
+
+			if ( to.isSvg ) {
+				to.clone.setAttribute( 'transform', toTransform );
+			} else {
+				to.clone.style.transform = to.clone.style.webkitTransform = toTransform;
+			}
 
 			rAF( tick );
 		}

@@ -3,24 +3,6 @@
 
 	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
 
-	<pre><code>ramjet.transform({{from}}, {{to}}, {
-  easing: eases.{{easing}},
-  duration: {{duration}}
-});</code></pre>
-
-	<div class='controls'>
-		<select value='{{easing}}'>
-			{{#each easingFunctions}}
-				<option>{{this}}</option>
-			{{/each}}
-		</select>
-
-		<label>
-			<input type='range' value='{{duration}}' min='0' max='2000'>
-			{{duration}}ms
-		</label>
-	</div>
-
 	<div class='container'>
 		{{#each items :i}}
 			<div
@@ -31,14 +13,16 @@
 			>{{i+1}}</div>
 		{{/each}}
 
-		{{#with detail}}
+		{{#if detail}}
 			<div
 				class='detail'
-				intro-outro='ramjet:{target:"[data-id={{detail.id}}]"}'
+				intro-outro='ramjet:{id:{{detail.id}}}'
+				style='background-image: url(images/{{detail.id}}.jpg);'
+				on-tap='select(null)'
 			>
 				{{title}}
 			</div>
-		{{/with}}
+		{{/if}}
 	</div>
 </section>
 
@@ -48,7 +32,9 @@
 	}
 
 	.container {
+		position: relative;
 		width: 15rem;
+		height: 20rem;
 	}
 
 	.menu-item {
@@ -60,8 +46,21 @@
 		line-height: 1;
 		float: left;
 		color: white;
-		margin: 0 0.5em 0.5em 0;
+		margin: 0 1rem 1rem 0;
 		background-image: url(noise.png);
+		cursor: pointer;
+	}
+
+	.detail {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: calc(100% - 1rem);
+		height: calc(100% - 1rem);
+		background: no-repeat 50% 50%;
+		background-size: cover;
+		cursor: pointer;
+		/*margin: 0 1rem 1rem 0;*/
 	}
 </style>
 
@@ -70,6 +69,21 @@
 	const tap = require( 'ractive-events-tap' );
 	const eases = require( 'eases' );
 
+	const BY = {
+		name: 'CC BY 2.0',
+		url: 'https://creativecommons.org/licenses/by/2.0/'
+	};
+
+	const BY_SA = {
+		name: 'CC BY-SA 2.0',
+		url: 'https://creativecommons.org/licenses/by-sa/2.0/'
+	};
+
+	const BY_ND = {
+		name: 'CC BY-ND 2.0',
+		url: 'https://creativecommons.org/licenses/by-nd/2.0/'
+	};
+
 	component.exports = {
 		data: () => ({
 			easingFunctions: Object.keys( eases ),
@@ -77,70 +91,98 @@
 			duration: 400,
 			reverse: false,
 
+			// via http://labs.tineye.com/multicolr
 			items: [
 				{
 					color: '#001f3f',
-					title: 'Triberg Falls, Black Forest, Germany',
-					id: '3597623642_586c254584',
-					url: 'https://www.flickr.com/photos/34419668@N08/3597623642'
+					id: '7863279376_fdfc66dee5_z',
+					url: 'https://www.flickr.com/photos/43428526@N03/7863279376',
+					license: BY
 				},
-				{ color: '#0074D9' },
-				{ color: '#7FDBFF' },
-				{ color: '#39CCCC' },
-				{ color: '#3D9970' },
-				{ color: '#2ECC40' },
-				{ color: '#01FF70' },
-				{ color: '#FFDC00' },
-				{ color: '#FF851B' },
-				{ color: '#FF4136' },
-				{ color: '#85144b' },
-				{ color: '#B10DC9' }
+				{
+					color: '#0074D9',
+					id: '6527537485_a10d95332a_z',
+					url: 'https://www.flickr.com/photos/25507134@N00/6527537485',
+					license: BY
+				},
+				{
+					color: '#7FDBFF',
+					id: '3354331318_a8764c5c6b_z',
+					url: 'https://www.flickr.com/photos/37707866@N00/3354331318',
+					license: BY
+				},
+				// {
+				// 	color: '#7FDBFF',
+				// 	id: '7050378839_a5ddebf64c_z',
+				// 	url: 'https://www.flickr.com/photos/12719710@N00/7050378839',
+				// 	license: {
+				// 		name: 'CC BY-SA 2.0',
+				// 		url: 'https://creativecommons.org/licenses/by-sa/2.0/'
+				// 	}
+				// },
+				{
+					color: '#39CCCC',
+					id: '4608886209_b00e405171_z',
+					url: 'https://www.flickr.com/photos/32751486@N00/4608886209',
+					license: BY_SA
+				},
+				{
+					color: '#3D9970',
+					id: '5548569010_bdb0623140_z',
+					url: 'https://www.flickr.com/photos/25483059@N08/5548569010',
+					license: BY
+				},
+				{
+					color: '#2ECC40',
+					id: '2447470760_53844a0359_o',
+					url: 'https://www.flickr.com/photos/8404611@N06/2447470760',
+					license: BY
+				},
+				{
+					color: '#01FF70',
+					id: '114428206_b7e5e87d2a_z',
+					url: 'https://www.flickr.com/photos/33917831@N00/114428206',
+					license: BY_SA
+				},
+				{
+					color: '#FFDC00',
+					id: '4818617089_bb60293550_z',
+					url: 'https://www.flickr.com/photos/46417125@N04/4818617089',
+					license: BY_ND
+				},
+				{
+					color: '#FF851B',
+					id: '3945496657_470f924759_z',
+					url: 'https://www.flickr.com/photos/56068058@N00/3945496657',
+					license: BY
+				},
+				{
+					color: '#FF4136',
+					id: '4216820032_9f2470f41b_z',
+					url: 'https://www.flickr.com/photos/31883499@N05/4216820032',
+					license: BY
+				},
+				{
+					color: '#85144b',
+					id: '2625506561_e3753e0fa8_z',
+					url: 'https://www.flickr.com/photos/8484971@N07/2625506561',
+					license: BY_ND
+				},
+				{
+					color: '#B10DC9',
+					id: '5385464371_c33ed491f6_z',
+					url: 'https://www.flickr.com/photos/58028312@N00/5385464371',
+					license: BY_ND
+				}
 			]
 		}),
-
-		computed: {
-			from: '${reverse} ? "b" : "a"',
-			to: '${reverse} ? "a" : "b"'
-		},
-
-		onrender: function () {
-			const a = this.find( '.a' );
-			const b = this.find( '.b' );
-
-			this.on( 'start', () => {
-				if ( this.get( 'transitioning' ) ) return;
-
-				this.set( 'transitioning', true );
-
-				const reverse = this.get( 'reverse' );
-
-				const from = reverse ? b : a;
-				const to = reverse ? a : b;
-
-				from.classList.remove( 'hidden' );
-				to.classList.remove( 'hidden' );
-
-				ramjet.transform( from, to, {
-					easing: eases[ this.get( 'easing' ) ],
-					duration: this.get( 'duration' ),
-					done: () => {
-						this.set( 'transitioning', false );
-
-						to.classList.remove( 'hidden' );
-						this.toggle( 'reverse' );
-					}
-				});
-
-				from.classList.add( 'hidden' );
-				to.classList.add( 'hidden' );
-			});
-		},
 
 		select ( item ) {
 			if ( this.get( 'transitioning' ) ) return;
 
 			this.set( 'transitioning', true );
 
+			console.log( 'setting detail to null' );
 			this.set( 'detail', null )
 				.then( () => {
 					console.log( 'setting detail', item );
@@ -157,8 +199,40 @@
 
 		transitions: {
 			ramjet ( t, params ) {
-				console.log( 'params', params );
-				t.complete();
+				const selector = `.menu-item[data-id='${params.id || t.node.__id}']`
+
+				if ( !selector ) {
+					throw new Error( 'No selector specified for ramjet transition' );
+				}
+
+				const target = document.querySelector( selector );
+
+				console.log( 'target', target );
+
+				const from = t.isIntro ? target : t.node;
+				const to = t.isIntro ? t.node : target;
+
+				console.log( 'from', from );
+				console.log( 'to', to );
+
+				ramjet.transform( from, to, {
+					duration: params.duration || ( t.isIntro ? 400 : 200 ),
+					easing: ramjet.easeOut,
+					done: () => {
+						ramjet.show( t.node );
+						ramjet.show( target );
+						t.complete();
+					}
+				});
+
+				ramjet.hide( t.node );
+				ramjet.hide( target );
+
+				// hack...
+				if ( t.isIntro ) {
+					t.node.__id = params.id;
+					console.log( 't.node.__id', t.node.__id );
+				}
 			}
 		}
 	};
