@@ -3,7 +3,7 @@
 
 	<p>You can use an easing function to make the transformation seem more natural. For convenience, <code>ramjet.linear</code> (the default), <code>ramjet.easeIn</code>, <code>ramjet.easeOut</code> and <code>ramjet.easeInOut</code> are included, but you can use any function that takes in input between 0 and 1 and returns a similar value, such as <a href='http://robertpenner.com/easing/'>Robert Penner's easing equations</a> (included here via Matt DesLauriers' <a href='https://www.npmjs.com/package/eases'>eases</a> package).</p>
 
-	<p>In supported browsers, ramjet uses CSS animations to make the transformation buttery smooth, even on mobile. It precalculates keyframes so that you can use any timing function you like, not just the limited ones built in to CSS.</p>
+	<p>In supported browsers, ramjet uses CSS animations to make the transformation buttery smooth, even on mobile. It precalculates keyframes so that you can use any timing function you like, not just the limited ones built in to CSS. (When transforming to or from SVG elements, ramjet falls back to timer-based animations, as SVG elements cannot be transformed with CSS. This may cause stutter on mobile devices.)</p>
 
 	<pre><code>var eases = require('eases');
 

@@ -6,6 +6,7 @@ body {
 	padding: 0 1em;
 	max-width: 48em;
 	margin: 0 auto;
+	overflow-x: hidden;
 }
 
 h1 {
@@ -22,7 +23,7 @@ pre {
 	background-color: #f4f4f4;
 	background-image: url(noise.png);
 	padding: 1em;
-	overflow-x: scroll;
+	overflow-x: auto;
 }
 
 main {
