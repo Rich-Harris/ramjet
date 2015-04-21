@@ -39,9 +39,12 @@ export function processNode ( node ) {
 		clone.style[ prop ] = style[ prop ];
 	});
 
-	clone.style.position = 'fixed';
-	clone.style.top = ( bcr.top - parseInt( style.marginTop, 10 ) ) + 'px';
-	clone.style.left = ( bcr.left - parseInt( style.marginLeft, 10 ) ) + 'px';
+	const offsetParent = node.offsetParent;
+	const offsetParentBcr = offsetParent.getBoundingClientRect();
+
+	clone.style.position = 'absolute';
+	clone.style.top = ( bcr.top - parseInt( style.marginTop, 10 ) - offsetParentBcr.top ) + 'px';
+	clone.style.left = ( bcr.left - parseInt( style.marginLeft, 10 ) - offsetParentBcr.left ) + 'px';
 
 	// clone children recursively. We don't do this at the top level, because we want
 	// to use the reference to `style`
