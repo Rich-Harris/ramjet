@@ -22,8 +22,6 @@
             	return keys;
             })();
 
-            var utils_styleKeys = styleKeys;
-
             var svgns = "http://www.w3.org/2000/svg";
             var svg = document.createElementNS(svgns, "svg");
 
@@ -44,7 +42,7 @@
             	if (node.nodeType === 1) {
             		style = window.getComputedStyle(node);
 
-            		utils_styleKeys.forEach(function (prop) {
+            		styleKeys.forEach(function (prop) {
             			clone.style[prop] = style[prop];
             		});
 
@@ -68,7 +66,7 @@
             	style = window.getComputedStyle(node);
 
             	clone = node.cloneNode();
-            	utils_styleKeys.forEach(function (prop) {
+            	styleKeys.forEach(function (prop) {
             		clone.style[prop] = style[prop];
             	});
 
@@ -120,7 +118,6 @@
             	}
             }
 
-            var utils_getTransform = getTransform;
             function getTransform(isSvg, cx, cy, dx, dy, dsx, dsy, t) {
             	if (isSvg) {
             		return "translate(" + cx + "px," + cy + "px) scale(" + (1 + t * dsx) + "," + (1 + t * dsy) + ") translate(-" + cx + "px,-" + cy + "px) translate(" + t * dx + "px," + t * dy + "px)";
@@ -146,12 +143,10 @@
                         return setTimeout(fn, 16);
             };
 
-            var utils_rAF = rAF;
+            var TimerTransformer___classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-            var transformers_TimerTransformer___classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-            var transformers_TimerTransformer__TimerTransformer = function TimerTransformer(from, to, options) {
-            	transformers_TimerTransformer___classCallCheck(this, transformers_TimerTransformer__TimerTransformer);
+            var TimerTransformer__TimerTransformer = function TimerTransformer__TimerTransformer(from, to, options) {
+            	TimerTransformer___classCallCheck(this, TimerTransformer__TimerTransformer);
 
             	var dx = to.cx - from.cx;
             	var dy = to.cy - from.cy;
@@ -191,19 +186,19 @@
             		cx = from.cx + dx * t;
             		cy = from.cy + dy * t;
 
-            		fromTransform = utils_getTransform(from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t) + " " + from.transform;
-            		toTransform = utils_getTransform(to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t) + " " + to.transform;
+            		fromTransform = getTransform(from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t) + " " + from.transform;
+            		toTransform = getTransform(to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t) + " " + to.transform;
 
             		from.clone.style.transform = from.clone.style.webkitTransform = fromTransform;
             		to.clone.style.transform = to.clone.style.webkitTransform = toTransform;
 
-            		utils_rAF(tick);
+            		rAF(tick);
             	}
 
             	tick();
             };
 
-            var transformers_TimerTransformer = transformers_TimerTransformer__TimerTransformer;
+            var TimerTransformer__default = TimerTransformer__TimerTransformer;
 
             var div = document.createElement("div");
 
@@ -247,11 +242,12 @@
             	keyframesSupported = false;
             }
 
-            var transformers_KeyframeTransformer___classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+            var KeyframeTransformer___classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-            var transformers_KeyframeTransformer__KeyframeTransformer = function KeyframeTransformer(from, to, options) {
-            	transformers_KeyframeTransformer___classCallCheck(this, transformers_KeyframeTransformer__KeyframeTransformer);
+            var KeyframeTransformer__KeyframeTransformer = function KeyframeTransformer__KeyframeTransformer(from, to, options) {
+            	KeyframeTransformer___classCallCheck(this, KeyframeTransformer__KeyframeTransformer);
 
+            	console.log("options.duration", options.duration);
             	var _getKeyframes = getKeyframes(from, to, options);
 
             	var fromKeyframes = _getKeyframes.fromKeyframes;
@@ -300,7 +296,7 @@
             	});
             };
 
-            var transformers_KeyframeTransformer = transformers_KeyframeTransformer__KeyframeTransformer;
+            var KeyframeTransformer__default = KeyframeTransformer__KeyframeTransformer;
 
             function addCss(css) {
             	var styleElement = document.createElement("style");
@@ -350,8 +346,8 @@
             		var _cx = from.cx + dx * t;
             		var _cy = from.cy + dy * t;
 
-            		var _fromTransform = utils_getTransform(from.isSvg, _cx, _cy, dx, dy, dsxf, dsyf, t) + " " + from.transform;
-            		var _toTransform = utils_getTransform(to.isSvg, _cx, _cy, -dx, -dy, dsxt, dsyt, 1 - t) + " " + to.transform;
+            		var _fromTransform = getTransform(from.isSvg, _cx, _cy, dx, dy, dsxf, dsyf, t) + " " + from.transform;
+            		var _toTransform = getTransform(to.isSvg, _cx, _cy, -dx, -dy, dsxt, dsyt, 1 - t) + " " + to.transform;
 
             		fromKeyframes.push("" + pc + "% { opacity: " + (1 - t) + "; " + TRANSFORM + ": " + _fromTransform + "; }");
             		toKeyframes.push("" + pc + "% { opacity: " + t + "; " + TRANSFORM + ": " + _toTransform + "; }");
@@ -360,8 +356,8 @@
             	var cx = from.cx + dx;
             	var cy = from.cy + dy;
 
-            	var fromTransform = utils_getTransform(from.isSvg, cx, cy, dx, dy, dsxf, dsyf, 1) + " " + from.transform;
-            	var toTransform = utils_getTransform(to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 0) + " " + to.transform;
+            	var fromTransform = getTransform(from.isSvg, cx, cy, dx, dy, dsxf, dsyf, 1) + " " + from.transform;
+            	var toTransform = getTransform(to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 0) + " " + to.transform;
 
             	fromKeyframes.push("100% { opacity: 0; " + TRANSFORM + ": " + fromTransform + "; }");
             	toKeyframes.push("100% { opacity: 1; " + TRANSFORM + ": " + toTransform + "; }");
@@ -379,13 +375,17 @@
             			options = { done: options };
             		}
 
+            		if (!("duration" in options)) {
+            			options.duration = 400;
+            		}
+
             		var from = processNode(fromNode);
             		var to = processNode(toNode);
 
             		if (!keyframesSupported || options.useTimer) {
-            			return new transformers_TimerTransformer(from, to, options);
+            			return new TimerTransformer__default(from, to, options);
             		} else {
-            			return new transformers_KeyframeTransformer(from, to, options);
+            			return new KeyframeTransformer__default(from, to, options);
             		}
             	},
 

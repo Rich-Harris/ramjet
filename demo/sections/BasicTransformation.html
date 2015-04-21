@@ -1,0 +1,32 @@
+<div class='demo' intro='fade'>
+	<button on-tap='start()' disabled='{{transitioning}}'>start</button>
+	<div class='from'><span>from</span></div>
+	<div class='to'><span>to</span></div>
+</div>
+
+<script>
+	component.exports = {
+		onrender: function () {
+			this.from = this.find( '.from' );
+			this.to = this.find( '.to' );
+		},
+
+		start: function () {
+			var self = this;
+
+			if ( this.get( 'transitioning' ) ) return;
+
+			this.set( 'transitioning', true );
+
+			ramjet.transform(
+				this.from,
+				this.to,
+				{
+					done: function () {
+						self.set( 'transitioning', false );
+					}
+				}
+			);
+		}
+	};
+</script>

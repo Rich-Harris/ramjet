@@ -11,37 +11,43 @@
 
 		h1 {
 			font-weight: 200;
+			font-size: 4em;
+			margin: 0 0 0.5em 0;
 		}
 
-		ul {
-			padding: 0;
-			list-style: none;
+		section h1 {
+			font-size: 2em;
 		}
 
-		li {
-			color: white;
-			display: inline-block;
+		section {
+
+		}
+
+		.from, .to {
+			position: relative;
+			width: 100px;
+			height: 100px;
+		}
+
+		.from span, .to span {
+			position: absolute;
+			display: block;
 			text-align: center;
-			padding: 0.5em;
-			width: 1em;
-			height: 1em;
-			line-height: 1;
-			font-weight: bold;
-			border: 1px solid;
-			cursor: pointer;
-		}
-
-		.detail {
-			max-width: 40em;
-			height: 20em;
-		}
-
-		article {
-			background-color: #e6e6e6;
-			font-weight: 200;
-			padding: 1em;
-			display: none;
+			width: 100%;
+			top: 50%;
 			color: white;
+			-webkit-transform: translate(0,-50%);
+			transform: translate(0,-50%);
+		}
+
+		.from {
+			float: left;
+			background-color: red;
+		}
+
+		.to {
+			float: right;
+			background-color: blue;
 		}
 	</style>
 </head>
@@ -50,142 +56,29 @@
 
 	<h1>ramjet</h1>
 
-	<label>
-		<input type='checkbox'>
-		slow motion
-	</label>
-
 	<main>
-		<ul>
-			<li data-id='1' data-color='rgb(24, 188, 156)'>1</li>
-			<li data-id='2' data-color='rgb(52, 152, 219)'>2</li>
-			<li data-id='3' data-color='rgb(243, 156, 18)'>3</li>
-			<li data-id='4' data-color='rgb(231, 76, 60)'>4</li>
-			<li data-id='5' data-color='rgb(44, 62, 80)'>5</li>
-		</ul>
-
-		<section class='detail'>
-			<article data-id='1'>
-				<strong>ramjet</strong> allows you to seamlessly transform one element into another, no matter where they sit in relation to each other in the DOM.
-			</article>
-
-			<article data-id='2'>
-				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-			</article>
-
-			<article data-id='3'>
-				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-			</article>
-
-			<article data-id='4'>
-				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-			</article>
-
-			<article data-id='5'>
-				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-			</article>
+		<section data-component='BasicTransformation'>
+			<h1>Transform your DOM elements</h1>
 		</section>
 	</main>
 
 	<script src='/dist/ramjet.js'></script>
 
+	<script src='ractive.min.js'></script>
+	<script src='ractive-load.js'></script>
+	<script src='ractive-transitions-fade.js'></script>
+	<script src='ractive-events-tap.js'></script>
+
 	<script>
-		[].slice.call( document.querySelectorAll( 'li' ) ).forEach( function ( li ) {
-			var article = $( 'article[data-id="' + li.getAttribute( 'data-id' ) + '"]' );
-
-			li.style.backgroundColor = li.style.borderColor = article.style.backgroundColor = li.getAttribute( 'data-color' );
+		[].slice.call( document.querySelectorAll( 'section' ) ).forEach( function ( section ) {
+			Ractive.load( 'sections/' + section.getAttribute( 'data-component' ) + '.html' )
+				.then( function ( Component ) {
+					new Component({
+						el: section,
+						append: true // don't overwrite header
+					});
+				});
 		});
-
-		var selected = null;
-		var checkbox = $( 'input' );
-
-		function $ ( selector ) {
-			return document.querySelector( selector );
-		};
-
-		function select ( li ) {
-			var article = $( 'article[data-id="' + li.getAttribute( 'data-id' ) + '"]' );
-
-			article.style.display = 'block';
-
-			var transformation = ramjet.transform( li, article, {
-				duration: checkbox.checked ? 2000 : 400,
-				easing: ramjet.easeOut,
-				done: function () {
-					console.log( 'done' );
-					ramjet.show( article );
-				}
-			});
-
-			console.log( 'transformation', transformation );
-
-			ramjet.hide( article );
-
-			li.style.backgroundColor = 'white';
-
-			selected = li;
-		}
-
-		function deselect ( li ) {
-			var article = $( 'article[data-id="' + li.getAttribute( 'data-id' ) + '"]' );
-
-			li.style.backgroundColor = li.getAttribute( 'data-color' );
-
-			ramjet.transform( article, li, {
-				duration: checkbox.checked ? 2000 : 200,
-				easing: ramjet.easeOut,
-				done: function () {
-					li.style.backgroundColor = li.getAttribute( 'data-color' );
-				}
-			});
-
-			article.style.display = 'none';
-
-			li.style.backgroundColor = 'white';
-		}
-
-		function findParent ( target, tagName ) {
-			do {
-				if ( target.tagName === tagName ) {
-					return target;
-				}
-
-				target = target.parentNode;
-			} while ( target );
-
-			return null;
-		}
-
-		window.addEventListener( 'click', function ( event ) {
-			var li = findParent( event.target, 'LI' );
-
-			// special case
-			if ( li && ( li === selected ) ) {
-				deselect( li );
-				selected = null;
-				return;
-			}
-
-			if ( selected ) {
-				deselect( selected );
-
-				if ( li ) {
-					setTimeout( function () {
-						select( selected );
-					}, checkbox.checked ? 2000 : 200 );
-				}
-			}
-
-			else if ( li ) {
-				select( li );
-			}
-
-			selected = li;
-		});
-
-		setTimeout( function () {
-			select( document.querySelector( 'li' ) );
-		}, 1000 );
 	</script>
 </body>
 </html>
