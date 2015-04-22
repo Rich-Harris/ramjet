@@ -14,16 +14,27 @@
 
 		<svg class='container' data-container='3' viewBox='0 0 600 300'>
 			<defs>
-				<path id='curve' d='M 90 150 C 200 80 400 80 510 150'/>
+				<path id='upper' d='M 90 150 C 200 80 400 80 510 150'/>
+				<path id='lower' d='M 90 150 C 200 220 400 220 510 150'/>
 			</defs>
 
 			<!-- TODO text on a path -->
 			<g data-stage='3'>
-				<ellipse fill='#2ECC40' cx='300' cy='150' rx='250' ry='100'/>
+				<!-- <ellipse fill='#2ECC40' cx='300' cy='150' rx='250' ry='100'/> -->
+				<rect fill='#85144b' x='50' y='50' width='500' height='200'/>
 
-				<text fill='white' style='font-size: 2rem;'>
-					<textPath xlink:href="#curve">
-						...or whether they're HTML or SVG
+				<!-- <use xlink:href='#upper'/>
+				<use xlink:href='#lower'/> -->
+
+				<text style='fill: white; font-size: 2rem; text-anchor: middle;'>
+					<textPath xlink:href="#upper" startOffset='50%'>
+						...or whether they're HTML
+					</textPath>
+				</text>
+
+				<text style='fill: white; font-size: 2rem; text-anchor: middle;'>
+					<textPath xlink:href="#lower" startOffset='50%'>
+						<tspan alignment-baseline='hanging'>~~~ o r &nbsp; S V G ! ~~~</tspan>
 					</textPath>
 				</text>
 			</g>
@@ -177,6 +188,9 @@
 	const tap = require( 'ractive-events-tap' );
 	const eases = require( 'eases' );
 
+	const addClass = require( './addClass' );
+	const removeClass = require( './removeClass' );
+
 	const Promise = Ractive.Promise;
 
 	function loadImage ( url ) {
@@ -206,7 +220,7 @@
 		}),
 
 		onrender: function () {
-			this.find( `[data-stage='0']` ).classList.add( 'visible' );
+			addClass( this.find( `[data-stage='0']` ), 'visible' );
 
 			// only active when in view
 			const el = this.find( 'section' );
@@ -243,8 +257,8 @@
 			const a = this.find( `[data-stage='${currentStage}']` );
 			const b = this.find( `[data-stage='${nextStage}']` );
 
-			a.classList.add( 'visible' );
-			b.classList.add( 'visible' );
+			addClass( a, 'visible' );
+			addClass( b, 'visible' );
 
 			ramjet.transform( a, b, {
 				easing: eases[ this.get( 'easing' ) ],
@@ -252,7 +266,7 @@
 				done: () => {
 					this.set( 'stage', nextStage );
 
-					b.classList.add( 'visible' );
+					addClass( b, 'visible' );
 
 					setTimeout( () => {
 						this.next();
@@ -260,8 +274,8 @@
 				}
 			});
 
-			a.classList.remove( 'visible' );
-			b.classList.remove( 'visible' );
+			removeClass( a, 'visible' );
+			removeClass( b, 'visible' );
 		},
 
 		events: {

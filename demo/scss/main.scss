@@ -3,7 +3,7 @@
 body {
 	font-family: 'Source Sans Pro', 'Helvetica Neue', arial;
 	color: #333;
-	padding: 0 1em;
+	padding: 2em 1em 4em 1em;
 	max-width: 48em;
 	margin: 0 auto;
 	overflow-x: hidden;
@@ -26,6 +26,10 @@ pre {
 	overflow-x: auto;
 }
 
-main {
+a {
+	color: #0074D9;
 
+	&:visited {
+		color: #85144b;
+	}
 }

@@ -1,26 +1,33 @@
 <section>
-	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+	<h1>More examples</h1>
 
-	<div class='container'>
-		{{#each items :i}}
-			<div
-				class='menu-item'
-				data-id='{{id}}'
-				style='background-color: {{color}};'
-				on-tap='select(this)'
-			>{{i+1}}</div>
-		{{/each}}
+	<p>Ramjet was inspired by the iOS-8 style zoom effect that happens when you open an app. The (square, with rounded corners) app icon smoothly transforms into a fullscreen rectangular app view, and your brain is totally okay with that! Somehow it is tricked into believing that the two completely different views represent the same object &ndash; that the app is somehow <em>contained</em> inside the icon.</p>
 
-		{{#if detail}}
-			<div
-				class='detail'
-				intro-outro='ramjet:{id:{{detail.id}}}'
-				style='background-image: url(images/{{detail.id}}.jpg);'
-				on-tap='select(null)'
-			>
-				{{title}}
-			</div>
-		{{/if}}
+	<p>So it only makes sense to have a demo showing a similar effect. If you have any other good use cases, <a href='https://github.com/rich-harris/ramjet'>come on over to Github</a> so we can add more examples!</p>
+
+	<div class='outer'>
+		<div class='inner'>
+			{{#each items :i}}
+				<div
+					class='menu-item'
+					data-id='{{id}}'
+					data-label='{{i+1}}'
+					style='background-color: {{color}};'
+					on-tap='select(this)'
+				></div>
+			{{/each}}
+
+			{{#if detail}}
+				<div
+					class='detail'
+					intro-outro='ramjet:{id:{{detail.id}}}'
+					style='background-image: url(images/{{detail.id}}.jpg);'
+					on-tap='select(null)'
+				>
+					<p class='credit'><a target='_blank' href='{{detail.url}}'>via Flickr</a> &ndash; <a target='_blank' href='{{detail.license.url}}'>{{detail.license.name}}</a></p>
+				</div>
+			{{/if}}
+		</div>
 	</div>
 </section>
 
@@ -29,24 +36,41 @@
 		margin: 0 0 1em 0;
 	}
 
-	.container {
+	.outer {
+		width: 100%;
+		max-width: 24rem;
+		margin: 0 auto;
+	}
+
+	.inner {
 		position: relative;
-		width: 15rem;
-		height: 20rem;
+		width: 100%;
+		padding: 0 0 133.333% 0;
 	}
 
 	.menu-item {
+		position: relative;
 		font-size: 2em;
-		width: 2rem;
-		height: 2rem;
-		padding: 1rem;
+		width: calc(33.333% - 1rem);
+		padding: 0 0 calc(33.333% - 1rem) 0;
 		text-align: center;
 		line-height: 1;
 		float: left;
-		color: white;
+		color: #fff;
 		margin: 0 1rem 1rem 0;
 		background-image: url(noise.png);
 		cursor: pointer;
+		box-sizing: border-box;
+	}
+
+	.menu-item::after {
+		content: attr(data-label);
+		position: absolute;
+		top: 50%;
+		left: 0;
+		width: 100%;
+		text-align: center;
+		transform: translate(0,-50%);
 	}
 
 	.detail {
@@ -59,6 +83,26 @@
 		background-size: cover;
 		cursor: pointer;
 		/*margin: 0 1rem 1rem 0;*/
+	}
+
+	.credit {
+		position: absolute;
+		width: 100%;
+		right: 0;
+		bottom: 0;
+		text-align: right;
+		padding: 1em;
+		margin: 0;
+		color: white;
+		font-weight: bold;
+		opacity: 0.6;
+		-webkit-box-sizing: border-box;
+		box-sizing: border-box;
+  		background: rgba(0,0,0,0.4);
+	}
+
+	.credit a, .credit a:visited {
+		color: white;
 	}
 </style>
 

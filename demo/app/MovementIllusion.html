@@ -40,6 +40,9 @@ b.classList.add('hidden');
 	const ramjet = require( './ramjet' );
 	const tap = require( 'ractive-events-tap' );
 
+	const addClass = require( './addClass' );
+	const removeClass = require( './removeClass' );
+
 	component.exports = {
 		data: () => ({
 			transitioning: false,
@@ -65,20 +68,20 @@ b.classList.add('hidden');
 				const from = reverse ? b : a;
 				const to = reverse ? a : b;
 
-				from.classList.remove( 'hidden' );
-				to.classList.remove( 'hidden' );
+				removeClass( from, 'hidden' );
+				removeClass( to, 'hidden' );
 
 				ramjet.transform( from, to, {
 					done: () => {
 						this.set( 'transitioning', false );
 
-						to.classList.remove( 'hidden' );
+						removeClass( to, 'hidden' );
 						this.toggle( 'reverse' );
 					}
 				});
 
-				from.classList.add( 'hidden' );
-				to.classList.add( 'hidden' );
+				addClass( from, 'hidden' );
+				addClass( to, 'hidden' );
 			});
 		},
 
