@@ -5,7 +5,7 @@ set -e;
 if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
 	echo "Deploying to Github pages..."
 
-	( cd .tmp
+	( cd dist
 		git init
 		git config user.name "Travis-CI"
 		git config user.email "richard.a.harris+travis@gmail.com"
