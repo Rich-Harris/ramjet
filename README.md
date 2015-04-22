@@ -5,7 +5,7 @@
 
 ## Installation
 
-`npm install ramjet`, or download [ramjet.js](TODO!).
+`npm install ramjet`, or download [ramjet.js](http://www.rich-harris.co.uk/ramjet/ramjet.js).
 
 
 ## Quick start
