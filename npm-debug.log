@@ -1,0 +1,38 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'run', 'build' ]
+2 info using npm@2.5.1
+3 info using node@v1.2.0
+4 verbose node symlink /usr/local/bin/node
+5 verbose run-script [ 'prebuild', 'build', 'postbuild' ]
+6 info prebuild ramjet@0.3.2
+7 info build ramjet@0.3.2
+8 verbose unsafe-perm in lifecycle true
+9 info ramjet@0.3.2 Failed to exec build script
+10 verbose stack Error: ramjet@0.3.2 build: `gobble build -f dist`
+10 verbose stack Exit status 1
+10 verbose stack     at EventEmitter.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/lifecycle.js:213:16)
+10 verbose stack     at emitTwo (events.js:85:13)
+10 verbose stack     at EventEmitter.emit (events.js:153:7)
+10 verbose stack     at ChildProcess.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/spawn.js:14:12)
+10 verbose stack     at emitTwo (events.js:85:13)
+10 verbose stack     at ChildProcess.emit (events.js:153:7)
+10 verbose stack     at maybeClose (child_process.js:984:16)
+10 verbose stack     at Process.ChildProcess._handle.onexit (child_process.js:1057:5)
+11 verbose pkgid ramjet@0.3.2
+12 verbose cwd /www/ramjet
+13 error Darwin 12.5.0
+14 error argv "node" "/usr/local/bin/npm" "run" "build"
+15 error node v1.2.0
+16 error npm  v2.5.1
+17 error code ELIFECYCLE
+18 error ramjet@0.3.2 build: `gobble build -f dist`
+18 error Exit status 1
+19 error Failed at the ramjet@0.3.2 build script 'gobble build -f dist'.
+19 error This is most likely a problem with the ramjet package,
+19 error not with npm itself.
+19 error Tell the author that this fails on your system:
+19 error     gobble build -f dist
+19 error You can get their info via:
+19 error     npm owner ls ramjet
+19 error There is likely additional logging output above.
+20 verbose exit [ 1, true ]

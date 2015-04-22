@@ -53,4 +53,19 @@ var demo = gobble([
 	gobble( 'demo/files' )
 ]);
 
-module.exports = gobble([ demo, lib ]);
+var built = gobble([ demo, lib ]);
+
+if ( gobble.env() === 'production' ) {
+	built = gobble([
+		demo = demo.transform( 'uglifyjs' ),
+		lib,
+		lib.transform( 'uglifyjs', { ext: '.min.js' })
+	]);
+} else {
+	built = gobble([
+		demo,
+		lib
+	]);
+}
+
+module.exports = built;
