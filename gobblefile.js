@@ -50,11 +50,9 @@ var demo = gobble([
 	gobble( 'demo/files' )
 ]);
 
-var built = gobble([ demo, lib ]);
-
 if ( gobble.env() === 'production' ) {
 	built = gobble([
-		demo = demo.transform( 'uglifyjs' ),
+		demo.transform( 'uglifyjs' ),
 		lib,
 		lib.transform( 'uglifyjs', { ext: '.min.js' })
 	]);
