@@ -12,7 +12,7 @@
 
 ```html
 <div id='a' style='background-color: red; font-size: 4em; padding: 1em;'>a</div>
-<div id='b' style='background-color: blue; font-size: 6em; padding: 1em;'>b</div>
+<div id='b' style='background-color: blue; font-size: 4em; padding: 1em;'>b</div>
 
 <script src='ramjet.js'></script>
 <script>
