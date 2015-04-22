@@ -1,5 +1,9 @@
 # changelog
 
+## 0.4.1
+
+* Tidy up npm package
+
 ## 0.4.0
 
 * Renamed! mogrify is now ramjet
