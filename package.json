@@ -26,7 +26,6 @@
     "gobble-derequire": "^0.1.1",
     "gobble-esperanto-bundle": "^0.1.7",
     "gobble-ractive": "^0.2.0",
-    "gobble-sass": "^0.4.0",
     "gobble-uglifyjs": "^0.2.1",
     "ractive": "^0.7.2",
     "ractive-events-tap": "^0.2.0",
