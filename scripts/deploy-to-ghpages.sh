@@ -1,6 +1,8 @@
 #!/bin/bash
 
-if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+set -e;
+
+if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
 	echo "Deploying to Github pages..."
 
 	( cd .tmp
