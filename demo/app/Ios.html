@@ -235,10 +235,8 @@
 
 			this.set( 'transitioning', true );
 
-			console.log( 'setting detail to null' );
 			this.set( 'detail', null )
 				.then( () => {
-					console.log( 'setting detail', item );
 					this.set({
 						detail: item,
 						transitioning: false
@@ -260,13 +258,8 @@
 
 				const target = document.querySelector( selector );
 
-				console.log( 'target', target );
-
 				const from = t.isIntro ? target : t.node;
 				const to = t.isIntro ? t.node : target;
-
-				console.log( 'from', from );
-				console.log( 'to', to );
 
 				ramjet.transform( from, to, {
 					duration: params.duration || ( t.isIntro ? 400 : 200 ),
@@ -284,7 +277,6 @@
 				// hack...
 				if ( t.isIntro ) {
 					t.node.__id = params.id;
-					console.log( 't.node.__id', t.node.__id );
 				}
 			}
 		}
