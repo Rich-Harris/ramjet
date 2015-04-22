@@ -34,55 +34,35 @@ a:visited {
 
 @font-face {
     font-family: 'Source Sans Pro';
-    src: url('fonts/Source_Sans_Pro/SourceSansPro-Regular-webfont.eot');
-    src: url('fonts/Source_Sans_Pro/SourceSansPro-Regular-webfont.eot?#iefix') format('embedded-opentype'),
-         url('fonts/Source_Sans_Pro/SourceSansPro-Regular-webfont.woff') format('woff'),
-         url('fonts/Source_Sans_Pro/SourceSansPro-Regular-webfont.ttf') format('truetype'),
-         url('fonts/Source_Sans_Pro/SourceSansPro-Regular-webfont.svg#source_sans_proregular') format('svg');
+    src: url('fonts/Source_Sans_Pro/SourceSansPro-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Source Sans Pro';
-    src: url('fonts/Source_Sans_Pro/SourceSansPro-Semibold.eot');
-    src: url('fonts/Source_Sans_Pro/SourceSansPro-Semibold.eot?#iefix') format('embedded-opentype'),
-         url('fonts/Source_Sans_Pro/SourceSansPro-Semibold.woff') format('woff'),
-         url('fonts/Source_Sans_Pro/SourceSansPro-Semibold.ttf') format('truetype'),
-         url('fonts/Source_Sans_Pro/SourceSansPro-Semibold.svg#source_sans_prosemibold') format('svg');
+    src: url('fonts/Source_Sans_Pro/SourceSansPro-Semibold.ttf') format('truetype');
     font-weight: 500;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Source Sans Pro';
-    src: url('fonts/Source_Sans_Pro/SourceSansPro-Bold.eot');
-    src: url('fonts/Source_Sans_Pro/SourceSansPro-Bold.eot?#iefix') format('embedded-opentype'),
-         url('fonts/Source_Sans_Pro/SourceSansPro-Bold.woff') format('woff'),
-         url('fonts/Source_Sans_Pro/SourceSansPro-Bold.ttf') format('truetype'),
-         url('fonts/Source_Sans_Pro/SourceSansPro-Bold.svg#source_sans_prosemibold') format('svg');
+    src: url('fonts/Source_Sans_Pro/SourceSansPro-Bold.ttf') format('truetype');
     font-weight: 700;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Source Sans Pro';
-    src: url('fonts/Source_Sans_Pro/SourceSansPro-Black.eot');
-    src: url('fonts/Source_Sans_Pro/SourceSansPro-Black.eot?#iefix') format('embedded-opentype'),
-         url('fonts/Source_Sans_Pro/SourceSansPro-Black.woff') format('woff'),
-         url('fonts/Source_Sans_Pro/SourceSansPro-Black.ttf') format('truetype'),
-         url('fonts/Source_Sans_Pro/SourceSansPro-Black.svg#source_sans_prosemibold') format('svg');
+    src: url('fonts/Source_Sans_Pro/SourceSansPro-Black.ttf') format('truetype');
     font-weight: 900;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Source Sans Pro';
-    src: url('fonts/Source_Sans_Pro/SourceSansPro-Light.eot');
-    src: url('fonts/Source_Sans_Pro/SourceSansPro-Light.eot?#iefix') format('embedded-opentype'),
-         url('fonts/Source_Sans_Pro/SourceSansPro-Light.woff') format('woff'),
-         url('fonts/Source_Sans_Pro/SourceSansPro-Light.ttf') format('truetype'),
-         url('fonts/Source_Sans_Pro/SourceSansPro-Light.svg#source_sans_prolight') format('svg');
+    src: url('fonts/Source_Sans_Pro/SourceSansPro-Light.ttf') format('truetype');
     font-weight: 200;
     font-style: normal;
 }
