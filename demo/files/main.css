@@ -1,3 +1,37 @@
+body {
+	font-family: 'Source Sans Pro', 'Helvetica Neue', arial;
+	color: #333;
+	padding: 2em 1em 4em 1em;
+	max-width: 48em;
+	margin: 0 auto;
+	overflow-x: hidden;
+}
+
+h1 {
+	font-weight: 700;
+	font-size: 4em;
+	margin: 0 0 0.5em 0;
+}
+
+pre, code {
+	font-family: 'Inconsolata';
+}
+
+pre {
+	background-color: #f4f4f4;
+	background-image: url(noise.png);
+	padding: 1em;
+	overflow-x: auto;
+}
+
+a {
+	color: #0074D9;
+}
+
+a:visited {
+	color: #85144b;
+}
+
 @font-face {
     font-family: 'Source Sans Pro';
     src: url('fonts/SourceSansPro/sourcesanspro-regular-webfont.eot');

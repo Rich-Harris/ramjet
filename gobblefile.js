@@ -47,9 +47,6 @@ var demo = gobble([
 			standalone: 'app'
 		}),
 
-	gobble( 'demo/scss' )
-		.transform( 'sass', { src: 'main.scss', dest: 'main.css' }),
-
 	gobble( 'demo/files' )
 ]);
 
