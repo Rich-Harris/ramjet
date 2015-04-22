@@ -1,5 +1,9 @@
 # changelog
 
+## 0.4.2
+
+* Account for offsetParent margin
+
 ## 0.4.1
 
 * Tidy up npm package

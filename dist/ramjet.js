@@ -75,11 +75,12 @@
             	});
 
             	var offsetParent = node.offsetParent;
+            	var offsetParentStyle = window.getComputedStyle(offsetParent);
             	var offsetParentBcr = offsetParent.getBoundingClientRect();
 
             	clone.style.position = 'absolute';
-            	clone.style.top = bcr.top - parseInt(style.marginTop, 10) - offsetParentBcr.top + 'px';
-            	clone.style.left = bcr.left - parseInt(style.marginLeft, 10) - offsetParentBcr.left + 'px';
+            	clone.style.top = bcr.top - parseInt(style.marginTop, 10) - (offsetParentBcr.top - parseInt(offsetParentStyle.marginTop, 10)) + 'px';
+            	clone.style.left = bcr.left - parseInt(style.marginLeft, 10) - (offsetParentBcr.left - parseInt(offsetParentStyle.marginLeft, 10)) + 'px';
 
             	// clone children recursively. We don't do this at the top level, because we want
             	// to use the reference to `style`
