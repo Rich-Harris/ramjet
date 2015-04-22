@@ -2,14 +2,70 @@ var gobble = require( 'gobble' );
 
 gobble.cwd( __dirname );
 
-module.exports = gobble( 'src' )
-.transform( '6to5', {
-	blacklist: [ 'es6.modules', 'useStrict' ],
-	sourceMap: false
-})
-.transform( 'esperanto-bundle', {
-	entry: 'mogrify',
-	type: 'umd',
-	name: 'mogrify',
-	sourceMap: false
-});
+var babelWhitelist = [
+	'es6.arrowFunctions',
+	'es6.blockScoping',
+	'es6.classes',
+	'es6.constants',
+	'es6.destructuring',
+	'es6.parameters.default',
+	'es6.parameters.rest',
+	'es6.properties.shorthand',
+	'es6.templateLiterals'
+];
+
+var lib = gobble( 'src' )
+	.transform( 'babel', {
+		whitelist: babelWhitelist,
+		sourceMap: false
+	})
+	.transform( 'esperanto-bundle', {
+		entry: 'ramjet',
+		type: 'umd',
+		name: 'ramjet',
+		sourceMap: false
+	});
+
+var demo = gobble([
+	gobble([ 'src', 'demo/app' ])
+		.transform( 'ractive', {
+			type: 'es6'
+		})
+		.transform( 'babel', {
+			whitelist: babelWhitelist,
+			inputSourceMap: false
+		})
+		.transform( 'esperanto-bundle', {
+			entry: 'main',
+			dest: 'app.js',
+			type: 'cjs'
+		})
+		.transform( 'derequire' )
+		.transform( 'browserify', {
+			entries: [ './app' ],
+			dest: 'app.js',
+			standalone: 'app'
+		}),
+
+	gobble( 'demo/scss' )
+		.transform( 'sass', { src: 'main.scss', dest: 'main.css' }),
+
+	gobble( 'demo/files' )
+]);
+
+var built = gobble([ demo, lib ]);
+
+if ( gobble.env() === 'production' ) {
+	built = gobble([
+		demo = demo.transform( 'uglifyjs' ),
+		lib,
+		lib.transform( 'uglifyjs', { ext: '.min.js' })
+	]);
+} else {
+	built = gobble([
+		demo,
+		lib
+	]);
+}
+
+module.exports = built;

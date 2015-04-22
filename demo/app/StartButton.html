@@ -1,0 +1,115 @@
+<div class='wrapper'>
+	<svg>
+
+		<g transform='translate(50,50)'>
+			<circle r='{{radius}}'></circle>
+			<!-- <text y='0.4em'>play &#9654;</text> -->
+			<polyline class='play' points='-3,-6 5,0 -3,6'/>
+
+
+			<!-- {{#if !paused}} -->
+				<path d='{{progressPath}}'>
+			<!-- {{/if}} -->
+		</g>
+	</svg>
+</div>
+
+<style>
+	.wrapper {
+		position: absolute;
+		left: 0;
+		width: 100px;
+		top: 50%;
+	}
+
+	svg {
+		position: absolute;
+		width: 100px;
+		height: 100px;
+		left: 0;
+		top: -50px;
+	}
+
+	g {
+		opacity: 0.6;
+		-webkit-transition: opacity 0.2s;
+		transition: opacity 0.2s;
+	}
+
+	.demo:hover g {
+		opacity: 1;
+	}
+
+	text {
+		text-anchor: middle;
+		font-size: 1.2em;
+		fill: rgba(0,0,0,0.4);
+	}
+
+	circle {
+		fill: #FFDC00;
+		fill-opacity: 0.7;
+	}
+
+	path {
+		stroke: #FFDC00;
+		stroke-width: 6;
+		fill: none;
+		stroke-linecap: round;
+	}
+
+	polyline {
+		fill: rgba(0,0,0,0.4);
+	}
+</style>
+
+<script>
+	const increment = 0.01;
+
+	component.exports = {
+		data: () => ({
+			paused: true,
+			progress: 0,
+			radius: 25
+		}),
+
+		oninit () {
+			this.observe( 'paused', paused => {
+
+
+				if ( !paused ) {
+					this.set( 'progress', 0 );
+
+					// kick off progress animation
+					this.animate( 'progress', 1, {
+						duration: this.get( 'duration' )
+					});
+				}
+			});
+		},
+
+		computed: {
+			progressPath () {
+				const progress = this.get( 'progress' );
+				const radius = this.get( 'radius' ) - 3;
+
+				const end = progress * 2 * Math.PI;
+
+				let angle;
+				let path = '';
+				let command = 'M';
+
+				for ( angle = 0; angle < end; angle += increment ) {
+					const x = radius * Math.sin( angle );
+					const y = radius * -Math.cos( angle );
+
+					path += `${command}${x},${y} `;
+
+					command = 'L';
+				}
+
+				return path;
+			}
+		}
+	};
+</script>

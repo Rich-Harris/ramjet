@@ -1,50 +1,61 @@
-import getTransform from './utils/getTransform';
-import { getEasing } from './easing';
-import { TRANSFORM, KEYFRAMES, ANIMATION_DIRECTION, ANIMATION_DURATION, ANIMATION_ITERATION_COUNT, ANIMATION_NAME, ANIMATION_TIMING_FUNCTION, ANIMATION_END } from './utils/detect';
+import getTransform from '../utils/getTransform';
+import { linear } from '../easing';
+import {
+	TRANSFORM,
+	KEYFRAMES,
+	ANIMATION_DIRECTION,
+	ANIMATION_DURATION,
+	ANIMATION_ITERATION_COUNT,
+	ANIMATION_NAME,
+	ANIMATION_TIMING_FUNCTION,
+	ANIMATION_END
+} from '../utils/detect';
 
-export default function mogrifyWithKeyframes ( from, to, options ) {
-	var { fromKeyframes, toKeyframes } = getKeyframes( from, to, options );
+export default class KeyframeTransformer {
+	constructor ( from, to, options ) {
+		var { fromKeyframes, toKeyframes } = getKeyframes( from, to, options );
 
-	let fromId = '_' + ~~( Math.random() * 1000000 );
-	let toId = '_' + ~~( Math.random() * 1000000 );
+		let fromId = '_' + ~~( Math.random() * 1000000 );
+		let toId = '_' + ~~( Math.random() * 1000000 );
 
-	var css = `${KEYFRAMES} ${fromId} { ${fromKeyframes} } ${KEYFRAMES} ${toId} { ${toKeyframes} }`;
-	var dispose = addCss( css );
+		var css = `${KEYFRAMES} ${fromId} { ${fromKeyframes} } ${KEYFRAMES} ${toId} { ${toKeyframes} }`;
+		var dispose = addCss( css );
 
-	from.clone.style[ ANIMATION_DIRECTION ] = 'alternate';
-	from.clone.style[ ANIMATION_DURATION ] = `${options.duration/1000}s`;
-	from.clone.style[ ANIMATION_ITERATION_COUNT ] = 1;
-	from.clone.style[ ANIMATION_NAME ] = fromId;
-	from.clone.style[ ANIMATION_TIMING_FUNCTION ] = 'linear';
+		from.clone.style[ ANIMATION_DIRECTION ] = 'alternate';
+		from.clone.style[ ANIMATION_DURATION ] = `${options.duration/1000}s`;
+		from.clone.style[ ANIMATION_ITERATION_COUNT ] = 1;
+		from.clone.style[ ANIMATION_NAME ] = fromId;
+		from.clone.style[ ANIMATION_TIMING_FUNCTION ] = 'linear';
 
-	to.clone.style[ ANIMATION_DIRECTION ] = 'alternate';
-	to.clone.style[ ANIMATION_DURATION ] = `${options.duration/1000}s`;
-	to.clone.style[ ANIMATION_ITERATION_COUNT ] = 1;
-	to.clone.style[ ANIMATION_NAME ] = toId;
-	to.clone.style[ ANIMATION_TIMING_FUNCTION ] = 'linear';
+		to.clone.style[ ANIMATION_DIRECTION ] = 'alternate';
+		to.clone.style[ ANIMATION_DURATION ] = `${options.duration/1000}s`;
+		to.clone.style[ ANIMATION_ITERATION_COUNT ] = 1;
+		to.clone.style[ ANIMATION_NAME ] = toId;
+		to.clone.style[ ANIMATION_TIMING_FUNCTION ] = 'linear';
 
-	var fromDone, toDone;
+		var fromDone, toDone;
 
-	function done () {
-		if ( fromDone && toDone ) {
-			from.clone.parentNode.removeChild( from.clone );
-			to.clone.parentNode.removeChild( to.clone );
+		function done () {
+			if ( fromDone && toDone ) {
+				from.clone.parentNode.removeChild( from.clone );
+				to.clone.parentNode.removeChild( to.clone );
 
-			if ( options.done ) options.done();
+				if ( options.done ) options.done();
 
-			dispose();
+				dispose();
+			}
 		}
+
+		from.clone.addEventListener( ANIMATION_END, () => {
+			fromDone = true;
+			done();
+		});
+
+		to.clone.addEventListener( ANIMATION_END, () => {
+			toDone = true;
+			done();
+		});
 	}
-
-	from.clone.addEventListener( ANIMATION_END, () => {
-		fromDone = true;
-		done();
-	});
-
-	to.clone.addEventListener( ANIMATION_END, () => {
-		toDone = true;
-		done();
-	});
 }
 
 function addCss ( css ) {
@@ -78,7 +89,7 @@ function getKeyframes ( from, to, options ) {
 	var dsxt = ( from.width / to.width ) - 1;
 	var dsyt = ( from.height / to.height ) - 1;
 
-	var easing = getEasing( options.easing );
+	var easing = options.easing || linear;
 
 	var numFrames = options.duration / 50; // one keyframe per 50ms is probably enough... this may prove not to be the case though
 

@@ -1,0 +1,292 @@
+<section>
+	<h1>More examples</h1>
+
+	<p>Ramjet was inspired by the iOS-8 style zoom effect that happens when you open an app. The (square, with rounded corners) app icon smoothly transforms into a fullscreen rectangular app view, and your brain is totally okay with that! Somehow it is tricked into believing that the two completely different views represent the same object &ndash; that the app is somehow <em>contained</em> inside the icon.</p>
+
+	<p>So it only makes sense to have a demo showing a similar effect. If you have any other good use cases, <a href='https://github.com/rich-harris/ramjet'>come on over to Github</a> so we can add more examples!</p>
+
+	<div class='outer'>
+		<div class='inner'>
+			{{#each items :i}}
+				<div
+					class='menu-item'
+					data-id='{{id}}'
+					data-label='{{i+1}}'
+					style='background-color: {{color}};'
+					on-tap='select(this)'
+				></div>
+			{{/each}}
+
+			{{#if detail}}
+				<div
+					class='detail'
+					intro-outro='ramjet:{id:{{detail.id}}}'
+					style='background-image: url(images/{{detail.id}}.jpg);'
+					on-tap='select(null)'
+				>
+					<p class='credit'><a target='_blank' href='{{detail.url}}'>via Flickr</a> &ndash; <a target='_blank' href='{{detail.license.url}}'>{{detail.license.name}}</a></p>
+				</div>
+			{{/if}}
+		</div>
+	</div>
+</section>
+
+<style>
+	.controls {
+		margin: 0 0 1em 0;
+	}
+
+	.outer {
+		width: 100%;
+		max-width: 24rem;
+		margin: 0 auto;
+	}
+
+	.inner {
+		position: relative;
+		width: 100%;
+		padding: 0 0 133.333% 0;
+	}
+
+	.menu-item {
+		position: relative;
+		font-size: 2em;
+		width: calc(33.333% - 1rem);
+		padding: 0 0 calc(33.333% - 1rem) 0;
+		text-align: center;
+		line-height: 1;
+		float: left;
+		color: #fff;
+		margin: 0 1rem 1rem 0;
+		background-image: url(noise.png);
+		cursor: pointer;
+		box-sizing: border-box;
+	}
+
+	.menu-item::after {
+		content: attr(data-label);
+		position: absolute;
+		top: 50%;
+		left: 0;
+		width: 100%;
+		text-align: center;
+		transform: translate(0,-50%);
+	}
+
+	.detail {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: calc(100% - 1rem);
+		height: calc(100% - 1rem);
+		background: no-repeat 50% 50%;
+		background-size: cover;
+		cursor: pointer;
+		/*margin: 0 1rem 1rem 0;*/
+	}
+
+	.credit {
+		position: absolute;
+		width: 100%;
+		right: 0;
+		bottom: 0;
+		text-align: right;
+		padding: 1em;
+		margin: 0;
+		color: white;
+		font-weight: bold;
+		opacity: 0.6;
+		-webkit-box-sizing: border-box;
+		box-sizing: border-box;
+  		background: rgba(0,0,0,0.4);
+	}
+
+	.credit a, .credit a:visited {
+		color: white;
+	}
+</style>
+
+<script>
+	const ramjet = require( './ramjet' );
+	const tap = require( 'ractive-events-tap' );
+	const eases = require( 'eases' );
+
+	const BY = {
+		name: 'CC BY 2.0',
+		url: 'https://creativecommons.org/licenses/by/2.0/'
+	};
+
+	const BY_SA = {
+		name: 'CC BY-SA 2.0',
+		url: 'https://creativecommons.org/licenses/by-sa/2.0/'
+	};
+
+	const BY_ND = {
+		name: 'CC BY-ND 2.0',
+		url: 'https://creativecommons.org/licenses/by-nd/2.0/'
+	};
+
+	let images = [
+		{
+			color: '#001f3f',
+			id: '7863279376_fdfc66dee5_z',
+			url: 'https://www.flickr.com/photos/43428526@N03/7863279376',
+			license: BY
+		},
+		{
+			color: '#0074D9',
+			id: '6527537485_a10d95332a_z',
+			url: 'https://www.flickr.com/photos/25507134@N00/6527537485',
+			license: BY
+		},
+		{
+			color: '#7FDBFF',
+			id: '3354331318_a8764c5c6b_z',
+			url: 'https://www.flickr.com/photos/37707866@N00/3354331318',
+			license: BY
+		},
+		// {
+		// 	color: '#7FDBFF',
+		// 	id: '7050378839_a5ddebf64c_z',
+		// 	url: 'https://www.flickr.com/photos/12719710@N00/7050378839',
+		// 	license: {
+		// 		name: 'CC BY-SA 2.0',
+		// 		url: 'https://creativecommons.org/licenses/by-sa/2.0/'
+		// 	}
+		// },
+		{
+			color: '#39CCCC',
+			id: '4608886209_b00e405171_z',
+			url: 'https://www.flickr.com/photos/32751486@N00/4608886209',
+			license: BY_SA
+		},
+		{
+			color: '#3D9970',
+			id: '5548569010_bdb0623140_z',
+			url: 'https://www.flickr.com/photos/25483059@N08/5548569010',
+			license: BY
+		},
+		{
+			color: '#2ECC40',
+			id: '2447470760_53844a0359_o',
+			url: 'https://www.flickr.com/photos/8404611@N06/2447470760',
+			license: BY
+		},
+		{
+			color: '#01FF70',
+			id: '114428206_b7e5e87d2a_z',
+			url: 'https://www.flickr.com/photos/33917831@N00/114428206',
+			license: BY_SA
+		},
+		{
+			color: '#FFDC00',
+			id: '4818617089_bb60293550_z',
+			url: 'https://www.flickr.com/photos/46417125@N04/4818617089',
+			license: BY_ND
+		},
+		{
+			color: '#FF851B',
+			id: '3945496657_470f924759_z',
+			url: 'https://www.flickr.com/photos/56068058@N00/3945496657',
+			license: BY
+		},
+		{
+			color: '#FF4136',
+			id: '4216820032_9f2470f41b_z',
+			url: 'https://www.flickr.com/photos/31883499@N05/4216820032',
+			license: BY
+		},
+		{
+			color: '#85144b',
+			id: '2625506561_e3753e0fa8_z',
+			url: 'https://www.flickr.com/photos/8484971@N07/2625506561',
+			license: BY_ND
+		},
+		{
+			color: '#B10DC9',
+			id: '5385464371_c33ed491f6_z',
+			url: 'https://www.flickr.com/photos/58028312@N00/5385464371',
+			license: BY_ND
+		}
+	];
+
+	images.forEach( image => {
+		image.src = `images/${image.id}.jpg`;
+
+		// preload
+		new Image().src = image.src;
+	});
+
+
+
+	component.exports = {
+		data: () => ({
+			easingFunctions: Object.keys( eases ),
+			easing: 'cubicOut',
+			duration: 400,
+			reverse: false,
+
+			// via http://labs.tineye.com/multicolr
+			items: images
+		}),
+
+		select ( item ) {
+			if ( this.get( 'transitioning' ) ) return;
+
+			this.set( 'transitioning', true );
+
+			console.log( 'setting detail to null' );
+			this.set( 'detail', null )
+				.then( () => {
+					console.log( 'setting detail', item );
+					this.set({
+						detail: item,
+						transitioning: false
+					});
+				});
+		},
+
+		events: {
+			tap
+		},
+
+		transitions: {
+			ramjet ( t, params ) {
+				const selector = `.menu-item[data-id='${params.id || t.node.__id}']`
+
+				if ( !selector ) {
+					throw new Error( 'No selector specified for ramjet transition' );
+				}
+
+				const target = document.querySelector( selector );
+
+				console.log( 'target', target );
+
+				const from = t.isIntro ? target : t.node;
+				const to = t.isIntro ? t.node : target;
+
+				console.log( 'from', from );
+				console.log( 'to', to );
+
+				ramjet.transform( from, to, {
+					duration: params.duration || ( t.isIntro ? 400 : 200 ),
+					easing: ramjet.easeOut,
+					done: () => {
+						ramjet.show( t.node );
+						ramjet.show( target );
+						t.complete();
+					}
+				});
+
+				ramjet.hide( t.node );
+				ramjet.hide( target );
+
+				// hack...
+				if ( t.isIntro ) {
+					t.node.__id = params.id;
+					console.log( 't.node.__id', t.node.__id );
+				}
+			}
+		}
+	};
+</script>

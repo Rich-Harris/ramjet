@@ -2,3 +2,4 @@
 node_modules
 .gobble
 .gobble-build
+.tmp

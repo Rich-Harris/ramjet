@@ -1,26 +1,35 @@
 {
-  "name": "mogrify",
+  "name": "ramjet",
   "description": "Morph DOM elements from one state to another with smooth transitions",
   "version": "0.3.2",
   "author": "Rich Harris",
   "license": "MIT",
-  "repository": "https://github.com/rich-harris/mogrify",
-  "main": "dist/mogrify.js",
-  "jsnext:main": "src/mogrify.js",
+  "repository": "https://github.com/rich-harris/ramjet",
+  "main": "dist/ramjet.js",
+  "jsnext:main": "src/ramjet.js",
   "files": [
     "src",
     "dist",
     "README.md"
   ],
   "scripts": {
+    "start": "gobble",
     "build": "gobble build -f dist",
     "prepublish": "npm run build"
   },
   "devDependencies": {
-    "esperanto": "^0.6.11",
-    "gobble": "^0.7.2",
-    "gobble-6to5": "^3.0.0",
+    "eases": "^1.0.6",
+    "gobble": "^0.9.0",
+    "gobble-babel": "^5.0.0",
+    "gobble-browserify": "^0.3.0",
     "gobble-cli": "^0.3.5",
-    "gobble-esperanto-bundle": "^0.1.7"
+    "gobble-derequire": "^0.1.1",
+    "gobble-esperanto-bundle": "^0.1.7",
+    "gobble-ractive": "^0.2.0",
+    "gobble-sass": "^0.4.0",
+    "gobble-uglifyjs": "^0.2.1",
+    "ractive": "^0.7.2",
+    "ractive-events-tap": "^0.2.0",
+    "ractive-transitions-fade": "^0.2.0"
   }
 }

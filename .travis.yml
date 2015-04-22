@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+- 'iojs'
+before_script:
+- npm run build
+script: sh ./scripts/deploy-to-gh-pages.sh
+env:
+  global:
+  - GH_REF: github.com/rich-harris/ramjet.git
+branches:
+  only:
+    - master
