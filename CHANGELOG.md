@@ -1,5 +1,12 @@
 # changelog
 
+## 0.4.0
+
+* Renamed! mogrify is now ramjet
+* Using `position: absolute` instead of fixed, so scrolling doesn't mess things up
+* Added a default duration
+* Added a demo page
+
 ## 0.3.2
 
 * Use camel-cased style properties (`animationName` instead of `animation-name`), for the benefit of older Firefox
