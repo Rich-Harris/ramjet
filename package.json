@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "start": "gobble",
-    "build": "gobble build -f dist",
+    "build": "sh ./scripts/build.sh",
     "prepublish": "npm run build"
   },
   "devDependencies": {
