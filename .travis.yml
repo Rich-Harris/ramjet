@@ -1,6 +1,8 @@
 language: node_js
 node_js:
 - 'iojs'
+before_script:
+- chmod a+x ./scripts/deploy-to-gh-pages.sh
 script: sh ./scripts/deploy-to-gh-pages.sh
 env:
   global:
