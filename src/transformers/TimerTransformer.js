@@ -4,24 +4,22 @@ import rAF from '../utils/rAF';
 
 export default class TimerTransformer {
 	constructor ( from, to, options ) {
-		var dx = to.cx - from.cx;
-		var dy = to.cy - from.cy;
+		const dx = to.cx - from.cx;
+		const dy = to.cy - from.cy;
 
-		var dsxf = ( to.width / from.width ) - 1;
-		var dsyf = ( to.height / from.height ) - 1;
+		const dsxf = ( to.width / from.width ) - 1;
+		const dsyf = ( to.height / from.height ) - 1;
 
-		var dsxt = ( from.width / to.width ) - 1;
-		var dsyt = ( from.height / to.height ) - 1;
+		const dsxt = ( from.width / to.width ) - 1;
+		const dsyt = ( from.height / to.height ) - 1;
 
-		var startTime = Date.now();
-		var duration = options.duration || 400;
-		var easing = options.easing || linear;
+		const startTime = Date.now();
+		const duration = options.duration || 400;
+		const easing = options.easing || linear;
 
 		function tick () {
-			var timeNow, elapsed, t, cx, cy, fromTransform, toTransform;
-
-			timeNow = Date.now();
-			elapsed = timeNow - startTime;
+			const timeNow = Date.now();
+			const elapsed = timeNow - startTime;
 
 			if ( elapsed > duration ) {
 				from.clone.parentNode.removeChild( from.clone );
@@ -34,16 +32,16 @@ export default class TimerTransformer {
 				return;
 			}
 
-			t = easing( elapsed / duration );
+			const t = easing( elapsed / duration );
 
 			from.clone.style.opacity = 1 - t;
 			to.clone.style.opacity = t;
 
-			cx = from.cx + ( dx * t );
-			cy = from.cy + ( dy * t );
+			const cx = from.cx + ( dx * t );
+			const cy = from.cy + ( dy * t );
 
-			fromTransform = getTransform( from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
-			toTransform = getTransform( to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
+			const fromTransform = getTransform( from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
+			const toTransform = getTransform( to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
 
 			if ( from.isSvg ) {
 				from.clone.setAttribute( 'transform', fromTransform );

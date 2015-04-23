@@ -7,20 +7,16 @@
             // for the sake of Safari, may it burn in hell
             var BLACKLIST = ['length', 'parentRule'];
 
-            var styleKeys = (function () {
-            	var keys;
+            var styleKeys = undefined;
 
-            	if (typeof CSS2Properties !== 'undefined') {
-            		// why hello Firefox
-            		keys = Object.keys(CSS2Properties.prototype);
-            	} else {
-            		keys = Object.keys(document.createElement('div').style).filter(function (k) {
-            			return ! ~BLACKLIST.indexOf(k);
-            		});
-            	}
-
-            	return keys;
-            })();
+            if (typeof CSS2Properties !== 'undefined') {
+            	// why hello Firefox
+            	styleKeys = Object.keys(CSS2Properties.prototype);
+            } else {
+            	styleKeys = Object.keys(document.createElement('div').style).filter(function (k) {
+            		return ! ~BLACKLIST.indexOf(k);
+            	});
+            }
 
             var utils_styleKeys = styleKeys;
 
@@ -37,9 +33,11 @@
             document.body.appendChild(svg);
 
             function cloneNode(node) {
-            	var style, clone, len, i, attr;
+            	var clone = node.cloneNode();
 
-            	clone = node.cloneNode();
+            	var style = undefined;
+            	var len = undefined;
+            	var i = undefined;
 
             	if (node.nodeType === 1) {
             		style = window.getComputedStyle(node);
@@ -47,6 +45,9 @@
             		utils_styleKeys.forEach(function (prop) {
             			clone.style[prop] = style[prop];
             		});
+
+            		len;
+            		i;
 
             		len = node.attributes.length;
             		for (i = 0; i < len; i += 1) {
@@ -154,6 +155,7 @@
             	if ((pos /= 0.5) < 1) {
             		return 0.5 * Math.pow(pos, 3);
             	}
+
             	return 0.5 * (Math.pow(pos - 2, 3) + 2);
             }
 

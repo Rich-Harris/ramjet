@@ -13,13 +13,13 @@ import {
 
 export default class KeyframeTransformer {
 	constructor ( from, to, options ) {
-		var { fromKeyframes, toKeyframes } = getKeyframes( from, to, options );
+		const { fromKeyframes, toKeyframes } = getKeyframes( from, to, options );
 
-		let fromId = '_' + ~~( Math.random() * 1000000 );
-		let toId = '_' + ~~( Math.random() * 1000000 );
+		const fromId = '_' + ~~( Math.random() * 1000000 );
+		const toId = '_' + ~~( Math.random() * 1000000 );
 
-		var css = `${KEYFRAMES} ${fromId} { ${fromKeyframes} } ${KEYFRAMES} ${toId} { ${toKeyframes} }`;
-		var dispose = addCss( css );
+		const css = `${KEYFRAMES} ${fromId} { ${fromKeyframes} } ${KEYFRAMES} ${toId} { ${toKeyframes} }`;
+		const dispose = addCss( css );
 
 		from.clone.style[ ANIMATION_DIRECTION ] = 'alternate';
 		from.clone.style[ ANIMATION_DURATION ] = `${options.duration/1000}s`;
@@ -33,7 +33,8 @@ export default class KeyframeTransformer {
 		to.clone.style[ ANIMATION_NAME ] = toId;
 		to.clone.style[ ANIMATION_TIMING_FUNCTION ] = 'linear';
 
-		var fromDone, toDone;
+		let fromDone;
+		let toDone;
 
 		function done () {
 			if ( fromDone && toDone ) {

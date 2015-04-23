@@ -2,9 +2,13 @@ import styleKeys from './styleKeys';
 import { svg, svgns } from './svg';
 
 export function cloneNode ( node ) {
-	var style, clone, len, i, attr;
+	const clone = node.cloneNode();
 
-	clone = node.cloneNode();
+	let style;
+	let len;
+	let i;
+
+	let attr;
 
 	if ( node.nodeType === 1 ) {
 		style = window.getComputedStyle( node );
@@ -29,12 +33,10 @@ export function cloneNode ( node ) {
 }
 
 export function processNode ( node ) {
-	var target, style, bcr, clone, i, len, child, ctm;
+	const bcr = node.getBoundingClientRect();
+	const style = window.getComputedStyle( node );
 
-	bcr = node.getBoundingClientRect();
-	style = window.getComputedStyle( node );
-
-	clone = node.cloneNode();
+	const clone = node.cloneNode();
 	styleKeys.forEach( function ( prop ) {
 		clone.style[ prop ] = style[ prop ];
 	});
@@ -49,13 +51,14 @@ export function processNode ( node ) {
 
 	// clone children recursively. We don't do this at the top level, because we want
 	// to use the reference to `style`
-	len = node.childNodes.length;
+	const len = node.childNodes.length;
+	let i;
+
 	for ( i = 0; i < len; i += 1 ) {
-		child = cloneNode( node.childNodes[i] );
-		clone.appendChild( child );
+		clone.appendChild( cloneNode( node.childNodes[i] ) );
 	}
 
-	target = {
+	const target = {
 		node, bcr, clone,
 		cx: ( bcr.left + bcr.right ) / 2,
 		cy: ( bcr.top + bcr.bottom ) / 2,
@@ -65,7 +68,7 @@ export function processNode ( node ) {
 	};
 
 	if ( target.isSvg ) {
-		ctm = node.getScreenCTM();
+		const ctm = node.getScreenCTM();
 		target.transform = 'matrix(' + [ ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f ].join( ',' ) + ')';
 
 		svg.appendChild( clone );

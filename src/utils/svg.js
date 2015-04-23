@@ -1,5 +1,5 @@
-var svgns = 'http://www.w3.org/2000/svg';
-var svg = document.createElementNS( svgns, 'svg' );
+const svgns = 'http://www.w3.org/2000/svg';
+const svg = document.createElementNS( svgns, 'svg' );
 
 svg.style.position = 'fixed';
 svg.style.top = svg.style.left = '0';

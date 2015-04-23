@@ -7,6 +7,7 @@
 		"window": true,
 		"document": true,
 		"requestAnimationFrame": true,
-		"CSS2Properties": true
+		"CSS2Properties": true,
+		"setTimeout": true
 	}
 }
