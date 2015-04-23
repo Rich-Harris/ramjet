@@ -39,21 +39,14 @@
             	var len = undefined;
             	var i = undefined;
 
+            	var attr = undefined;
+
             	if (node.nodeType === 1) {
             		style = window.getComputedStyle(node);
 
             		utils_styleKeys.forEach(function (prop) {
             			clone.style[prop] = style[prop];
             		});
-
-            		len;
-            		i;
-
-            		len = node.attributes.length;
-            		for (i = 0; i < len; i += 1) {
-            			attr = node.attributes[i];
-            			clone.setAttribute(attr.name, attr.value);
-            		}
 
             		len = node.childNodes.length;
             		for (i = 0; i < len; i += 1) {
@@ -64,53 +57,47 @@
             	return clone;
             }
 
-            function processNode(node) {
-            	var target, style, bcr, clone, i, len, child, ctm;
+            function wrapNode(node) {
+            	var isSvg = node.namespaceURI === svgns;
 
-            	bcr = node.getBoundingClientRect();
-            	style = window.getComputedStyle(node);
+            	var _node$getBoundingClientRect = node.getBoundingClientRect();
 
-            	clone = node.cloneNode();
-            	utils_styleKeys.forEach(function (prop) {
-            		clone.style[prop] = style[prop];
-            	});
+            	var left = _node$getBoundingClientRect.left;
+            	var right = _node$getBoundingClientRect.right;
+            	var top = _node$getBoundingClientRect.top;
+            	var bottom = _node$getBoundingClientRect.bottom;
 
-            	var offsetParent = node.offsetParent;
-            	var offsetParentStyle = window.getComputedStyle(offsetParent);
-            	var offsetParentBcr = offsetParent.getBoundingClientRect();
+            	var style = window.getComputedStyle(node);
 
-            	clone.style.position = 'absolute';
-            	clone.style.top = bcr.top - parseInt(style.marginTop, 10) - (offsetParentBcr.top - parseInt(offsetParentStyle.marginTop, 10)) + 'px';
-            	clone.style.left = bcr.left - parseInt(style.marginLeft, 10) - (offsetParentBcr.left - parseInt(offsetParentStyle.marginLeft, 10)) + 'px';
+            	var clone = cloneNode(node);
 
-            	// clone children recursively. We don't do this at the top level, because we want
-            	// to use the reference to `style`
-            	len = node.childNodes.length;
-            	for (i = 0; i < len; i += 1) {
-            		child = cloneNode(node.childNodes[i]);
-            		clone.appendChild(child);
-            	}
-
-            	target = {
-            		node: node, bcr: bcr, clone: clone,
-            		cx: (bcr.left + bcr.right) / 2,
-            		cy: (bcr.top + bcr.bottom) / 2,
-            		width: bcr.right - bcr.left,
-            		height: bcr.bottom - bcr.top,
-            		isSvg: node.namespaceURI === svgns
+            	var wrapper = {
+            		node: node, clone: clone, isSvg: isSvg,
+            		cx: (left + right) / 2,
+            		cy: (top + bottom) / 2,
+            		width: right - left,
+            		height: bottom - top
             	};
 
-            	if (target.isSvg) {
-            		ctm = node.getScreenCTM();
-            		target.transform = 'matrix(' + [ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f].join(',') + ')';
+            	if (isSvg) {
+            		var ctm = node.getScreenCTM();
+            		wrapper.transform = 'matrix(' + [ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f].join(',') + ')';
 
             		svg.appendChild(clone);
             	} else {
-            		target.transform = ''; // TODO...?
+            		var offsetParent = node.offsetParent;
+            		var offsetParentStyle = window.getComputedStyle(offsetParent);
+            		var offsetParentBcr = offsetParent.getBoundingClientRect();
+
+            		clone.style.position = 'absolute';
+            		clone.style.top = top - parseInt(style.marginTop, 10) - (offsetParentBcr.top - parseInt(offsetParentStyle.marginTop, 10)) + 'px';
+            		clone.style.left = left - parseInt(style.marginLeft, 10) - (offsetParentBcr.left - parseInt(offsetParentStyle.marginLeft, 10)) + 'px';
+
+            		wrapper.transform = ''; // TODO...?
             		node.parentNode.appendChild(clone);
             	}
 
-            	return target;
+            	return wrapper;
             }
 
             function hideNode(node) {
@@ -184,10 +171,8 @@
             	var easing = options.easing || linear;
 
             	function tick() {
-            		var timeNow, elapsed, t, cx, cy, fromTransform, toTransform;
-
-            		timeNow = Date.now();
-            		elapsed = timeNow - startTime;
+            		var timeNow = Date.now();
+            		var elapsed = timeNow - startTime;
 
             		if (elapsed > duration) {
             			from.clone.parentNode.removeChild(from.clone);
@@ -200,16 +185,16 @@
             			return;
             		}
 
-            		t = easing(elapsed / duration);
+            		var t = easing(elapsed / duration);
 
             		from.clone.style.opacity = 1 - t;
             		to.clone.style.opacity = t;
 
-            		cx = from.cx + dx * t;
-            		cy = from.cy + dy * t;
+            		var cx = from.cx + dx * t;
+            		var cy = from.cy + dy * t;
 
-            		fromTransform = utils_getTransform(from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t) + ' ' + from.transform;
-            		toTransform = utils_getTransform(to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t) + ' ' + to.transform;
+            		var fromTransform = utils_getTransform(from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t) + ' ' + from.transform;
+            		var toTransform = utils_getTransform(to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t) + ' ' + to.transform;
 
             		if (from.isSvg) {
             			from.clone.setAttribute('transform', fromTransform);
@@ -301,7 +286,8 @@
             	to.clone.style[ANIMATION_NAME] = toId;
             	to.clone.style[ANIMATION_TIMING_FUNCTION] = 'linear';
 
-            	var fromDone, toDone;
+            	var fromDone = undefined;
+            	var toDone = undefined;
 
             	function done() {
             		if (fromDone && toDone) {
@@ -409,8 +395,8 @@
             			options.duration = 400;
             		}
 
-            		var from = processNode(fromNode);
-            		var to = processNode(toNode);
+            		var from = wrapNode(fromNode);
+            		var to = wrapNode(toNode);
 
             		if (!keyframesSupported || options.useTimer || from.isSvg || to.isSvg) {
             			return new transformers_TimerTransformer(from, to, options);

@@ -69,22 +69,22 @@ a:visited {
 
 @font-face {
     font-family: 'Inconsolata';
-    src: url('fonts/Inconsolata/inconsolata-Regular-webfont.eot');
-    src: url('fonts/Inconsolata/inconsolata-Regular-webfont.eot?#iefix') format('embedded-opentype'),
-         url('fonts/Inconsolata/inconsolata-Regular-webfont.woff') format('woff'),
-         url('fonts/Inconsolata/inconsolata-Regular-webfont.ttf') format('truetype'),
-         url('fonts/Inconsolata/inconsolata-Regular-webfont.svg#inconsolataregular') format('svg');
+    src: url('fonts/Inconsolata/inconsolata-regular-webfont.eot');
+    src: url('fonts/Inconsolata/inconsolata-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('fonts/Inconsolata/inconsolata-regular-webfont.woff') format('woff'),
+         url('fonts/Inconsolata/inconsolata-regular-webfont.ttf') format('truetype'),
+         url('fonts/Inconsolata/inconsolata-regular-webfont.svg#inconsolataregular') format('svg');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Inconsolata';
-    src: url('fonts/Inconsolata/inconsolata-Bold-webfont.eot');
-    src: url('fonts/Inconsolata/inconsolata-Bold-webfont.eot?#iefix') format('embedded-opentype'),
-         url('fonts/Inconsolata/inconsolata-Bold-webfont.woff') format('woff'),
-         url('fonts/Inconsolata/inconsolata-Bold-webfont.ttf') format('truetype'),
-         url('fonts/Inconsolata/inconsolata-Bold-webfont.svg#inconsolatabold') format('svg');
+    src: url('fonts/Inconsolata/inconsolata-bold-webfont.eot');
+    src: url('fonts/Inconsolata/inconsolata-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('fonts/Inconsolata/inconsolata-bold-webfont.woff') format('woff'),
+         url('fonts/Inconsolata/inconsolata-bold-webfont.ttf') format('truetype'),
+         url('fonts/Inconsolata/inconsolata-bold-webfont.svg#inconsolatabold') format('svg');
     font-weight: 500;
     font-style: normal;
 }
