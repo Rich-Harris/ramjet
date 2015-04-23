@@ -1,5 +1,9 @@
 # changelog
 
+## 0.4.3
+
+* Fix Firefox SVG bug
+
 ## 0.4.2
 
 * Account for offsetParent margin
