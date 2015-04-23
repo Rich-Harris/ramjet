@@ -5,7 +5,7 @@ export default function addClass ( node, className ) {
 	}
 
 	var pattern = new RegExp( `\\b${className}\\b`, 'g' );
-	if ( pattern.test( node.className ) ) {
-		node.className = node.className.replace( pattern, '' );
+	if ( pattern.test( node.getAttribute( 'class' ) ) ) {
+		node.setAttribute( 'class', node.getAttribute( 'class' ).replace( pattern, '' ) );
 	}
 }
