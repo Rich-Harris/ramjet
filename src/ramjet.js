@@ -1,4 +1,4 @@
-import { processNode, showNode, hideNode } from './utils/node';
+import { wrapNode, showNode, hideNode } from './utils/node';
 import TimerTransformer from './transformers/TimerTransformer';
 import KeyframeTransformer from './transformers/KeyframeTransformer';
 import { linear, easeIn, easeOut, easeInOut } from './easing';
@@ -14,8 +14,8 @@ export default {
 			options.duration = 400;
 		}
 
-		const from = processNode( fromNode );
-		const to = processNode( toNode );
+		const from = wrapNode( fromNode );
+		const to = wrapNode( toNode );
 
 		if ( !keyframesSupported || options.useTimer || from.isSvg || to.isSvg ) {
 			return new TimerTransformer( from, to, options );

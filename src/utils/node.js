@@ -32,7 +32,9 @@ export function cloneNode ( node ) {
 	return clone;
 }
 
-export function processNode ( node ) {
+export function wrapNode ( node ) {
+	const isSvg = node.namespaceURI === svgns;
+
 	const bcr = node.getBoundingClientRect();
 	const style = window.getComputedStyle( node );
 
@@ -40,14 +42,6 @@ export function processNode ( node ) {
 	styleKeys.forEach( function ( prop ) {
 		clone.style[ prop ] = style[ prop ];
 	});
-
-	const offsetParent = node.offsetParent;
-	const offsetParentStyle = window.getComputedStyle( offsetParent );
-	const offsetParentBcr = offsetParent.getBoundingClientRect();
-
-	clone.style.position = 'absolute';
-	clone.style.top = ( bcr.top - parseInt( style.marginTop, 10 ) - ( offsetParentBcr.top - parseInt( offsetParentStyle.marginTop, 10 ) ) ) + 'px';
-	clone.style.left = ( bcr.left - parseInt( style.marginLeft, 10 ) - ( offsetParentBcr.left - parseInt( offsetParentStyle.marginLeft, 10 ) ) ) + 'px';
 
 	// clone children recursively. We don't do this at the top level, because we want
 	// to use the reference to `style`
@@ -58,26 +52,33 @@ export function processNode ( node ) {
 		clone.appendChild( cloneNode( node.childNodes[i] ) );
 	}
 
-	const target = {
-		node, bcr, clone,
+	const wrapper = {
+		node, bcr, clone, isSvg,
 		cx: ( bcr.left + bcr.right ) / 2,
 		cy: ( bcr.top + bcr.bottom ) / 2,
 		width: bcr.right - bcr.left,
-		height: bcr.bottom - bcr.top,
-		isSvg: node.namespaceURI === svgns
+		height: bcr.bottom - bcr.top
 	};
 
-	if ( target.isSvg ) {
+	if ( isSvg ) {
 		const ctm = node.getScreenCTM();
-		target.transform = 'matrix(' + [ ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f ].join( ',' ) + ')';
+		wrapper.transform = 'matrix(' + [ ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f ].join( ',' ) + ')';
 
 		svg.appendChild( clone );
 	} else {
-		target.transform = ''; // TODO...?
+		const offsetParent = node.offsetParent;
+		const offsetParentStyle = window.getComputedStyle( offsetParent );
+		const offsetParentBcr = offsetParent.getBoundingClientRect();
+
+		clone.style.position = 'absolute';
+		clone.style.top = ( bcr.top - parseInt( style.marginTop, 10 ) - ( offsetParentBcr.top - parseInt( offsetParentStyle.marginTop, 10 ) ) ) + 'px';
+		clone.style.left = ( bcr.left - parseInt( style.marginLeft, 10 ) - ( offsetParentBcr.left - parseInt( offsetParentStyle.marginLeft, 10 ) ) ) + 'px';
+
+		wrapper.transform = ''; // TODO...?
 		node.parentNode.appendChild( clone );
 	}
 
-	return target;
+	return wrapper;
 }
 
 export function hideNode ( node ) {
