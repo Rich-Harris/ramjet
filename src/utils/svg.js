@@ -8,6 +8,11 @@ svg.style.overflow = 'visible';
 svg.style.pointerEvents = 'none';
 svg.setAttribute( 'class', 'mogrify-svg' );
 
-document.body.appendChild( svg );
+let appendedSvg = false;
 
-export { svg, svgns };
+function appendSvg () {
+	document.body.appendChild( svg );
+	appendedSvg = true;
+}
+
+export { svg, svgns, appendSvg, appendedSvg };

@@ -3,6 +3,7 @@ import TimerTransformer from './transformers/TimerTransformer';
 import KeyframeTransformer from './transformers/KeyframeTransformer';
 import { linear, easeIn, easeOut, easeInOut } from './easing';
 import { keyframesSupported } from './utils/detect';
+import { appendedSvg, appendSvg } from './utils/svg';
 
 export default {
 	transform ( fromNode, toNode, options = {} ) {
@@ -16,6 +17,10 @@ export default {
 
 		const from = wrapNode( fromNode );
 		const to = wrapNode( toNode );
+
+		if ( from.isSvg || to.isSvg && !appendedSvg ) {
+			appendSvg();
+		}
 
 		if ( !keyframesSupported || options.useTimer || from.isSvg || to.isSvg ) {
 			return new TimerTransformer( from, to, options );
