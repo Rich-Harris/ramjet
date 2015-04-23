@@ -29,17 +29,17 @@ export function cloneNode ( node ) {
 export function wrapNode ( node ) {
 	const isSvg = node.namespaceURI === svgns;
 
-	const bcr = node.getBoundingClientRect();
+	const { left, right, top, bottom } = node.getBoundingClientRect();
 	const style = window.getComputedStyle( node );
 
 	const clone = cloneNode( node );
 
 	const wrapper = {
-		node, bcr, clone, isSvg,
-		cx: ( bcr.left + bcr.right ) / 2,
-		cy: ( bcr.top + bcr.bottom ) / 2,
-		width: bcr.right - bcr.left,
-		height: bcr.bottom - bcr.top
+		node, clone, isSvg,
+		cx: ( left + right ) / 2,
+		cy: ( top + bottom ) / 2,
+		width: right - left,
+		height: bottom - top
 	};
 
 	if ( isSvg ) {
@@ -53,8 +53,8 @@ export function wrapNode ( node ) {
 		const offsetParentBcr = offsetParent.getBoundingClientRect();
 
 		clone.style.position = 'absolute';
-		clone.style.top = ( bcr.top - parseInt( style.marginTop, 10 ) - ( offsetParentBcr.top - parseInt( offsetParentStyle.marginTop, 10 ) ) ) + 'px';
-		clone.style.left = ( bcr.left - parseInt( style.marginLeft, 10 ) - ( offsetParentBcr.left - parseInt( offsetParentStyle.marginLeft, 10 ) ) ) + 'px';
+		clone.style.top = ( top - parseInt( style.marginTop, 10 ) - ( offsetParentBcr.top - parseInt( offsetParentStyle.marginTop, 10 ) ) ) + 'px';
+		clone.style.left = ( left - parseInt( style.marginLeft, 10 ) - ( offsetParentBcr.left - parseInt( offsetParentStyle.marginLeft, 10 ) ) ) + 'px';
 
 		wrapper.transform = ''; // TODO...?
 		node.parentNode.appendChild( clone );
