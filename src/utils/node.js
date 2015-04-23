@@ -17,12 +17,6 @@ export function cloneNode ( node ) {
 			clone.style[ prop ] = style[ prop ];
 		});
 
-		len = node.attributes.length;
-		for ( i = 0; i < len; i += 1 ) {
-			attr = node.attributes[i];
-			clone.setAttribute( attr.name, attr.value );
-		}
-
 		len = node.childNodes.length;
 		for ( i = 0; i < len; i += 1 ) {
 			clone.appendChild( cloneNode( node.childNodes[i] ) );
@@ -38,19 +32,7 @@ export function wrapNode ( node ) {
 	const bcr = node.getBoundingClientRect();
 	const style = window.getComputedStyle( node );
 
-	const clone = node.cloneNode();
-	styleKeys.forEach( function ( prop ) {
-		clone.style[ prop ] = style[ prop ];
-	});
-
-	// clone children recursively. We don't do this at the top level, because we want
-	// to use the reference to `style`
-	const len = node.childNodes.length;
-	let i;
-
-	for ( i = 0; i < len; i += 1 ) {
-		clone.appendChild( cloneNode( node.childNodes[i] ) );
-	}
+	const clone = cloneNode( node );
 
 	const wrapper = {
 		node, bcr, clone, isSvg,
