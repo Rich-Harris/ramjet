@@ -10,7 +10,17 @@ let ANIMATION_NAME;
 let ANIMATION_TIMING_FUNCTION;
 let ANIMATION_END;
 
-if ( ( 'transform' in div.style || 'webkitTransform' in div.style ) && ( 'animation' in div.style || 'webkitAnimation' in div.style ) ) {
+// We have to browser-sniff for IE11, because it was apparently written
+// by a barrel of stoned monkeys - http://jsfiddle.net/rich_harris/oquLu2qL/
+
+// http://stackoverflow.com/questions/17907445/how-to-detect-ie11
+const isIe11 = !window.ActiveXObject && 'ActiveXObject' in window
+
+if (
+	!isIe11 &&
+	( 'transform' in div.style || 'webkitTransform' in div.style ) &&
+	( 'animation' in div.style || 'webkitAnimation' in div.style )
+) {
 	keyframesSupported = true;
 
 	TRANSFORM = 'transform' in div.style ? 'transform' : '-webkit-transform';
