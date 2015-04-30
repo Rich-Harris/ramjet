@@ -1,0 +1,15 @@
+{
+  "name": "ramjet",
+  "homepage": "http://www.rich-harris.co.uk/ramjet/",
+  "authors": [
+    "Rich Harris <richard.a.harris@gmail.com>"
+  ],
+  "description": "Transform DOM elements into each another with smooth transitions",
+  "main": "dist/ramjet.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "scripts",
+    "test"
+  ]
+}
