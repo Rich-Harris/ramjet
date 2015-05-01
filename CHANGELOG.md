@@ -1,5 +1,9 @@
 # changelog
 
+## 0.4.4
+
+* Add IE9 support ([#3](https://github.com/Rich-Harris/ramjet/issues/3)). Thanks crohrer!
+
 ## 0.4.3
 
 * Fix Firefox SVG bug
