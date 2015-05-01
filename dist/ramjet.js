@@ -30,7 +30,12 @@
             svg.style.pointerEvents = 'none';
             svg.setAttribute('class', 'mogrify-svg');
 
-            document.body.appendChild(svg);
+            var appendedSvg = false;
+
+            function appendSvg() {
+            	document.body.appendChild(svg);
+            	appendedSvg = true;
+            }
 
             function cloneNode(node) {
             	var clone = node.cloneNode();
@@ -199,13 +204,13 @@
             		if (from.isSvg) {
             			from.clone.setAttribute('transform', fromTransform);
             		} else {
-            			from.clone.style.transform = from.clone.style.webkitTransform = fromTransform;
+            			from.clone.style.transform = from.clone.style.webkitTransform = from.clone.style.msTransform = fromTransform;
             		}
 
             		if (to.isSvg) {
             			to.clone.setAttribute('transform', toTransform);
             		} else {
-            			to.clone.style.transform = to.clone.style.webkitTransform = toTransform;
+            			to.clone.style.transform = to.clone.style.webkitTransform = to.clone.style.msTransform = toTransform;
             		}
 
             		utils_rAF(tick);
@@ -219,6 +224,7 @@
             var div = document.createElement('div');
 
             var keyframesSupported = true;
+            var transformSupported = true;
             var TRANSFORM = undefined;
             var KEYFRAMES = undefined;
             var ANIMATION_DIRECTION = undefined;
@@ -228,34 +234,47 @@
             var ANIMATION_TIMING_FUNCTION = undefined;
             var ANIMATION_END = undefined;
 
-            if (('transform' in div.style || 'webkitTransform' in div.style) && ('animation' in div.style || 'webkitAnimation' in div.style)) {
-            	keyframesSupported = true;
+            // We have to browser-sniff for IE11, because it was apparently written
+            // by a barrel of stoned monkeys - http://jsfiddle.net/rich_harris/oquLu2qL/
 
-            	TRANSFORM = 'transform' in div.style ? 'transform' : '-webkit-transform';
+            // http://stackoverflow.com/questions/17907445/how-to-detect-ie11
+            var isIe11 = !window.ActiveXObject && 'ActiveXObject' in window;
 
-            	if ('animation' in div.style) {
-            		KEYFRAMES = '@keyframes';
+            if (!isIe11 && ('animation' in div.style || 'webkitAnimation' in div.style)) {
+                  keyframesSupported = true;
 
-            		ANIMATION_DIRECTION = 'animationDirection';
-            		ANIMATION_DURATION = 'animationDuration';
-            		ANIMATION_ITERATION_COUNT = 'animationIterationCount';
-            		ANIMATION_NAME = 'animationName';
-            		ANIMATION_TIMING_FUNCTION = 'animationTimingFunction';
+                  if ('animation' in div.style) {
+                        KEYFRAMES = '@keyframes';
 
-            		ANIMATION_END = 'animationend';
-            	} else {
-            		KEYFRAMES = '@-webkit-keyframes';
+                        ANIMATION_DIRECTION = 'animationDirection';
+                        ANIMATION_DURATION = 'animationDuration';
+                        ANIMATION_ITERATION_COUNT = 'animationIterationCount';
+                        ANIMATION_NAME = 'animationName';
+                        ANIMATION_TIMING_FUNCTION = 'animationTimingFunction';
 
-            		ANIMATION_DIRECTION = 'webkitAnimationDirection';
-            		ANIMATION_DURATION = 'webkitAnimationDuration';
-            		ANIMATION_ITERATION_COUNT = 'webkitAnimationIterationCount';
-            		ANIMATION_NAME = 'webkitAnimationName';
-            		ANIMATION_TIMING_FUNCTION = 'webkitAnimationTimingFunction';
+                        ANIMATION_END = 'animationend';
+                  } else {
+                        KEYFRAMES = '@-webkit-keyframes';
 
-            		ANIMATION_END = 'webkitAnimationEnd';
-            	}
+                        ANIMATION_DIRECTION = 'webkitAnimationDirection';
+                        ANIMATION_DURATION = 'webkitAnimationDuration';
+                        ANIMATION_ITERATION_COUNT = 'webkitAnimationIterationCount';
+                        ANIMATION_NAME = 'webkitAnimationName';
+                        ANIMATION_TIMING_FUNCTION = 'webkitAnimationTimingFunction';
+
+                        ANIMATION_END = 'webkitAnimationEnd';
+                  }
             } else {
-            	keyframesSupported = false;
+                  keyframesSupported = false;
+            }
+
+            if (!isIe11 && ('transform' in div.style || 'webkitTransform' in div.style || 'msTransform' in div.style)) {
+            	transformSupported = true;
+
+            	TRANSFORM = 'transform' in div.style ? 'transform' : 'webkitTransform' in div.style ? '-webkit-transform' : '-ms-transform';
+
+            } else {
+            	transformSupported = false;
             }
 
             var transformers_KeyframeTransformer___classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
@@ -397,6 +416,10 @@
 
             		var from = wrapNode(fromNode);
             		var to = wrapNode(toNode);
+
+            		if (from.isSvg || to.isSvg && !appendedSvg) {
+            			appendSvg();
+            		}
 
             		if (!keyframesSupported || options.useTimer || from.isSvg || to.isSvg) {
             			return new transformers_TimerTransformer(from, to, options);

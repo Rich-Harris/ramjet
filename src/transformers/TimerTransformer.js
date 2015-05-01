@@ -46,13 +46,13 @@ export default class TimerTransformer {
 			if ( from.isSvg ) {
 				from.clone.setAttribute( 'transform', fromTransform );
 			} else {
-				from.clone.style.transform = from.clone.style.webkitTransform = fromTransform;
+				from.clone.style.transform = from.clone.style.webkitTransform = from.clone.style.msTransform = fromTransform;
 			}
 
 			if ( to.isSvg ) {
 				to.clone.setAttribute( 'transform', toTransform );
 			} else {
-				to.clone.style.transform = to.clone.style.webkitTransform = toTransform;
+				to.clone.style.transform = to.clone.style.webkitTransform = to.clone.style.msTransform = toTransform;
 			}
 
 			rAF( tick );
