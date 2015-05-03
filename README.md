@@ -60,7 +60,7 @@ A handful of easing functions, included for convenience.
 
 ## Browser support
 
-Successfully tested in IE10+, Chrome (desktop and Android), Firefox, Safari 6+ and mobile Safari - please raise an issue if your experience differs! IE9 support will [happen one day](https://github.com/Rich-Harris/ramjet/issues/3).
+Successfully tested in IE9+, Chrome (desktop and Android), Firefox, Safari 6+ and mobile Safari - please raise an issue if your experience differs!
 
 
 ## License
