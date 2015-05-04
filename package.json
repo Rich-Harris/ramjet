@@ -15,7 +15,8 @@
   "scripts": {
     "start": "gobble",
     "build": "sh ./scripts/build.sh",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "test": "open http://localhost:4567/test.html; npm start"
   },
   "devDependencies": {
     "eases": "^1.0.6",

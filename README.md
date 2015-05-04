@@ -63,6 +63,16 @@ A handful of easing functions, included for convenience.
 Successfully tested in IE9+, Chrome (desktop and Android), Firefox, Safari 6+ and mobile Safari - please raise an issue if your experience differs!
 
 
+## Developing and testing
+
+Once you've cloned this repo and installed all the development dependencies (`npm install`), you can start a development server by running `npm start` and navigating to [localhost:4567](http://localhost:4567). Any changes to the source code (in the `src` directory) will be immediately reflected, courtesy of [gobble](https://github.com/gobblejs/gobble).
+
+To build, do `npm run build`.
+
+Reliable automated tests of a library like ramjet are all but impossible. Instead `npm test` will start the development server and navigate you to [localhost:4567/test.html](http://localhost:4567/test.html), where you can visually check that the library behaves as expected.
+
+
+
 ## License
 
 MIT.
