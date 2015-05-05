@@ -1,18 +1,29 @@
 const svgns = 'http://www.w3.org/2000/svg';
-const svg = document.createElementNS( svgns, 'svg' );
+const svgContainer = document.createElementNS( svgns, 'svg' );
 
-svg.style.position = 'fixed';
-svg.style.top = svg.style.left = '0';
-svg.style.width = svg.style.height = '100%';
-svg.style.overflow = 'visible';
-svg.style.pointerEvents = 'none';
-svg.setAttribute( 'class', 'mogrify-svg' );
+svgContainer.style.position = 'fixed';
+svgContainer.style.top = svgContainer.style.left = '0';
+svgContainer.style.width = svgContainer.style.height = '100%';
+svgContainer.style.overflow = 'visible';
+svgContainer.style.pointerEvents = 'none';
+svgContainer.setAttribute( 'class', 'ramjet-svg' );
 
-let appendedSvg = false;
+let count = 0;
 
-function appendSvg () {
-	document.body.appendChild( svg );
-	appendedSvg = true;
+function incrementSvg () {
+	if ( !count ) {
+		document.body.appendChild( svgContainer );
+	}
+
+	count += 1;
 }
 
-export { svg, svgns, appendSvg, appendedSvg };
+function decrementSvg () {
+	count -= 1;
+
+	if ( !count ) {
+		document.body.removeChild( svgContainer );
+	}
+}
+
+export { svgContainer, incrementSvg, decrementSvg, svgns };

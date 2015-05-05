@@ -1,5 +1,8 @@
 import styleKeys from './styleKeys';
-import { svg, svgns } from './svg';
+import { svgContainer, svgns } from './svg';
+import getCumulativeOpacity from './getCumulativeOpacity';
+import getCumulativeTransform from './getCumulativeTransform';
+import { invert, parseMatrixTransformString } from './matrix';
 
 export function cloneNode ( node ) {
 	const clone = node.cloneNode();
@@ -26,67 +29,87 @@ export function cloneNode ( node ) {
 	return clone;
 }
 
-export function wrapNode ( node ) {
+export function wrapNode ( node, container ) {
 	const isSvg = node.namespaceURI === svgns;
 
-	const { left, right, top, bottom } = node.getBoundingClientRect();
+	let bcr = node.getBoundingClientRect();
 	const style = window.getComputedStyle( node );
+	const opacity = getCumulativeOpacity( node );
 
 	const clone = cloneNode( node );
 
-	const wrapper = {
-		node, clone, isSvg,
-		cx: ( left + right ) / 2,
-		cy: ( top + bottom ) / 2,
-		width: right - left,
-		height: bottom - top,
-		transform: null,
-		borderRadius: null
-	};
+	let transform;
+	let borderRadius;
 
 	if ( isSvg ) {
 		const ctm = node.getScreenCTM();
-		wrapper.transform = 'matrix(' + [ ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f ].join( ',' ) + ')';
-		wrapper.borderRadius = [ 0, 0, 0, 0 ];
-
-		svg.appendChild( clone );
+		transform = 'matrix(' + [ ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f ].join( ',' ) + ')';
+		borderRadius = [ 0, 0, 0, 0 ];
 	} else {
 		const offsetParent = node.offsetParent;
 		const offsetParentStyle = window.getComputedStyle( offsetParent );
 		const offsetParentBcr = offsetParent.getBoundingClientRect();
 
-		clone.style.position = 'absolute';
-		clone.style.top = ( top - parseInt( style.marginTop, 10 ) - ( offsetParentBcr.top - parseInt( offsetParentStyle.marginTop, 10 ) ) ) + 'px';
-		clone.style.left = ( left - parseInt( style.marginLeft, 10 ) - ( offsetParentBcr.left - parseInt( offsetParentStyle.marginLeft, 10 ) ) ) + 'px';
+		transform = getCumulativeTransform( node );
 
-		wrapper.transform = ''; // TODO...?
-		wrapper.borderRadius = [
+		// temporarily invert the cumulative transform so that we can get the correct boundingClientRect
+		const transformStyle = node.style.transform || node.style.webkitTransform;
+		const transformStyleComputed = style.webkitTransform || style.transform;
+
+		if ( transformStyleComputed !== 'none' ) {
+			const inverted = invert( parseMatrixTransformString( transformStyleComputed ) );
+			node.style.webkitTransform = node.style.transform = `matrix(${inverted.join(',')})`;
+
+			bcr = node.getBoundingClientRect();
+
+			node.style.webkitTransform = node.style.transform = transformStyle;
+		}
+
+		clone.style.position = 'absolute';
+		clone.style.top = ( bcr.top - parseInt( style.marginTop, 10 ) + window.scrollY ) + 'px';
+		clone.style.left = ( bcr.left - parseInt( style.marginLeft, 10 ) + window.scrollX ) + 'px';
+
+		// TODO use matrices all the way down, this is silly
+		transform = `matrix(${transform.join(',')})`;
+
+		// TODO this is wrong... need to account for corners with 2 radii
+		borderRadius = [
 			parseFloat( style.borderTopLeftRadius ),
 			parseFloat( style.borderTopRightRadius ),
 			parseFloat( style.borderBottomRightRadius ),
 			parseFloat( style.borderBottomLeftRadius )
 		];
-
-		node.parentNode.appendChild( clone );
 	}
+
+	const wrapper = {
+		node, clone, isSvg, transform, borderRadius, opacity,
+		cx: ( bcr.left + bcr.right ) / 2,
+		cy: ( bcr.top + bcr.bottom ) / 2,
+		width: bcr.right - bcr.left,
+		height: bcr.bottom - bcr.top
+	};
 
 	return wrapper;
 }
 
 export function hideNode ( node ) {
-	node.__ramjetOriginalTransition__ = node.style.transition;
-	node.style.transition = '';
+	node.__ramjetOriginalTransition__ = node.style.webkitTransition || node.style.transition;
+	node.__ramjetOriginalOpacity__ = node.style.opacity;
+
+	node.style.webkitTransition = node.style.transition = '';
 
 	node.style.opacity = 0;
 }
 
 export function showNode ( node ) {
-	node.style.transition = '';
-	node.style.opacity = 1;
+	if ( '__ramjetOriginalOpacity__' in node ) {
+		node.style.transition = '';
+		node.style.opacity = node.__ramjetOriginalOpacity__;
 
-	if ( node.__ramjetOriginalTransition__ ) {
-		setTimeout( () => {
-			node.style.transition = node.__ramjetOriginalTransition__;
-		});
+		if ( node.__ramjetOriginalTransition__ ) {
+			setTimeout( () => {
+				node.style.transition = node.__ramjetOriginalTransition__;
+			});
+		}
 	}
 }

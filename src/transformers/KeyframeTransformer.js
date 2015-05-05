@@ -1,6 +1,7 @@
 import getTransform from '../utils/getTransform';
 import getBorderRadius from '../utils/getBorderRadius';
 import { linear } from '../easing';
+import { decrementHtml } from '../utils/html';
 import {
 	TRANSFORM,
 	KEYFRAMES,
@@ -12,27 +13,35 @@ import {
 	ANIMATION_END
 } from '../utils/detect';
 
+function generateId () {
+	return '_' + ~~( Math.random() * 1000000 );
+}
+
+function makeAnimatable ( node, options, id ) {
+	node.style[ ANIMATION_DIRECTION ] = 'alternate';
+	node.style[ ANIMATION_DURATION ] = `${options.duration/1000}s`;
+	node.style[ ANIMATION_ITERATION_COUNT ] = 1;
+	node.style[ ANIMATION_NAME ] = id;
+	node.style[ ANIMATION_TIMING_FUNCTION ] = 'linear';
+}
+
 export default class KeyframeTransformer {
-	constructor ( from, to, options ) {
-		const { fromKeyframes, toKeyframes } = getKeyframes( from, to, options );
+	constructor ( from, to, container, options ) {
+		const { fromKeyframes, toKeyframes, containerKeyframes } = getKeyframes( from, to, options );
 
-		const fromId = '_' + ~~( Math.random() * 1000000 );
-		const toId = '_' + ~~( Math.random() * 1000000 );
+		const fromId = generateId();
+		const toId = generateId();
+		const containerId = generateId();
 
-		const css = `${KEYFRAMES} ${fromId} { ${fromKeyframes} } ${KEYFRAMES} ${toId} { ${toKeyframes} }`;
+		const css = `
+			${KEYFRAMES} ${fromId}      { ${fromKeyframes} }
+			${KEYFRAMES} ${toId}        { ${toKeyframes} }
+			${KEYFRAMES} ${containerId} { ${containerKeyframes} }`;
 		const dispose = addCss( css );
 
-		from.clone.style[ ANIMATION_DIRECTION ] = 'alternate';
-		from.clone.style[ ANIMATION_DURATION ] = `${options.duration/1000}s`;
-		from.clone.style[ ANIMATION_ITERATION_COUNT ] = 1;
-		from.clone.style[ ANIMATION_NAME ] = fromId;
-		from.clone.style[ ANIMATION_TIMING_FUNCTION ] = 'linear';
-
-		to.clone.style[ ANIMATION_DIRECTION ] = 'alternate';
-		to.clone.style[ ANIMATION_DURATION ] = `${options.duration/1000}s`;
-		to.clone.style[ ANIMATION_ITERATION_COUNT ] = 1;
-		to.clone.style[ ANIMATION_NAME ] = toId;
-		to.clone.style[ ANIMATION_TIMING_FUNCTION ] = 'linear';
+		makeAnimatable( from.clone, options, fromId );
+		makeAnimatable( to.clone, options, toId );
+		makeAnimatable( container, options, containerId );
 
 		let fromDone;
 		let toDone;
@@ -41,6 +50,10 @@ export default class KeyframeTransformer {
 			if ( fromDone && toDone ) {
 				from.clone.parentNode.removeChild( from.clone );
 				to.clone.parentNode.removeChild( to.clone );
+
+				// remove containers if possible
+				decrementHtml();
+				decrementHtml();
 
 				if ( options.done ) options.done();
 
@@ -82,22 +95,23 @@ function addCss ( css ) {
 }
 
 function getKeyframes ( from, to, options ) {
-	var dx = to.cx - from.cx;
-	var dy = to.cy - from.cy;
+	const dx = to.cx - from.cx;
+	const dy = to.cy - from.cy;
 
-	var dsxf = ( to.width / from.width ) - 1;
-	var dsyf = ( to.height / from.height ) - 1;
+	const dsxf = ( to.width / from.width ) - 1;
+	const dsyf = ( to.height / from.height ) - 1;
 
-	var dsxt = ( from.width / to.width ) - 1;
-	var dsyt = ( from.height / to.height ) - 1;
+	const dsxt = ( from.width / to.width ) - 1;
+	const dsyt = ( from.height / to.height ) - 1;
 
-	var easing = options.easing || linear;
+	const easing = options.easing || linear;
 
-	var numFrames = options.duration / 50; // one keyframe per 50ms is probably enough... this may prove not to be the case though
+	const numFrames = options.duration / 50; // one keyframe per 50ms is probably enough... this may prove not to be the case though
 
-	var fromKeyframes = [];
-	var toKeyframes = [];
-	var i;
+	let fromKeyframes = [];
+	let toKeyframes = [];
+	let containerKeyframes = [];
+	let i;
 
 	function addKeyframes ( pc, t ) {
 		const cx = from.cx + ( dx * t );
@@ -109,9 +123,11 @@ function getKeyframes ( from, to, options ) {
 		const fromTransform = getTransform( false, cx, cy, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
 		const toTransform = getTransform( false, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
 
+		const containerOpacity = from.opacity + t * ( to.opacity - from.opacity );
+
 		fromKeyframes.push( `
 			${pc}% {
-				opacity: ${1-t};
+				/* opacity: ${1-t}; */
 				border-top-left-radius: ${fromBorderRadius[0]};
 				border-top-right-radius: ${fromBorderRadius[1]};
 				border-bottom-right-radius: ${fromBorderRadius[2]};
@@ -130,6 +146,12 @@ function getKeyframes ( from, to, options ) {
 				${TRANSFORM}: ${toTransform};
 			}`
 		);
+
+		containerKeyframes.push( `
+			${pc}% {
+				opacity: ${containerOpacity};
+			}`
+		);
 	}
 
 	for ( i = 0; i < numFrames; i += 1 ) {
@@ -143,6 +165,7 @@ function getKeyframes ( from, to, options ) {
 
 	fromKeyframes = fromKeyframes.join( '\n' );
 	toKeyframes = toKeyframes.join( '\n' );
+	containerKeyframes = containerKeyframes.join( '\n' );
 
-	return { fromKeyframes, toKeyframes };
+	return { fromKeyframes, toKeyframes, containerKeyframes };
 }

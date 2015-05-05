@@ -1,10 +1,12 @@
 import getTransform from '../utils/getTransform';
 import getBorderRadius from '../utils/getBorderRadius';
+import { decrementHtml } from '../utils/html';
+import { decrementSvg } from '../utils/svg';
 import { linear } from '../easing';
 import rAF from '../utils/rAF';
 
 export default class TimerTransformer {
-	constructor ( from, to, options ) {
+	constructor ( from, to, container, options ) {
 		const dx = to.cx - from.cx;
 		const dy = to.cy - from.cy;
 
@@ -26,6 +28,10 @@ export default class TimerTransformer {
 				from.clone.parentNode.removeChild( from.clone );
 				to.clone.parentNode.removeChild( to.clone );
 
+				// remove containers if possible
+				( from.isSvg ? decrementSvg : decrementHtml )();
+				( to.isSvg ? decrementSvg : decrementHtml )();
+
 				if ( options.done ) {
 					options.done();
 				}
@@ -36,7 +42,9 @@ export default class TimerTransformer {
 			const t = easing( elapsed / duration );
 
 			// opacity
-			from.clone.style.opacity = 1 - t;
+			const containerOpacity = from.opacity + t * ( to.opacity - from.opacity );
+			console.log( 'setting container opacity to %s', containerOpacity );
+			container.style.opacity = containerOpacity; // TODO same for keyframe transformer
 			to.clone.style.opacity = t;
 
 			// border radius
