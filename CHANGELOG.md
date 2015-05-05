@@ -1,5 +1,10 @@
 # changelog
 
+## 0.4.5
+
+* Morph border-radius ([#25](https://github.com/Rich-Harris/ramjet/issues/25))
+* Internal: add rudimentary [test suite](http://www.rich-harris.co.uk/ramjet/test.html)
+
 ## 0.4.4
 
 * Add IE9 support ([#3](https://github.com/Rich-Harris/ramjet/issues/3)). Thanks crohrer!
