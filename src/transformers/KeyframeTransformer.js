@@ -103,18 +103,19 @@ function getKeyframes ( from, to, options ) {
 		const cx = from.cx + ( dx * t );
 		const cy = from.cy + ( dy * t );
 
-		const borderRadius = getBorderRadius( from.borderRadius, to.borderRadius, t );
+		const fromBorderRadius = getBorderRadius( from.borderRadius, to.borderRadius, dsxf, dsyf, t );
+		const toBorderRadius = getBorderRadius( to.borderRadius, from.borderRadius, dsxt, dsyt, 1 - t );
 
-		const fromTransform = getTransform( from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
-		const toTransform = getTransform( to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
+		const fromTransform = getTransform( false, cx, cy, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
+		const toTransform = getTransform( false, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
 
 		fromKeyframes.push( `
 			${pc}% {
 				opacity: ${1-t};
-				border-top-left-radius: ${borderRadius[0]};
-				border-top-right-radius: ${borderRadius[1]};
-				border-bottom-right-radius: ${borderRadius[2]};
-				border-bottom-left-radius: ${borderRadius[3]};
+				border-top-left-radius: ${fromBorderRadius[0]};
+				border-top-right-radius: ${fromBorderRadius[1]};
+				border-bottom-right-radius: ${fromBorderRadius[2]};
+				border-bottom-left-radius: ${fromBorderRadius[3]};
 				${TRANSFORM}: ${fromTransform};
 			}`
 		);
@@ -122,10 +123,10 @@ function getKeyframes ( from, to, options ) {
 		toKeyframes.push( `
 			${pc}% {
 				opacity: ${t};
-				border-top-left-radius: ${borderRadius[0]};
-				border-top-right-radius: ${borderRadius[1]};
-				border-bottom-right-radius: ${borderRadius[2]};
-				border-bottom-left-radius: ${borderRadius[3]};
+				border-top-left-radius: ${toBorderRadius[0]};
+				border-top-right-radius: ${toBorderRadius[1]};
+				border-bottom-right-radius: ${toBorderRadius[2]};
+				border-bottom-left-radius: ${toBorderRadius[3]};
 				${TRANSFORM}: ${toTransform};
 			}`
 		);
