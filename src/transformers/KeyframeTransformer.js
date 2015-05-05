@@ -1,4 +1,5 @@
 import getTransform from '../utils/getTransform';
+import getBorderRadius from '../utils/getBorderRadius';
 import { linear } from '../easing';
 import {
 	TRANSFORM,
@@ -98,28 +99,47 @@ function getKeyframes ( from, to, options ) {
 	var toKeyframes = [];
 	var i;
 
-	for ( i = 0; i < numFrames; i += 1 ) {
-		let pc = 100 * ( i / numFrames );
-		let t = easing( i / numFrames );
+	function addKeyframes ( pc, t ) {
+		const cx = from.cx + ( dx * t );
+		const cy = from.cy + ( dy * t );
 
-		let cx = from.cx + ( dx * t );
-		let cy = from.cy + ( dy * t );
+		const fromBorderRadius = getBorderRadius( from.borderRadius, to.borderRadius, dsxf, dsyf, t );
+		const toBorderRadius = getBorderRadius( to.borderRadius, from.borderRadius, dsxt, dsyt, 1 - t );
 
-		let fromTransform = getTransform( from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
-		let toTransform = getTransform( to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
+		const fromTransform = getTransform( false, cx, cy, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
+		const toTransform = getTransform( false, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
 
-		fromKeyframes.push( `${pc}% { opacity: ${1-t}; ${TRANSFORM}: ${fromTransform}; }` );
-		toKeyframes.push( `${pc}% { opacity: ${t}; ${TRANSFORM}: ${toTransform}; }` );
+		fromKeyframes.push( `
+			${pc}% {
+				opacity: ${1-t};
+				border-top-left-radius: ${fromBorderRadius[0]};
+				border-top-right-radius: ${fromBorderRadius[1]};
+				border-bottom-right-radius: ${fromBorderRadius[2]};
+				border-bottom-left-radius: ${fromBorderRadius[3]};
+				${TRANSFORM}: ${fromTransform};
+			}`
+		);
+
+		toKeyframes.push( `
+			${pc}% {
+				opacity: ${t};
+				border-top-left-radius: ${toBorderRadius[0]};
+				border-top-right-radius: ${toBorderRadius[1]};
+				border-bottom-right-radius: ${toBorderRadius[2]};
+				border-bottom-left-radius: ${toBorderRadius[3]};
+				${TRANSFORM}: ${toTransform};
+			}`
+		);
 	}
 
-	let cx = from.cx + ( dx );
-	let cy = from.cy + ( dy );
+	for ( i = 0; i < numFrames; i += 1 ) {
+		const pc = 100 * ( i / numFrames );
+		const t = easing( i / numFrames );
 
-	let fromTransform = getTransform( from.isSvg, cx, cy, dx, dy, dsxf, dsyf, 1 ) + ' ' + from.transform;
-	let toTransform = getTransform( to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 0 ) + ' ' + to.transform;
+		addKeyframes( pc, t );
+	}
 
-	fromKeyframes.push( `100% { opacity: 0; ${TRANSFORM}: ${fromTransform}; }` );
-	toKeyframes.push( `100% { opacity: 1; ${TRANSFORM}: ${toTransform}; }` );
+	addKeyframes( 100, 1 );
 
 	fromKeyframes = fromKeyframes.join( '\n' );
 	toKeyframes = toKeyframes.join( '\n' );

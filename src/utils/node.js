@@ -39,12 +39,15 @@ export function wrapNode ( node ) {
 		cx: ( left + right ) / 2,
 		cy: ( top + bottom ) / 2,
 		width: right - left,
-		height: bottom - top
+		height: bottom - top,
+		transform: null,
+		borderRadius: null
 	};
 
 	if ( isSvg ) {
 		const ctm = node.getScreenCTM();
 		wrapper.transform = 'matrix(' + [ ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f ].join( ',' ) + ')';
+		wrapper.borderRadius = [ 0, 0, 0, 0 ];
 
 		svg.appendChild( clone );
 	} else {
@@ -57,6 +60,13 @@ export function wrapNode ( node ) {
 		clone.style.left = ( left - parseInt( style.marginLeft, 10 ) - ( offsetParentBcr.left - parseInt( offsetParentStyle.marginLeft, 10 ) ) ) + 'px';
 
 		wrapper.transform = ''; // TODO...?
+		wrapper.borderRadius = [
+			parseFloat( style.borderTopLeftRadius ),
+			parseFloat( style.borderTopRightRadius ),
+			parseFloat( style.borderBottomRightRadius ),
+			parseFloat( style.borderBottomLeftRadius )
+		];
+
 		node.parentNode.appendChild( clone );
 	}
 

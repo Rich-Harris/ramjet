@@ -81,12 +81,15 @@
             		cx: (left + right) / 2,
             		cy: (top + bottom) / 2,
             		width: right - left,
-            		height: bottom - top
+            		height: bottom - top,
+            		transform: null,
+            		borderRadius: null
             	};
 
             	if (isSvg) {
             		var ctm = node.getScreenCTM();
             		wrapper.transform = 'matrix(' + [ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f].join(',') + ')';
+            		wrapper.borderRadius = [0, 0, 0, 0];
 
             		svg.appendChild(clone);
             	} else {
@@ -99,6 +102,8 @@
             		clone.style.left = left - parseInt(style.marginLeft, 10) - (offsetParentBcr.left - parseInt(offsetParentStyle.marginLeft, 10)) + 'px';
 
             		wrapper.transform = ''; // TODO...?
+            		wrapper.borderRadius = [parseFloat(style.borderTopLeftRadius), parseFloat(style.borderTopRightRadius), parseFloat(style.borderBottomRightRadius), parseFloat(style.borderBottomLeftRadius)];
+
             		node.parentNode.appendChild(clone);
             	}
 
@@ -131,6 +136,22 @@
             	return transform;
             }
 
+            var utils_getBorderRadius = getBorderRadius;
+
+            function getBorderRadius(a, b, dsx, dsy, t) {
+            	var sx = 1 + t * dsx;
+            	var sy = 1 + t * dsy;
+
+            	return a.map(function (from, i) {
+            		var to = b[i];
+
+            		var rx = (from + t * (to - from)) / sx;
+            		var ry = (from + t * (to - from)) / sy;
+
+            		return "" + rx + "px " + ry + "px";
+            	});
+            }
+
             function linear(pos) {
             	return pos;
             }
@@ -157,7 +178,7 @@
 
             var utils_rAF = rAF;
 
-            var transformers_TimerTransformer___classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
+            function transformers_TimerTransformer___classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
             var transformers_TimerTransformer__TimerTransformer = function TimerTransformer(from, to, options) {
             	transformers_TimerTransformer___classCallCheck(this, transformers_TimerTransformer__TimerTransformer);
@@ -192,8 +213,16 @@
 
             		var t = easing(elapsed / duration);
 
+            		// opacity
             		from.clone.style.opacity = 1 - t;
             		to.clone.style.opacity = t;
+
+            		// border radius
+            		var borderRadius = utils_getBorderRadius(from.borderRadius, to.borderRadius, t);
+            		from.clone.style.borderTopLeftRadius = to.clone.style.borderTopLeftRadius = borderRadius[0];
+            		from.clone.style.borderTopRightRadius = to.clone.style.borderTopRightRadius = borderRadius[1];
+            		from.clone.style.borderBottomRightRadius = to.clone.style.borderBottomRightRadius = borderRadius[2];
+            		from.clone.style.borderBottomLeftRadius = to.clone.style.borderBottomLeftRadius = borderRadius[3];
 
             		var cx = from.cx + dx * t;
             		var cy = from.cy + dy * t;
@@ -224,7 +253,6 @@
             var div = document.createElement('div');
 
             var keyframesSupported = true;
-            var transformSupported = true;
             var TRANSFORM = undefined;
             var KEYFRAMES = undefined;
             var ANIMATION_DIRECTION = undefined;
@@ -240,44 +268,37 @@
             // http://stackoverflow.com/questions/17907445/how-to-detect-ie11
             var isIe11 = !window.ActiveXObject && 'ActiveXObject' in window;
 
-            if (!isIe11 && ('animation' in div.style || 'webkitAnimation' in div.style)) {
-                  keyframesSupported = true;
+            if (!isIe11 && ('transform' in div.style || 'webkitTransform' in div.style) && ('animation' in div.style || 'webkitAnimation' in div.style)) {
+            	keyframesSupported = true;
 
-                  if ('animation' in div.style) {
-                        KEYFRAMES = '@keyframes';
+            	TRANSFORM = 'transform' in div.style ? 'transform' : '-webkit-transform';
 
-                        ANIMATION_DIRECTION = 'animationDirection';
-                        ANIMATION_DURATION = 'animationDuration';
-                        ANIMATION_ITERATION_COUNT = 'animationIterationCount';
-                        ANIMATION_NAME = 'animationName';
-                        ANIMATION_TIMING_FUNCTION = 'animationTimingFunction';
+            	if ('animation' in div.style) {
+            		KEYFRAMES = '@keyframes';
 
-                        ANIMATION_END = 'animationend';
-                  } else {
-                        KEYFRAMES = '@-webkit-keyframes';
+            		ANIMATION_DIRECTION = 'animationDirection';
+            		ANIMATION_DURATION = 'animationDuration';
+            		ANIMATION_ITERATION_COUNT = 'animationIterationCount';
+            		ANIMATION_NAME = 'animationName';
+            		ANIMATION_TIMING_FUNCTION = 'animationTimingFunction';
 
-                        ANIMATION_DIRECTION = 'webkitAnimationDirection';
-                        ANIMATION_DURATION = 'webkitAnimationDuration';
-                        ANIMATION_ITERATION_COUNT = 'webkitAnimationIterationCount';
-                        ANIMATION_NAME = 'webkitAnimationName';
-                        ANIMATION_TIMING_FUNCTION = 'webkitAnimationTimingFunction';
+            		ANIMATION_END = 'animationend';
+            	} else {
+            		KEYFRAMES = '@-webkit-keyframes';
 
-                        ANIMATION_END = 'webkitAnimationEnd';
-                  }
+            		ANIMATION_DIRECTION = 'webkitAnimationDirection';
+            		ANIMATION_DURATION = 'webkitAnimationDuration';
+            		ANIMATION_ITERATION_COUNT = 'webkitAnimationIterationCount';
+            		ANIMATION_NAME = 'webkitAnimationName';
+            		ANIMATION_TIMING_FUNCTION = 'webkitAnimationTimingFunction';
+
+            		ANIMATION_END = 'webkitAnimationEnd';
+            	}
             } else {
-                  keyframesSupported = false;
+            	keyframesSupported = false;
             }
 
-            if (!isIe11 && ('transform' in div.style || 'webkitTransform' in div.style || 'msTransform' in div.style)) {
-            	transformSupported = true;
-
-            	TRANSFORM = 'transform' in div.style ? 'transform' : 'webkitTransform' in div.style ? '-webkit-transform' : '-ms-transform';
-
-            } else {
-            	transformSupported = false;
-            }
-
-            var transformers_KeyframeTransformer___classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
+            function transformers_KeyframeTransformer___classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
             var transformers_KeyframeTransformer__KeyframeTransformer = function KeyframeTransformer(from, to, options) {
             	transformers_KeyframeTransformer___classCallCheck(this, transformers_KeyframeTransformer__KeyframeTransformer);
@@ -373,28 +394,29 @@
             	var toKeyframes = [];
             	var i;
 
+            	function addKeyframes(pc, t) {
+            		var cx = from.cx + dx * t;
+            		var cy = from.cy + dy * t;
+
+            		var fromBorderRadius = utils_getBorderRadius(from.borderRadius, to.borderRadius, dsxf, dsyf, t);
+            		var toBorderRadius = utils_getBorderRadius(to.borderRadius, from.borderRadius, dsxt, dsyt, 1 - t);
+
+            		var fromTransform = utils_getTransform(false, cx, cy, dx, dy, dsxf, dsyf, t) + ' ' + from.transform;
+            		var toTransform = utils_getTransform(false, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t) + ' ' + to.transform;
+
+            		fromKeyframes.push('\n\t\t\t' + pc + '% {\n\t\t\t\topacity: ' + (1 - t) + ';\n\t\t\t\tborder-top-left-radius: ' + fromBorderRadius[0] + ';\n\t\t\t\tborder-top-right-radius: ' + fromBorderRadius[1] + ';\n\t\t\t\tborder-bottom-right-radius: ' + fromBorderRadius[2] + ';\n\t\t\t\tborder-bottom-left-radius: ' + fromBorderRadius[3] + ';\n\t\t\t\t' + TRANSFORM + ': ' + fromTransform + ';\n\t\t\t}');
+
+            		toKeyframes.push('\n\t\t\t' + pc + '% {\n\t\t\t\topacity: ' + t + ';\n\t\t\t\tborder-top-left-radius: ' + toBorderRadius[0] + ';\n\t\t\t\tborder-top-right-radius: ' + toBorderRadius[1] + ';\n\t\t\t\tborder-bottom-right-radius: ' + toBorderRadius[2] + ';\n\t\t\t\tborder-bottom-left-radius: ' + toBorderRadius[3] + ';\n\t\t\t\t' + TRANSFORM + ': ' + toTransform + ';\n\t\t\t}');
+            	}
+
             	for (i = 0; i < numFrames; i += 1) {
             		var pc = 100 * (i / numFrames);
             		var t = easing(i / numFrames);
 
-            		var _cx = from.cx + dx * t;
-            		var _cy = from.cy + dy * t;
-
-            		var _fromTransform = utils_getTransform(from.isSvg, _cx, _cy, dx, dy, dsxf, dsyf, t) + ' ' + from.transform;
-            		var _toTransform = utils_getTransform(to.isSvg, _cx, _cy, -dx, -dy, dsxt, dsyt, 1 - t) + ' ' + to.transform;
-
-            		fromKeyframes.push('' + pc + '% { opacity: ' + (1 - t) + '; ' + TRANSFORM + ': ' + _fromTransform + '; }');
-            		toKeyframes.push('' + pc + '% { opacity: ' + t + '; ' + TRANSFORM + ': ' + _toTransform + '; }');
+            		addKeyframes(pc, t);
             	}
 
-            	var cx = from.cx + dx;
-            	var cy = from.cy + dy;
-
-            	var fromTransform = utils_getTransform(from.isSvg, cx, cy, dx, dy, dsxf, dsyf, 1) + ' ' + from.transform;
-            	var toTransform = utils_getTransform(to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 0) + ' ' + to.transform;
-
-            	fromKeyframes.push('100% { opacity: 0; ' + TRANSFORM + ': ' + fromTransform + '; }');
-            	toKeyframes.push('100% { opacity: 1; ' + TRANSFORM + ': ' + toTransform + '; }');
+            	addKeyframes(100, 1);
 
             	fromKeyframes = fromKeyframes.join('\n');
             	toKeyframes = toKeyframes.join('\n');

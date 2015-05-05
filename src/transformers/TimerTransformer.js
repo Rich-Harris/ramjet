@@ -1,4 +1,5 @@
 import getTransform from '../utils/getTransform';
+import getBorderRadius from '../utils/getBorderRadius';
 import { linear } from '../easing';
 import rAF from '../utils/rAF';
 
@@ -34,8 +35,16 @@ export default class TimerTransformer {
 
 			const t = easing( elapsed / duration );
 
+			// opacity
 			from.clone.style.opacity = 1 - t;
 			to.clone.style.opacity = t;
+
+			// border radius
+			const borderRadius = getBorderRadius( from.borderRadius, to.borderRadius, t );
+			from.clone.style.borderTopLeftRadius = to.clone.style.borderTopLeftRadius = borderRadius[0];
+			from.clone.style.borderTopRightRadius = to.clone.style.borderTopRightRadius = borderRadius[1];
+			from.clone.style.borderBottomRightRadius = to.clone.style.borderBottomRightRadius = borderRadius[2];
+			from.clone.style.borderBottomLeftRadius = to.clone.style.borderBottomLeftRadius = borderRadius[3];
 
 			const cx = from.cx + ( dx * t );
 			const cy = from.cy + ( dy * t );
