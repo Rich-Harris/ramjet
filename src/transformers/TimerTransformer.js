@@ -40,11 +40,11 @@ export default class TimerTransformer {
 			to.clone.style.opacity = t;
 
 			// border radius
-			const borderRadius = getBorderRadius( from.borderRadius, to.borderRadius, t );
-			from.clone.style.borderTopLeftRadius = to.clone.style.borderTopLeftRadius = borderRadius[0];
-			from.clone.style.borderTopRightRadius = to.clone.style.borderTopRightRadius = borderRadius[1];
-			from.clone.style.borderBottomRightRadius = to.clone.style.borderBottomRightRadius = borderRadius[2];
-			from.clone.style.borderBottomLeftRadius = to.clone.style.borderBottomLeftRadius = borderRadius[3];
+			const fromBorderRadius = getBorderRadius( from.borderRadius, to.borderRadius, dsxf, dsyf, t );
+			const toBorderRadius = getBorderRadius( to.borderRadius, from.borderRadius, dsxt, dsyt, 1 - t );
+
+			applyBorderRadius( from.clone, fromBorderRadius );
+			applyBorderRadius( to.clone, toBorderRadius );
 
 			const cx = from.cx + ( dx * t );
 			const cy = from.cy + ( dy * t );
@@ -69,4 +69,11 @@ export default class TimerTransformer {
 
 		tick();
 	}
+}
+
+function applyBorderRadius ( node, borderRadius ) {
+	node.style.borderTopLeftRadius = borderRadius[0];
+	node.style.borderTopRightRadius = borderRadius[1];
+	node.style.borderBottomRightRadius = borderRadius[2];
+	node.style.borderBottomLeftRadius = borderRadius[3];
 }
