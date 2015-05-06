@@ -1,5 +1,9 @@
 # changelog
 
+## 0.4.6
+
+* Extend border-radius morphing to timer-based transformations
+
 ## 0.4.5
 
 * Morph border-radius ([#25](https://github.com/Rich-Harris/ramjet/issues/25))
