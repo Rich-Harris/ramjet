@@ -1,5 +1,7 @@
 import { multiply, parseMatrixTransformString } from './matrix';
 
+// TODO it may turn out we don't need this after all
+
 export default function getCumulativeTransform ( node ) {
 	let matrix = [ 1, 0, 0, 1, 0, 0 ];
 

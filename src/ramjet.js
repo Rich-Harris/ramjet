@@ -1,22 +1,9 @@
-import { wrapNode, showNode, hideNode } from './utils/node';
+import { showNode, hideNode } from './utils/node';
+import wrapNode from './wrappers/wrapNode';
 import TimerTransformer from './transformers/TimerTransformer';
 import KeyframeTransformer from './transformers/KeyframeTransformer';
 import { linear, easeIn, easeOut, easeInOut } from './easing';
 import { keyframesSupported } from './utils/detect';
-import { incrementSvg } from './utils/svg';
-import { incrementHtml, htmlContainer } from './utils/html';
-
-function makeContainer () {
-	const div = document.createElement( 'div' );
-
-	div.style.position = 'absolute';
-	div.style.left = div.style.top = 0;
-	div.style.width = div.style.height = '100%';
-
-	htmlContainer.appendChild( div );
-
-	return div;
-}
 
 export default {
 	transform ( fromNode, toNode, options = {} ) {
@@ -28,24 +15,20 @@ export default {
 			options.duration = 400;
 		}
 
-		const container = makeContainer();
 		const from = wrapNode( fromNode );
 		const to = wrapNode( toNode );
 
-		from.clone.style.opacity = 1;
-		to.clone.style.opacity = 0;
-
-		// create top-level container if necessary
-		incrementHtml();
+		from.setOpacity( 1 );
+		to.setOpacity( 0 );
 
 		// TODO this breaks svg support!
-		container.appendChild( from.clone );
-		container.appendChild( to.clone );
+		from.insert();
+		to.insert();
 
-		if ( !keyframesSupported || options.useTimer /*|| from.isSvg || to.isSvg*/ ) {
-			return new TimerTransformer( from, to, container, options );
+		if ( !keyframesSupported || options.useTimer ) {
+			return new TimerTransformer( from, to, options );
 		} else {
-			return new KeyframeTransformer( from, to, container, options );
+			return new KeyframeTransformer( from, to, options );
 		}
 	},
 

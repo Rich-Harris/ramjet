@@ -7,7 +7,7 @@ import { linear } from '../easing';
 import rAF from '../utils/rAF';
 
 export default class TimerTransformer {
-	constructor ( from, to, container, options ) {
+	constructor ( from, to, options ) {
 		const dx = to.left - from.left;
 		const dy = to.top - from.top;
 
@@ -26,11 +26,8 @@ export default class TimerTransformer {
 			const elapsed = timeNow - startTime;
 
 			if ( elapsed > duration ) {
-				from.clone.parentNode.removeChild( from.clone );
-				to.clone.parentNode.removeChild( to.clone );
-
-				// remove containers if possible
-				decrementHtml();
+				from.detach();
+				to.detach();
 
 				if ( options.done ) {
 					options.done();
@@ -68,17 +65,8 @@ export default class TimerTransformer {
 			const fromTransform = getTransform( false, left, top, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
 			const toTransform = getTransform( false, left, top, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
 
-			// if ( from.isSvg ) {
-			// 	from.clone.setAttribute( 'transform', fromTransform );
-			// } else {
-				from.clone.style.transform = from.clone.style.webkitTransform = from.clone.style.msTransform = fromTransform;
-			// }
-
-			// if ( to.isSvg ) {
-			// 	to.clone.setAttribute( 'transform', toTransform );
-			// } else {
-				to.clone.style.transform = to.clone.style.webkitTransform = to.clone.style.msTransform = toTransform;
-			// }
+			from.setTransform( fromTransform );
+			to.setTransform( toTransform );
 
 			rAF( tick );
 		}

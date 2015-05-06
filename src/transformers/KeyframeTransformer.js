@@ -27,33 +27,27 @@ function makeAnimatable ( node, options, id ) {
 }
 
 export default class KeyframeTransformer {
-	constructor ( from, to, container, options ) {
-		const { fromKeyframes, toKeyframes, containerKeyframes } = getKeyframes( from, to, options );
+	constructor ( from, to, options ) {
+		const { fromKeyframes, toKeyframes } = getKeyframes( from, to, options );
 
 		const fromId = generateId();
 		const toId = generateId();
-		const containerId = generateId();
 
 		const css = `
 			${KEYFRAMES} ${fromId}      { ${fromKeyframes} }
-			${KEYFRAMES} ${toId}        { ${toKeyframes} }
-			${KEYFRAMES} ${containerId} { ${containerKeyframes} }`;
+			${KEYFRAMES} ${toId}        { ${toKeyframes} }`;
 		const dispose = addCss( css );
 
 		makeAnimatable( from.clone, options, fromId );
 		makeAnimatable( to.clone, options, toId );
-		makeAnimatable( container, options, containerId );
 
 		let fromDone;
 		let toDone;
 
 		function done () {
 			if ( fromDone && toDone ) {
-				from.clone.parentNode.removeChild( from.clone );
-				to.clone.parentNode.removeChild( to.clone );
-
-				// remove containers if possible
-				decrementHtml();
+				from.detach();
+				to.detach();
 
 				if ( options.done ) options.done();
 
@@ -110,7 +104,6 @@ function getKeyframes ( from, to, options ) {
 
 	let fromKeyframes = [];
 	let toKeyframes = [];
-	let containerKeyframes = [];
 	let i;
 
 	function addKeyframes ( pc, t ) {
@@ -122,6 +115,9 @@ function getKeyframes ( from, to, options ) {
 
 		const fromTransform = getTransform( false, left, top, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
 		const toTransform = getTransform( false, left, top, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
+
+		console.log( 'fromTransform', fromTransform );
+		console.log( 'toTransform', toTransform );
 
 		const opacities = getOpacity(from, to, t);
 		const backgroundColors = getBackgroundColors(from, to, t);
@@ -149,8 +145,6 @@ function getKeyframes ( from, to, options ) {
 				${TRANSFORM}: ${toTransform};
 			}`
 		);
-		// console.log('to:'+toKeyframes);
-
 	}
 
 	for ( i = 0; i < numFrames; i += 1 ) {
@@ -164,7 +158,6 @@ function getKeyframes ( from, to, options ) {
 
 	fromKeyframes = fromKeyframes.join( '\n' );
 	toKeyframes = toKeyframes.join( '\n' );
-	containerKeyframes = containerKeyframes.join( '\n' );
 
-	return { fromKeyframes, toKeyframes, containerKeyframes };
+	return { fromKeyframes, toKeyframes };
 }
