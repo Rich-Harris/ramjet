@@ -2,7 +2,6 @@ import getTransform from '../utils/getTransform';
 import {getOpacity, getBackgroundColors} from '../utils/getOpacity';
 import getBorderRadius from '../utils/getBorderRadius';
 import { linear } from '../easing';
-import { decrementHtml } from '../utils/html';
 import {
 	TRANSFORM,
 	KEYFRAMES

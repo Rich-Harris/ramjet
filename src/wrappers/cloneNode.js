@@ -7,8 +7,6 @@ export default function cloneNode ( node, copyStyles ) {
 	let len;
 	let i;
 
-	let attr;
-
 	if ( node.nodeType === 1 ) {
 		if ( copyStyles ) {
 			style = window.getComputedStyle( node );

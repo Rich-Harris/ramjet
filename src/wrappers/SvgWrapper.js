@@ -23,14 +23,9 @@ export default class SvgWrapper extends HtmlWrapper {
 		let transform;
 		let borderRadius;
 
-		const ctm = node.getScreenCTM();
-		//transform = 'matrix(1,0,0,1,0,0)';
 		transform = '';
-		//transform = 'matrix(' + [ ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f ].join( ',' ) + ')';
 		borderRadius = [ 0, 0, 0, 0 ];
 
-		// clone.style.top = ( bcr.top + window.scrollY ) + 'px';
-		// clone.style.left = ( bcr.left + window.scrollX ) + 'px'
 		const offsetParent = node.offsetParent;
 		const offsetParentStyle = window.getComputedStyle( offsetParent );
 		const offsetParentBcr = offsetParent.getBoundingClientRect();

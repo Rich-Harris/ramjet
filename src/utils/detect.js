@@ -14,7 +14,7 @@ let ANIMATION_END;
 // by a barrel of stoned monkeys - http://jsfiddle.net/rich_harris/oquLu2qL/
 
 // http://stackoverflow.com/questions/17907445/how-to-detect-ie11
-const isIe11 = !window.ActiveXObject && 'ActiveXObject' in window
+const isIe11 = !window.ActiveXObject && 'ActiveXObject' in window;
 
 if (
 	!isIe11 &&

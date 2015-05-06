@@ -1,7 +1,5 @@
 import cloneNode from './cloneNode';
 import {
-	TRANSFORM,
-	KEYFRAMES,
 	ANIMATION_DIRECTION,
 	ANIMATION_DURATION,
 	ANIMATION_ITERATION_COUNT,
@@ -24,7 +22,7 @@ export default class HtmlWrapper {
 
 		// node.backgroundColor will be a four element array containing the rgba values.
 		// The fourth element will be NaN if either equal to 1 or only an rgb value.
-		var bgColorRegexp = /^rgb[a]?\((\d+),\s*(\d+),\s*(\d+),?\s*(\d?.\d+)?\)$/
+		var bgColorRegexp = /^rgb[a]?\((\d+),\s*(\d+),\s*(\d+),?\s*(\d?.\d+)?\)$/;
 		// If the background color matches, then split the matched values and parse their values.
 		const backgroundColor = (bgColorRegexp.test(style.backgroundColor) ? bgColorRegexp.exec(style.backgroundColor).slice(1).map(parseFloat) : null);
 

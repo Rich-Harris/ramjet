@@ -1,8 +1,6 @@
 import getTransform from '../utils/getTransform';
 import { getOpacity, getBackgroundColors } from '../utils/getOpacity';
 import getBorderRadius from '../utils/getBorderRadius';
-import { decrementHtml } from '../utils/html';
-import { decrementSvg } from '../utils/svg';
 import { linear } from '../easing';
 import rAF from '../utils/rAF';
 
