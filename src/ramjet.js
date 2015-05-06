@@ -21,7 +21,6 @@ export default {
 		from.setOpacity( 1 );
 		to.setOpacity( 0 );
 
-		// TODO this breaks svg support!
 		from.insert();
 		to.insert();
 

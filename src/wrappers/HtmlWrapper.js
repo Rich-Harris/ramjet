@@ -72,4 +72,16 @@ export default class HtmlWrapper {
 	setTransform( transform ) {
 		this.clone.style.transform = this.clone.style.webkitTransform = this.clone.style.msTransform = transform;
 	}
+
+	setBackgroundColor ( color ) {
+		this.clone.style.backgroundColor = color;
+	}
+
+	setBorderRadius ( borderRadius ) {
+		// TODO handle corners with two radii
+		this.clone.style.borderTopLeftRadius     = borderRadius[0];
+		this.clone.style.borderTopRightRadius    = borderRadius[1];
+		this.clone.style.borderBottomRightRadius = borderRadius[2];
+		this.clone.style.borderBottomLeftRadius  = borderRadius[3];
+	}
 }

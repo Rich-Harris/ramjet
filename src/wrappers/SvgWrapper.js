@@ -59,6 +59,15 @@ export default class SvgWrapper extends HtmlWrapper {
 		const svg = findParent( this.node, 'svg' );
 		svg.parentNode.appendChild( this.clone );
 	}
+
+	setBackgroundColor ( color ) {
+		throw new Error( 'TODO' ); // need to store reference to the cloned node, not just the <svg> wrapper...
+	}
+
+	setBorderRadius ( borderRadius ) {
+		// noop. TODO we can make this work with <rect>, <circle> and possible <ellipse> elements.
+		// would only work in timer mode
+	}
 }
 
 function findParent ( node, tagName ) {

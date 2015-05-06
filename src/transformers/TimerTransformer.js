@@ -39,25 +39,27 @@ export default class TimerTransformer {
 			const t = easing( elapsed / duration );
 
 			// opacity
-			const opacities = getOpacity(from, to, t);
-			from.clone.style.opacity = opacities[0];
-			to.clone.style.opacity = opacities[1];
+			const [ fromOpacity, toOpacity ] = getOpacity( from, to, t );
+			from.setOpacity( fromOpacity );
+			to.setOpacity( toOpacity );
 
 			// opacity
-			const backgroundColors = getBackgroundColors(from, to, t);
-			if(backgroundColors[0]){
-				from.clone.style.backgroundColor = backgroundColors[0];
+			const [ fromBg, toBg ] = getBackgroundColors( from, to, t );
+
+			if ( fromBg ) {
+				from.clone.style.backgroundColor = fromBg;
 			}
-			if(backgroundColors[1]){
-				to.clone.style.backgroundColor = backgroundColors[1];
+
+			if ( toBg ) {
+				to.clone.style.backgroundColor = toBg;
 			}
 
 			// border radius
 			const fromBorderRadius = getBorderRadius( from.borderRadius, to.borderRadius, dsxf, dsyf, t );
 			const toBorderRadius = getBorderRadius( to.borderRadius, from.borderRadius, dsxt, dsyt, 1 - t );
 
-			applyBorderRadius( from.clone, fromBorderRadius );
-			applyBorderRadius( to.clone, toBorderRadius );
+			from.setBorderRadius( fromBorderRadius );
+			to.setBorderRadius( toBorderRadius );
 
 			const left = from.left + ( dx * t );
 			const top = from.top + ( dy * t );
@@ -73,11 +75,4 @@ export default class TimerTransformer {
 
 		tick();
 	}
-}
-
-function applyBorderRadius ( node, borderRadius ) {
-	node.style.borderTopLeftRadius = borderRadius[0];
-	node.style.borderTopRightRadius = borderRadius[1];
-	node.style.borderBottomRightRadius = borderRadius[2];
-	node.style.borderBottomLeftRadius = borderRadius[3];
 }
