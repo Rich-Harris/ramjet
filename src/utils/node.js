@@ -36,6 +36,12 @@ export function wrapNode ( node, container ) {
 	const style = window.getComputedStyle( node );
 	const opacity = getCumulativeOpacity( node );
 
+	// node.backgroundColor will be a four element array containing the rgba values.
+	// The fourth element will be NaN if either equal to 1 or only an rgb value.
+	var bgColorRegexp = /^rgb[a]?\((\d+),\s*(\d+),\s*(\d+),?\s*(\d?.\d+)?\)$/
+	// If the background color matches, then split the matched values and parse their values.
+	const backgroundColor = (bgColorRegexp.test(style.backgroundColor) ? bgColorRegexp.exec(style.backgroundColor).slice(1).map(parseFloat) : null);
+
 	const clone = cloneNode( node );
 
 	let transform;
@@ -82,7 +88,7 @@ export function wrapNode ( node, container ) {
 	}
 
 	const wrapper = {
-		node, clone, isSvg, transform, borderRadius, opacity,
+		node, clone, isSvg, transform, borderRadius, opacity, backgroundColor,
 		cx: ( bcr.left + bcr.right ) / 2,
 		cy: ( bcr.top + bcr.bottom ) / 2,
 		width: bcr.right - bcr.left,

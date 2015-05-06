@@ -1,4 +1,5 @@
 import getTransform from '../utils/getTransform';
+import {getOpacity, getBackgroundColors} from '../utils/getOpacity';
 import getBorderRadius from '../utils/getBorderRadius';
 import { linear } from '../easing';
 import { decrementHtml } from '../utils/html';
@@ -123,11 +124,14 @@ function getKeyframes ( from, to, options ) {
 		const fromTransform = getTransform( false, cx, cy, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
 		const toTransform = getTransform( false, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
 
-		const containerOpacity = from.opacity + t * ( to.opacity - from.opacity );
+    const opacities = getOpacity(from, to, t);
+    const backgroundColors = getBackgroundColors(from, to, t);
+    console.log(backgroundColors);
 
 		fromKeyframes.push( `
 			${pc}% {
-				/* opacity: ${1-t}; */
+				opacity: ${opacities[0]};
+				${(backgroundColors[0] ? "background-color: "+backgroundColors[0]: '')};
 				border-top-left-radius: ${fromBorderRadius[0]};
 				border-top-right-radius: ${fromBorderRadius[1]};
 				border-bottom-right-radius: ${fromBorderRadius[2]};
@@ -138,7 +142,8 @@ function getKeyframes ( from, to, options ) {
 
 		toKeyframes.push( `
 			${pc}% {
-				opacity: ${t};
+				opacity: ${opacities[1]};
+				${(backgroundColors[1] ? "background-color: "+backgroundColors[1]: '')};
 				border-top-left-radius: ${toBorderRadius[0]};
 				border-top-right-radius: ${toBorderRadius[1]};
 				border-bottom-right-radius: ${toBorderRadius[2]};
@@ -146,12 +151,8 @@ function getKeyframes ( from, to, options ) {
 				${TRANSFORM}: ${toTransform};
 			}`
 		);
+		// console.log('to:'+toKeyframes);
 
-		containerKeyframes.push( `
-			${pc}% {
-				opacity: ${containerOpacity};
-			}`
-		);
 	}
 
 	for ( i = 0; i < numFrames; i += 1 ) {
