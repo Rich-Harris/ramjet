@@ -1,16 +1,16 @@
 import cloneNode from './cloneNode';
 
 export default class HtmlWrapper {
-	constructor ( node ) {
-		this.init( node );
+	constructor ( node, options ) {
+		this.init( node, options );
 	}
 
-	init ( node ) {
+	init ( node, options ) {
 		let bcr = node.getBoundingClientRect();
 		const style = window.getComputedStyle( node );
 		const opacity = +( style.opacity );
 
-		let clone = cloneNode( node );
+		let clone = cloneNode( node, options.copyStyles );
 
 		// node.backgroundColor will be a four element array containing the rgba values.
 		// The fourth element will be NaN if either equal to 1 or only an rgb value.

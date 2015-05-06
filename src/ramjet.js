@@ -15,8 +15,8 @@ export default {
 			options.duration = 400;
 		}
 
-		const from = wrapNode( fromNode );
-		const to = wrapNode( toNode );
+		const from = wrapNode( fromNode, options );
+		const to = wrapNode( toNode, options );
 
 		from.setOpacity( 1 );
 		to.setOpacity( 0 );

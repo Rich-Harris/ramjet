@@ -3,17 +3,16 @@ import { svgns } from '../utils/svg';
 import cloneNode from './cloneNode';
 
 export default class SvgWrapper extends HtmlWrapper {
-	constructor ( node ) {
-		super( node );
+	constructor ( node, options ) {
+		super( node, options );
 	}
 
-	init ( node ) {
-		console.log( 'node', node );
+	init ( node, options ) {
 		let bcr = node.getBoundingClientRect();
 		const style = window.getComputedStyle( node );
 		const opacity = style.opacity;
 
-		let clone = wrapWithSvg( cloneNode( node ) );
+		let clone = wrapWithSvg( cloneNode( node, options.copyStyles ) );
 
 		// node.backgroundColor will be a four element array containing the rgba values.
 		// The fourth element will be NaN if either equal to 1 or only an rgb value.
@@ -35,8 +34,6 @@ export default class SvgWrapper extends HtmlWrapper {
 		const offsetParent = node.offsetParent;
 		const offsetParentStyle = window.getComputedStyle( offsetParent );
 		const offsetParentBcr = offsetParent.getBoundingClientRect();
-
-		console.log( 'clone', clone );
 
 		clone.style.position = 'absolute';
 		clone.style.top = ( bcr.top - parseInt( style.marginTop, 10 ) - ( offsetParentBcr.top - parseInt( offsetParentStyle.marginTop, 10 ) ) ) + 'px';

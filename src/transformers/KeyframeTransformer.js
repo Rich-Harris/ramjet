@@ -116,9 +116,6 @@ function getKeyframes ( from, to, options ) {
 		const fromTransform = getTransform( false, left, top, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
 		const toTransform = getTransform( false, left, top, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
 
-		console.log( 'fromTransform', fromTransform );
-		console.log( 'toTransform', toTransform );
-
 		const opacities = getOpacity(from, to, t);
 		const backgroundColors = getBackgroundColors(from, to, t);
 

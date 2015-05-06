@@ -1,6 +1,6 @@
 import styleKeys from '../utils/styleKeys';
 
-export default function cloneNode ( node ) {
+export default function cloneNode ( node, copyStyles ) {
 	const clone = node.cloneNode();
 
 	let style;
@@ -10,11 +10,15 @@ export default function cloneNode ( node ) {
 	let attr;
 
 	if ( node.nodeType === 1 ) {
-		style = window.getComputedStyle( node );
+		if ( copyStyles ) {
+			style = window.getComputedStyle( node );
 
-		styleKeys.forEach( function ( prop ) {
-			clone.style[ prop ] = style[ prop ];
-		});
+			styleKeys.forEach( function ( prop ) {
+				if ( style[ prop ] !== '' ) {
+					clone.style[ prop ] = style[ prop ];
+				}
+			});
+		}
 
 		len = node.childNodes.length;
 		for ( i = 0; i < len; i += 1 ) {
