@@ -11,6 +11,7 @@ function makeContainer () {
 
 	div.style.position = 'absolute';
 	div.style.left = div.style.top = 0;
+	div.style.width = div.style.height = '100%';
 
 	htmlContainer.appendChild( div );
 
@@ -34,15 +35,14 @@ export default {
 		from.clone.style.opacity = 1;
 		to.clone.style.opacity = 0;
 
-		// create top-level containers if necessary
-		( from.isSvg ? incrementSvg : incrementHtml )();
-		( to.isSvg ? incrementSvg : incrementHtml )();
+		// create top-level container if necessary
+		incrementHtml();
 
 		// TODO this breaks svg support!
 		container.appendChild( from.clone );
 		container.appendChild( to.clone );
 
-		if ( !keyframesSupported || options.useTimer || from.isSvg || to.isSvg ) {
+		if ( !keyframesSupported || options.useTimer /*|| from.isSvg || to.isSvg*/ ) {
 			return new TimerTransformer( from, to, container, options );
 		} else {
 			return new KeyframeTransformer( from, to, container, options );

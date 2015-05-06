@@ -7,6 +7,17 @@ htmlContainer.style.overflow = 'visible';
 htmlContainer.style.pointerEvents = 'none';
 htmlContainer.setAttribute( 'class', 'ramjet-html' );
 
+window.addEventListener( 'resize', function () {
+	if ( count ) resize();
+});
+
+function resize () {
+	htmlContainer.style.width = document.body.offsetWidth + 'px';
+	htmlContainer.style.height = document.body.offsetHeight + 'px';
+}
+
+resize();
+
 let count = 0;
 
 function incrementHtml () {

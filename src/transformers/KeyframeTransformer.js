@@ -53,7 +53,6 @@ export default class KeyframeTransformer {
 
 				// remove containers if possible
 				decrementHtml();
-				decrementHtml();
 
 				if ( options.done ) options.done();
 
@@ -95,8 +94,8 @@ function addCss ( css ) {
 }
 
 function getKeyframes ( from, to, options ) {
-	const dx = to.cx - from.cx;
-	const dy = to.cy - from.cy;
+	const dx = to.left - from.left;
+	const dy = to.top - from.top;
 
 	const dsxf = ( to.width / from.width ) - 1;
 	const dsyf = ( to.height / from.height ) - 1;
@@ -114,14 +113,14 @@ function getKeyframes ( from, to, options ) {
 	let i;
 
 	function addKeyframes ( pc, t ) {
-		const cx = from.cx + ( dx * t );
-		const cy = from.cy + ( dy * t );
+		const left = from.left + ( dx * t );
+		const top = from.top + ( dy * t );
 
 		const fromBorderRadius = getBorderRadius( from.borderRadius, to.borderRadius, dsxf, dsyf, t );
 		const toBorderRadius = getBorderRadius( to.borderRadius, from.borderRadius, dsxt, dsyt, 1 - t );
 
-		const fromTransform = getTransform( false, cx, cy, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
-		const toTransform = getTransform( false, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
+		const fromTransform = getTransform( false, left, top, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
+		const toTransform = getTransform( false, left, top, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
 
 		const containerOpacity = from.opacity + t * ( to.opacity - from.opacity );
 

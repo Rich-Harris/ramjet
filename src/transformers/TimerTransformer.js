@@ -7,8 +7,8 @@ import rAF from '../utils/rAF';
 
 export default class TimerTransformer {
 	constructor ( from, to, container, options ) {
-		const dx = to.cx - from.cx;
-		const dy = to.cy - from.cy;
+		const dx = to.left - from.left;
+		const dy = to.top - from.top;
 
 		const dsxf = ( to.width / from.width ) - 1;
 		const dsyf = ( to.height / from.height ) - 1;
@@ -29,8 +29,7 @@ export default class TimerTransformer {
 				to.clone.parentNode.removeChild( to.clone );
 
 				// remove containers if possible
-				( from.isSvg ? decrementSvg : decrementHtml )();
-				( to.isSvg ? decrementSvg : decrementHtml )();
+				decrementHtml();
 
 				if ( options.done ) {
 					options.done();
@@ -43,7 +42,6 @@ export default class TimerTransformer {
 
 			// opacity
 			const containerOpacity = from.opacity + t * ( to.opacity - from.opacity );
-			console.log( 'setting container opacity to %s', containerOpacity );
 			container.style.opacity = containerOpacity; // TODO same for keyframe transformer
 			to.clone.style.opacity = t;
 
@@ -54,23 +52,23 @@ export default class TimerTransformer {
 			applyBorderRadius( from.clone, fromBorderRadius );
 			applyBorderRadius( to.clone, toBorderRadius );
 
-			const cx = from.cx + ( dx * t );
-			const cy = from.cy + ( dy * t );
+			const left = from.left + ( dx * t );
+			const top = from.top + ( dy * t );
 
-			const fromTransform = getTransform( from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
-			const toTransform = getTransform( to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
+			const fromTransform = getTransform( false, left, top, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
+			const toTransform = getTransform( false, left, top, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
 
-			if ( from.isSvg ) {
-				from.clone.setAttribute( 'transform', fromTransform );
-			} else {
+			// if ( from.isSvg ) {
+			// 	from.clone.setAttribute( 'transform', fromTransform );
+			// } else {
 				from.clone.style.transform = from.clone.style.webkitTransform = from.clone.style.msTransform = fromTransform;
-			}
+			// }
 
-			if ( to.isSvg ) {
-				to.clone.setAttribute( 'transform', toTransform );
-			} else {
+			// if ( to.isSvg ) {
+			// 	to.clone.setAttribute( 'transform', toTransform );
+			// } else {
 				to.clone.style.transform = to.clone.style.webkitTransform = to.clone.style.msTransform = toTransform;
-			}
+			// }
 
 			rAF( tick );
 		}

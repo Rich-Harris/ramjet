@@ -29,6 +29,16 @@ export function cloneNode ( node ) {
 	return clone;
 }
 
+// TODO refactor this
+function wrapSvgClone ( node ) {
+	const svg = document.createElementNS( svgns, 'svg' );
+	svg.style.position = 'absolute';
+	svg.style.width = svg.style.height = '100%';
+
+	svg.appendChild( node );
+	return svg;
+}
+
 export function wrapNode ( node, container ) {
 	const isSvg = node.namespaceURI === svgns;
 
@@ -36,15 +46,21 @@ export function wrapNode ( node, container ) {
 	const style = window.getComputedStyle( node );
 	const opacity = getCumulativeOpacity( node );
 
-	const clone = cloneNode( node );
+	let clone = cloneNode( node );
 
 	let transform;
 	let borderRadius;
 
 	if ( isSvg ) {
 		const ctm = node.getScreenCTM();
-		transform = 'matrix(' + [ ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f ].join( ',' ) + ')';
+		transform = 'matrix(1,0,0,1,0,0)';
+		//transform = 'matrix(' + [ ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f ].join( ',' ) + ')';
 		borderRadius = [ 0, 0, 0, 0 ];
+
+		clone = wrapSvgClone( clone );
+
+		clone.style.top = ( bcr.top + window.scrollY ) + 'px';
+		clone.style.left = ( bcr.left + window.scrollX ) + 'px'
 	} else {
 		const offsetParent = node.offsetParent;
 		const offsetParentStyle = window.getComputedStyle( offsetParent );
@@ -53,10 +69,10 @@ export function wrapNode ( node, container ) {
 		transform = getCumulativeTransform( node );
 
 		// temporarily invert the cumulative transform so that we can get the correct boundingClientRect
-		const transformStyle = node.style.transform || node.style.webkitTransform;
 		const transformStyleComputed = style.webkitTransform || style.transform;
 
 		if ( transformStyleComputed !== 'none' ) {
+			const transformStyle = node.style.transform || node.style.webkitTransform;
 			const inverted = invert( parseMatrixTransformString( transformStyleComputed ) );
 			node.style.webkitTransform = node.style.transform = `matrix(${inverted.join(',')})`;
 
@@ -81,10 +97,14 @@ export function wrapNode ( node, container ) {
 		];
 	}
 
+	clone.style.webkitTransformOrigin = clone.style.transformOrigin = '0 0';
+
 	const wrapper = {
 		node, clone, isSvg, transform, borderRadius, opacity,
-		cx: ( bcr.left + bcr.right ) / 2,
-		cy: ( bcr.top + bcr.bottom ) / 2,
+		left: bcr.left,
+		top: bcr.top,
+		// cx: ( bcr.left + bcr.right ) / 2,
+		// cy: ( bcr.top + bcr.bottom ) / 2,
 		width: bcr.right - bcr.left,
 		height: bcr.bottom - bcr.top
 	};
