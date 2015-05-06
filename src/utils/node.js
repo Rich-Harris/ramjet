@@ -48,6 +48,12 @@ export function wrapNode ( node, container ) {
 
 	let clone = cloneNode( node );
 
+	// node.backgroundColor will be a four element array containing the rgba values.
+	// The fourth element will be NaN if either equal to 1 or only an rgb value.
+	var bgColorRegexp = /^rgb[a]?\((\d+),\s*(\d+),\s*(\d+),?\s*(\d?.\d+)?\)$/
+	// If the background color matches, then split the matched values and parse their values.
+	const backgroundColor = (bgColorRegexp.test(style.backgroundColor) ? bgColorRegexp.exec(style.backgroundColor).slice(1).map(parseFloat) : null);
+
 	let transform;
 	let borderRadius;
 
@@ -100,7 +106,7 @@ export function wrapNode ( node, container ) {
 	clone.style.webkitTransformOrigin = clone.style.transformOrigin = '0 0';
 
 	const wrapper = {
-		node, clone, isSvg, transform, borderRadius, opacity,
+		node, clone, isSvg, transform, borderRadius, opacity, backgroundColor,
 		left: bcr.left,
 		top: bcr.top,
 		// cx: ( bcr.left + bcr.right ) / 2,

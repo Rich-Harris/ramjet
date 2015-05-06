@@ -50,11 +50,17 @@
 		    background-color: #0074D9;
 		    float: left;
 		}
+		.a.transparent {
+			background-color: rgba(0, 116, 217, 0.3);
+		}
 
 		.b {
 		    background-color: #2ECC40;
 		    fill: #2ECC40;
 		    float: right;
+		}
+		.b.transparent {
+			background-color: rgba(46, 204, 64, 1)
 		}
 
 		text {
@@ -182,6 +188,32 @@
 					<text x='50' y='50'>b</text>
 				</g>
 			</svg>
+		</article>
+
+		<article data-params='{duration:1000, easing: ramjet.easeInOut}'>
+			<h1>Background rgba opacities are respected (keyframes)</h1>
+
+			<button>go</button>
+
+			<p style='position: absolute'>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+			<div style='position: relative;'>
+				<div class='a transparent'>a</div>
+				<div class='b transparent'>b</div>
+			</div>
+		</article>
+
+		<article data-params='{duration:1000,useTimer:true}'>
+			<h1>Background rgba opacities are respected (timer)</h1>
+
+			<button>go</button>
+
+			<p style='position: absolute'>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+			<div style='position: relative;'>
+				<div class='a transparent'>a</div>
+				<div class='b transparent'>b</div>
+			</div>
 		</article>
 	</main>
 

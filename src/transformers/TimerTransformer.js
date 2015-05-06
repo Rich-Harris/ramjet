@@ -1,4 +1,5 @@
 import getTransform from '../utils/getTransform';
+import { getOpacity, getBackgroundColors } from '../utils/getOpacity';
 import getBorderRadius from '../utils/getBorderRadius';
 import { decrementHtml } from '../utils/html';
 import { decrementSvg } from '../utils/svg';
@@ -41,9 +42,18 @@ export default class TimerTransformer {
 			const t = easing( elapsed / duration );
 
 			// opacity
-			const containerOpacity = from.opacity + t * ( to.opacity - from.opacity );
-			container.style.opacity = containerOpacity; // TODO same for keyframe transformer
-			to.clone.style.opacity = t;
+			const opacities = getOpacity(from, to, t);
+			from.clone.style.opacity = opacities[0];
+			to.clone.style.opacity = opacities[1];
+
+			// opacity
+			const backgroundColors = getBackgroundColors(from, to, t);
+			if(backgroundColors[0]){
+				from.clone.style.backgroundColor = backgroundColors[0];
+			}
+			if(backgroundColors[1]){
+				to.clone.style.backgroundColor = backgroundColors[1];
+			}
 
 			// border radius
 			const fromBorderRadius = getBorderRadius( from.borderRadius, to.borderRadius, dsxf, dsyf, t );
