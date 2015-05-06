@@ -1,6 +1,7 @@
 import HtmlWrapper from './HtmlWrapper';
 import { svgns } from '../utils/svg';
 import cloneNode from './cloneNode';
+import { invert } from '../utils/matrix';
 
 export default class SvgWrapper extends HtmlWrapper {
 	constructor ( node, options ) {
@@ -8,11 +9,16 @@ export default class SvgWrapper extends HtmlWrapper {
 	}
 
 	init ( node, options ) {
-		let bcr = node.getBoundingClientRect();
+		let { top, right, bottom, left } = node.getBoundingClientRect();
+		const width = right - left;
+		const height = bottom - top;
+
 		const style = window.getComputedStyle( node );
 		const opacity = style.opacity;
 
-		let clone = wrapWithSvg( cloneNode( node, options.copyStyles ) );
+		const ctm = node.getCTM();
+
+		let clone = wrapWithSvg( cloneNode( node, options.copyStyles ), width, height, ctm );
 
 		// node.backgroundColor will be a four element array containing the rgba values.
 		// The fourth element will be NaN if either equal to 1 or only an rgb value.
@@ -31,8 +37,8 @@ export default class SvgWrapper extends HtmlWrapper {
 		const offsetParentBcr = offsetParent.getBoundingClientRect();
 
 		clone.style.position = 'absolute';
-		clone.style.top = ( bcr.top - parseInt( style.marginTop, 10 ) - ( offsetParentBcr.top - parseInt( offsetParentStyle.marginTop, 10 ) ) ) + 'px';
-		clone.style.left = ( bcr.left - parseInt( style.marginLeft, 10 ) - ( offsetParentBcr.left - parseInt( offsetParentStyle.marginLeft, 10 ) ) ) + 'px';
+		clone.style.top = ( top - parseInt( style.marginTop, 10 ) - ( offsetParentBcr.top - parseInt( offsetParentStyle.marginTop, 10 ) ) ) + 'px';
+		clone.style.left = ( left - parseInt( style.marginLeft, 10 ) - ( offsetParentBcr.left - parseInt( offsetParentStyle.marginLeft, 10 ) ) ) + 'px';
 
 		clone.style.webkitTransformOrigin = clone.style.transformOrigin = '0 0';
 
@@ -44,10 +50,10 @@ export default class SvgWrapper extends HtmlWrapper {
 		this.opacity = opacity;
 		this.backgroundColor = backgroundColor;
 
-		this.left = bcr.left;
-		this.top = bcr.top;
-		this.width = bcr.width;
-		this.height = bcr.height;
+		this.left = left;
+		this.top = top;
+		this.width = width;
+		this.height = height;
 	}
 
 	insert () {
@@ -76,11 +82,18 @@ function findParent ( node, tagName ) {
 }
 
 // TODO refactor this
-function wrapWithSvg ( node ) {
+function wrapWithSvg ( node, width, height, { a, b, c, d, e, f } ) {
 	const svg = document.createElementNS( svgns, 'svg' );
 	svg.style.position = 'absolute';
-	svg.style.width = svg.style.height = '100%';
+	svg.style.width = width + 'px';
+	svg.style.height = height + 'px';
+	svg.style.overflow = 'visible';
 
-	svg.appendChild( node );
+	const g = document.createElementNS( svgns, 'g' );
+	g.setAttribute( 'transform', `matrix(${a},${b},${c},${d},${e},${f})` );
+	g.appendChild( node );
+
+	svg.appendChild( g );
+
 	return svg;
 }
