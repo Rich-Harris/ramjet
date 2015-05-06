@@ -1,4 +1,14 @@
 import cloneNode from './cloneNode';
+import {
+	TRANSFORM,
+	KEYFRAMES,
+	ANIMATION_DIRECTION,
+	ANIMATION_DURATION,
+	ANIMATION_ITERATION_COUNT,
+	ANIMATION_NAME,
+	ANIMATION_TIMING_FUNCTION,
+	ANIMATION_END
+} from '../utils/detect';
 
 export default class HtmlWrapper {
 	constructor ( node, options ) {
@@ -83,5 +93,15 @@ export default class HtmlWrapper {
 		this.clone.style.borderTopRightRadius    = borderRadius[1];
 		this.clone.style.borderBottomRightRadius = borderRadius[2];
 		this.clone.style.borderBottomLeftRadius  = borderRadius[3];
+	}
+
+	animateWithKeyframes ( id, duration, callback ) {
+		this.clone.style[ ANIMATION_DIRECTION ] = 'alternate';
+		this.clone.style[ ANIMATION_DURATION ] = `${duration/1000}s`;
+		this.clone.style[ ANIMATION_ITERATION_COUNT ] = 1;
+		this.clone.style[ ANIMATION_NAME ] = id;
+		this.clone.style[ ANIMATION_TIMING_FUNCTION ] = 'linear';
+
+		this.clone.addEventListener( ANIMATION_END, callback );
 	}
 }

@@ -5,25 +5,11 @@ import { linear } from '../easing';
 import { decrementHtml } from '../utils/html';
 import {
 	TRANSFORM,
-	KEYFRAMES,
-	ANIMATION_DIRECTION,
-	ANIMATION_DURATION,
-	ANIMATION_ITERATION_COUNT,
-	ANIMATION_NAME,
-	ANIMATION_TIMING_FUNCTION,
-	ANIMATION_END
+	KEYFRAMES
 } from '../utils/detect';
 
 function generateId () {
-	return '_' + ~~( Math.random() * 1000000 );
-}
-
-function makeAnimatable ( node, options, id ) {
-	node.style[ ANIMATION_DIRECTION ] = 'alternate';
-	node.style[ ANIMATION_DURATION ] = `${options.duration/1000}s`;
-	node.style[ ANIMATION_ITERATION_COUNT ] = 1;
-	node.style[ ANIMATION_NAME ] = id;
-	node.style[ ANIMATION_TIMING_FUNCTION ] = 'linear';
+	return 'ramjet' + ~~( Math.random() * 1000000 );
 }
 
 export default class KeyframeTransformer {
@@ -38,14 +24,13 @@ export default class KeyframeTransformer {
 			${KEYFRAMES} ${toId}        { ${toKeyframes} }`;
 		const dispose = addCss( css );
 
-		makeAnimatable( from.clone, options, fromId );
-		makeAnimatable( to.clone, options, toId );
+		let animating = 2;
 
-		let fromDone;
-		let toDone;
+		from.animateWithKeyframes( fromId, options.duration, done );
+		to.animateWithKeyframes( toId, options.duration, done );
 
 		function done () {
-			if ( fromDone && toDone ) {
+			if ( !--animating ) {
 				from.detach();
 				to.detach();
 
@@ -54,16 +39,6 @@ export default class KeyframeTransformer {
 				dispose();
 			}
 		}
-
-		from.clone.addEventListener( ANIMATION_END, () => {
-			fromDone = true;
-			done();
-		});
-
-		to.clone.addEventListener( ANIMATION_END, () => {
-			toDone = true;
-			done();
-		});
 	}
 }
 
