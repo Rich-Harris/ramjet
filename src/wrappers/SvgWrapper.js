@@ -18,7 +18,7 @@ export default class SvgWrapper extends HtmlWrapper {
 
 		const ctm = node.getCTM();
 
-		let clone = wrapWithSvg( cloneNode( node, options.copyStyles ), width, height, ctm );
+		let clone = wrapWithSvg( cloneNode( node ), width, height, ctm );
 
 		// node.backgroundColor will be a four element array containing the rgba values.
 		// The fourth element will be NaN if either equal to 1 or only an rgb value.

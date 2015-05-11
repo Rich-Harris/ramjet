@@ -18,7 +18,7 @@ export default class HtmlWrapper {
 		const style = window.getComputedStyle( node );
 		const opacity = +( style.opacity );
 
-		let clone = cloneNode( node, options.copyStyles );
+		let clone = cloneNode( node );
 
 		// node.backgroundColor will be a four element array containing the rgba values.
 		// The fourth element will be NaN if either equal to 1 or only an rgb value.

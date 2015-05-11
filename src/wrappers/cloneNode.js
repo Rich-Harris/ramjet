@@ -1,24 +1,12 @@
-import styleKeys from '../utils/styleKeys';
-
-export default function cloneNode ( node, copyStyles ) {
+export default function cloneNode ( node ) {
 	const clone = node.cloneNode();
 
-	let style;
-	let len;
-	let i;
-
 	if ( node.nodeType === 1 ) {
-		if ( copyStyles ) {
-			style = window.getComputedStyle( node );
+		clone.setAttribute( 'style', window.getComputedStyle( node ).cssText );
 
-			styleKeys.forEach( function ( prop ) {
-				if ( style[ prop ] !== '' ) {
-					clone.style[ prop ] = style[ prop ];
-				}
-			});
-		}
+		const len = node.childNodes.length;
+		let i;
 
-		len = node.childNodes.length;
 		for ( i = 0; i < len; i += 1 ) {
 			clone.appendChild( cloneNode( node.childNodes[i] ) );
 		}
