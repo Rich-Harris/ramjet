@@ -1,5 +1,6 @@
 import getTransform from '../utils/getTransform';
-import {getOpacity, getBackgroundColors} from '../utils/getOpacity';
+import getOpacityInterpolator from '../interpolators/opacity';
+import getRgbaInterpolator from '../interpolators/rgba';
 import getBorderRadius from '../utils/getBorderRadius';
 import { linear } from '../easing';
 import {
@@ -74,6 +75,9 @@ function getKeyframes ( from, to, options ) {
 
 	const easing = options.easing || linear;
 
+	const opacityAt = getOpacityInterpolator( from.opacity, to.opacity );
+	const backgroundColorAt = getRgbaInterpolator( from.rgba, to.rgba );
+
 	const numFrames = options.duration / 50; // one keyframe per 50ms is probably enough... this may prove not to be the case though
 
 	let fromKeyframes = [];
@@ -90,13 +94,13 @@ function getKeyframes ( from, to, options ) {
 		const fromTransform = getTransform( false, left, top, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
 		const toTransform = getTransform( false, left, top, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
 
-		const opacities = getOpacity(from, to, t);
-		const backgroundColors = getBackgroundColors(from, to, t);
+		const opacity = opacityAt( t );
+		const backgroundColor = backgroundColorAt ? backgroundColorAt( t ) : null;
 
 		fromKeyframes.push( `
 			${pc}% {
-				opacity: ${opacities[0]};
-				${(backgroundColors[0] ? "background-color: "+backgroundColors[0]: '')};
+				opacity: ${opacity.from};
+				${(backgroundColor ? "background-color: "+backgroundColor.from: '')};
 				border-top-left-radius: ${fromBorderRadius[0]};
 				border-top-right-radius: ${fromBorderRadius[1]};
 				border-bottom-right-radius: ${fromBorderRadius[2]};
@@ -107,8 +111,8 @@ function getKeyframes ( from, to, options ) {
 
 		toKeyframes.push( `
 			${pc}% {
-				opacity: ${opacities[1]};
-				${(backgroundColors[1] ? "background-color: "+backgroundColors[1]: '')};
+				opacity: ${opacity.to};
+				${(backgroundColor ? "background-color: "+backgroundColor.to: '')};
 				border-top-left-radius: ${toBorderRadius[0]};
 				border-top-right-radius: ${toBorderRadius[1]};
 				border-bottom-right-radius: ${toBorderRadius[2]};

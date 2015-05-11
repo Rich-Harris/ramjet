@@ -1,5 +1,6 @@
 import getTransform from '../utils/getTransform';
-import { getOpacity, getBackgroundColors } from '../utils/getOpacity';
+import getOpacityInterpolator from '../interpolators/opacity';
+import getRgbaInterpolator from '../interpolators/rgba';
 import getBorderRadius from '../utils/getBorderRadius';
 import { linear } from '../easing';
 import rAF from '../utils/rAF';
@@ -19,6 +20,10 @@ export default class TimerTransformer {
 		const duration = options.duration || 400;
 		const easing = options.easing || linear;
 
+		const opacityAt = getOpacityInterpolator( from.opacity, to.opacity );
+		const backgroundColorAt = getRgbaInterpolator( from.rgba, to.rgba );
+		//const borderRadiusAt = getBorderRadiusInterpolator( from, to );
+
 		function tick () {
 			const timeNow = Date.now();
 			const elapsed = timeNow - startTime;
@@ -37,19 +42,15 @@ export default class TimerTransformer {
 			const t = easing( elapsed / duration );
 
 			// opacity
-			const [ fromOpacity, toOpacity ] = getOpacity( from, to, t );
-			from.setOpacity( fromOpacity );
-			to.setOpacity( toOpacity );
+			const opacity = opacityAt( t );
+			from.setOpacity( opacity.from );
+			to.setOpacity( opacity.to );
 
-			// opacity
-			const [ fromBg, toBg ] = getBackgroundColors( from, to, t );
-
-			if ( fromBg ) {
-				from.clone.style.backgroundColor = fromBg;
-			}
-
-			if ( toBg ) {
-				to.clone.style.backgroundColor = toBg;
+			// background color
+			if ( backgroundColorAt ) {
+				const backgroundColor = backgroundColorAt( t );
+				from.clone.style.backgroundColor = backgroundColor.from;
+				to.clone.style.backgroundColor = backgroundColor.to;
 			}
 
 			// border radius

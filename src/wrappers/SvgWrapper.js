@@ -2,6 +2,7 @@ import HtmlWrapper from './HtmlWrapper';
 import { svgns } from '../utils/svg';
 import cloneNode from './cloneNode';
 import { invert } from '../utils/matrix';
+import parseColor from '../utils/parseColor';
 
 export default class SvgWrapper extends HtmlWrapper {
 	constructor ( node, options ) {
@@ -20,11 +21,7 @@ export default class SvgWrapper extends HtmlWrapper {
 
 		let clone = wrapWithSvg( cloneNode( node ), width, height, ctm );
 
-		// node.backgroundColor will be a four element array containing the rgba values.
-		// The fourth element will be NaN if either equal to 1 or only an rgb value.
-		var bgColorRegexp = /^rgb[a]?\((\d+),\s*(\d+),\s*(\d+),?\s*(\d?.\d+)?\)$/
-		// If the background color matches, then split the matched values and parse their values.
-		const backgroundColor = (bgColorRegexp.test(style.fill) ? bgColorRegexp.exec(style.fill).slice(1).map(parseFloat) : null);
+		const rgba = parseColor( style.fill );
 
 		let transform;
 		let borderRadius;
@@ -48,7 +45,7 @@ export default class SvgWrapper extends HtmlWrapper {
 		this.transform = transform;
 		this.borderRadius = borderRadius;
 		this.opacity = opacity;
-		this.backgroundColor = backgroundColor;
+		this.rgba = rgba;
 
 		this.left = left;
 		this.top = top;

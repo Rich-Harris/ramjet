@@ -7,6 +7,7 @@ import {
 	ANIMATION_TIMING_FUNCTION,
 	ANIMATION_END
 } from '../utils/detect';
+import parseColor from '../utils/parseColor';
 
 export default class HtmlWrapper {
 	constructor ( node, options ) {
@@ -20,11 +21,7 @@ export default class HtmlWrapper {
 
 		let clone = cloneNode( node );
 
-		// node.backgroundColor will be a four element array containing the rgba values.
-		// The fourth element will be NaN if either equal to 1 or only an rgb value.
-		var bgColorRegexp = /^rgb[a]?\((\d+),\s*(\d+),\s*(\d+),?\s*(\d?.\d+)?\)$/;
-		// If the background color matches, then split the matched values and parse their values.
-		const backgroundColor = (bgColorRegexp.test(style.backgroundColor) ? bgColorRegexp.exec(style.backgroundColor).slice(1).map(parseFloat) : null);
+		const rgba = parseColor( style.backgroundColor );
 
 		let transform;
 		let borderRadius;
@@ -57,7 +54,7 @@ export default class HtmlWrapper {
 		this.transform = transform;
 		this.borderRadius = borderRadius;
 		this.opacity = opacity;
-		this.backgroundColor = backgroundColor;
+		this.rgba = rgba;
 
 		this.left = bcr.left;
 		this.top = bcr.top;
