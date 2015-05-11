@@ -8,6 +8,7 @@ import {
 	ANIMATION_END
 } from '../utils/detect';
 import parseColor from '../utils/parseColor';
+import parseBorderRadius from '../utils/parseBorderRadius';
 
 export default class HtmlWrapper {
 	constructor ( node, options ) {
@@ -38,13 +39,13 @@ export default class HtmlWrapper {
 		//transform = `matrix(${transform.join(',')})`;
 		transform = '';
 
-		// TODO this is wrong... need to account for corners with 2 radii
-		borderRadius = [
-			parseFloat( style.borderTopLeftRadius ),
-			parseFloat( style.borderTopRightRadius ),
-			parseFloat( style.borderBottomRightRadius ),
-			parseFloat( style.borderBottomLeftRadius )
-		];
+		// TODO create a flat array? easier to work with later?
+		borderRadius = {
+			tl: parseBorderRadius( style.borderTopLeftRadius ),
+			tr: parseBorderRadius( style.borderTopRightRadius ),
+			br: parseBorderRadius( style.borderBottomRightRadius ),
+			bl: parseBorderRadius( style.borderBottomLeftRadius )
+		};
 
 		clone.style.webkitTransformOrigin = clone.style.transformOrigin = '0 0';
 
@@ -83,11 +84,12 @@ export default class HtmlWrapper {
 	}
 
 	setBorderRadius ( borderRadius ) {
+		this.clone.style.borderRadius = borderRadius;
 		// TODO handle corners with two radii
-		this.clone.style.borderTopLeftRadius     = borderRadius[0];
-		this.clone.style.borderTopRightRadius    = borderRadius[1];
-		this.clone.style.borderBottomRightRadius = borderRadius[2];
-		this.clone.style.borderBottomLeftRadius  = borderRadius[3];
+		// this.clone.style.borderTopLeftRadius     = borderRadius.topLeft;
+		// this.clone.style.borderTopRightRadius    = borderRadius.topRight;
+		// this.clone.style.borderBottomRightRadius = borderRadius.bottomRight;
+		// this.clone.style.borderBottomLeftRadius  = borderRadius.bottomLeft;
 	}
 
 	animateWithKeyframes ( id, duration, callback ) {

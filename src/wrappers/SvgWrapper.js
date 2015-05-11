@@ -27,7 +27,12 @@ export default class SvgWrapper extends HtmlWrapper {
 		let borderRadius;
 
 		transform = '';
-		borderRadius = [ 0, 0, 0, 0 ];
+		borderRadius = {
+			tl: { x: 0, y: 0 },
+			tr: { x: 0, y: 0 },
+			br: { x: 0, y: 0 },
+			bl: { x: 0, y: 0 }
+		};
 
 		const offsetParent = node.offsetParent;
 		const offsetParentStyle = window.getComputedStyle( offsetParent );

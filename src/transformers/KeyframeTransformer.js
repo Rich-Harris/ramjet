@@ -1,7 +1,7 @@
 import getTransform from '../utils/getTransform';
 import getOpacityInterpolator from '../interpolators/opacity';
 import getRgbaInterpolator from '../interpolators/rgba';
-import getBorderRadius from '../utils/getBorderRadius';
+import getBorderRadiusInterpolator from '../interpolators/borderRadius';
 import { linear } from '../easing';
 import {
 	TRANSFORM,
@@ -77,6 +77,7 @@ function getKeyframes ( from, to, options ) {
 
 	const opacityAt = getOpacityInterpolator( from.opacity, to.opacity );
 	const backgroundColorAt = getRgbaInterpolator( from.rgba, to.rgba );
+	const borderRadiusAt = getBorderRadiusInterpolator( from, to );
 
 	const numFrames = options.duration / 50; // one keyframe per 50ms is probably enough... this may prove not to be the case though
 
@@ -88,23 +89,18 @@ function getKeyframes ( from, to, options ) {
 		const left = from.left + ( dx * t );
 		const top = from.top + ( dy * t );
 
-		const fromBorderRadius = getBorderRadius( from.borderRadius, to.borderRadius, dsxf, dsyf, t );
-		const toBorderRadius = getBorderRadius( to.borderRadius, from.borderRadius, dsxt, dsyt, 1 - t );
-
 		const fromTransform = getTransform( false, left, top, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
 		const toTransform = getTransform( false, left, top, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
 
 		const opacity = opacityAt( t );
 		const backgroundColor = backgroundColorAt ? backgroundColorAt( t ) : null;
+		const borderRadius = borderRadiusAt( t ); // TODO this needs to be optional, to avoid repaints
 
 		fromKeyframes.push( `
 			${pc}% {
 				opacity: ${opacity.from};
 				${(backgroundColor ? "background-color: "+backgroundColor.from: '')};
-				border-top-left-radius: ${fromBorderRadius[0]};
-				border-top-right-radius: ${fromBorderRadius[1]};
-				border-bottom-right-radius: ${fromBorderRadius[2]};
-				border-bottom-left-radius: ${fromBorderRadius[3]};
+				border-radius: ${borderRadius.from};
 				${TRANSFORM}: ${fromTransform};
 			}`
 		);
@@ -113,10 +109,7 @@ function getKeyframes ( from, to, options ) {
 			${pc}% {
 				opacity: ${opacity.to};
 				${(backgroundColor ? "background-color: "+backgroundColor.to: '')};
-				border-top-left-radius: ${toBorderRadius[0]};
-				border-top-right-radius: ${toBorderRadius[1]};
-				border-bottom-right-radius: ${toBorderRadius[2]};
-				border-bottom-left-radius: ${toBorderRadius[3]};
+				border-radius: ${borderRadius.to};
 				${TRANSFORM}: ${toTransform};
 			}`
 		);
