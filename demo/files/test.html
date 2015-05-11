@@ -176,7 +176,7 @@
 			</div>
 		</article>
 
-		<article data-params='{duration:3000}'>
+		<article data-params='{duration:600}'>
 			<h1>HTML to SVG</h1>
 
 			<button>go</button>
@@ -213,6 +213,20 @@
 			<div style='position: relative;'>
 				<div class='a transparent'>a</div>
 				<div class='b transparent'>b</div>
+			</div>
+		</article>
+
+		<article data-params='{duration:3000}'>
+			<h1>'to' element is given a higher z-index than 'from', when they are not siblings</h1>
+
+			<button>go</button>
+
+			<div class='container' style='position: relative;'>
+				<div class='a' style='display: block; float: none;'>a</div>
+			</div>
+
+			<div class='container' style='position: relative;'>
+				<div class='b' style='display: block; float: none;'>b</div>
 			</div>
 		</article>
 	</main>

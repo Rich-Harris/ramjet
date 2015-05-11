@@ -21,6 +21,12 @@ export default {
 		from.setOpacity( 1 );
 		to.setOpacity( 0 );
 
+		// This will fail if `from` is inside a different (higher)
+		// stacking context than `to`. Not much we can do ¯\_(ツ)_/¯
+		const fromZIndex = parseFloat( from.clone.style.zIndex ) || 0;
+		const toZIndex = parseFloat( to.clone.style.zIndex ) || 0;
+		to.clone.style.zIndex = Math.max( toZIndex, fromZIndex + 1 );
+
 		from.insert();
 		to.insert();
 
