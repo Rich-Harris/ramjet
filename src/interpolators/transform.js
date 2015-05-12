@@ -7,8 +7,6 @@ export default function getTransformInterpolator ( a, b ) {
 	const a_to_b = [ b.width / a.width, 0, 0, b.height / a.height, b.left - a.left, b.top - a.top ];
 	const a_end = multiply( multiply( a.invertedParentCTM, a_to_b ), b.ctm );
 
-	console.log( 'a_end', a_end );
-
 	let transform = [];
 
 	return function ( t ) {

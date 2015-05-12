@@ -61,14 +61,6 @@ export default class HtmlWrapper {
 
 		const bcr = getBoundingClientRect( node, this.invertedParentCTM );
 		this.bcr = bcr;
-		window.draw( bcr.left, bcr.top, bcr.width, bcr.height );
-
-		console.group( node );
-		console.log( 'this.invertedParentCTM', this.invertedParentCTM );
-		console.log( 'this.transform', this.transform );
-		console.log( 'this.ctm', this.ctm );
-		console.log( 'bcr', bcr );
-		console.groupEnd();
 
 		const opacity = +( style.opacity );
 
@@ -95,18 +87,31 @@ export default class HtmlWrapper {
 	}
 
 	insert () {
-		const container = findTransformParent( this._node );
+		const bcr = this.bcr;
+
+		let clone;
+		let container;
+
+		if ( this._node.namespaceURI === svgns ) { // TODO what if it's the <svg> itself, not a child?
+			const svg = findParentByTagName( this._node, 'svg' ); // TODO should be the namespace boundary - could be SVG inside SVG
+			container = findTransformParent( svg );
+
+			clone = svg.cloneNode( false );
+			clone.appendChild( this._clone ); // TODO what about transforms?
+		} else {
+			container = findTransformParent( this._node );
+			clone = this._clone;
+		}
+
 		const containerStyle = window.getComputedStyle( container );
 		const containerBcr = getBoundingClientRect( container, invert( getCumulativeTransformMatrix( container.parentNode ) ) );
 
-		const bcr = this.bcr;
+		clone.style.position = 'absolute';
+		clone.style[ TRANSFORM_ORIGIN ] = '0 0';
+		clone.style.top = ( bcr.top - parseInt( this.style.marginTop, 10 ) - ( containerBcr.top - parseInt( containerStyle.marginTop, 10 ) ) ) + 'px';
+		clone.style.left = ( bcr.left - parseInt( this.style.marginLeft, 10 ) - ( containerBcr.left - parseInt( containerStyle.marginLeft, 10 ) ) ) + 'px';
 
-		this._clone.style.position = 'absolute';
-		this._clone.style[ TRANSFORM_ORIGIN ] = '0 0';
-		this._clone.style.top = ( bcr.top - parseInt( this.style.marginTop, 10 ) - ( containerBcr.top - parseInt( containerStyle.marginTop, 10 ) ) ) + 'px';
-		this._clone.style.left = ( bcr.left - parseInt( this.style.marginLeft, 10 ) - ( containerBcr.left - parseInt( containerStyle.marginLeft, 10 ) ) ) + 'px';
-
-		this._node.parentNode.appendChild( this._clone );
+		container.appendChild( clone );
 	}
 
 	detach () {
