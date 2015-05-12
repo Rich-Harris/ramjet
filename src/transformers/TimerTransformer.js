@@ -1,7 +1,7 @@
-import getTransform from '../utils/getTransform';
 import getOpacityInterpolator from '../interpolators/opacity';
 import getRgbaInterpolator from '../interpolators/rgba';
 import getBorderRadiusInterpolator from '../interpolators/borderRadius';
+import getTransformInterpolator from '../interpolators/transform';
 import { linear } from '../easing';
 import rAF from '../utils/rAF';
 
@@ -23,6 +23,7 @@ export default class TimerTransformer {
 		const opacityAt = getOpacityInterpolator( from.opacity, to.opacity );
 		const backgroundColorAt = getRgbaInterpolator( from.rgba, to.rgba );
 		const borderRadiusAt = getBorderRadiusInterpolator( from, to );
+		const transformAt = getTransformInterpolator( from, to );
 
 		function tick () {
 			const timeNow = Date.now();
@@ -58,14 +59,10 @@ export default class TimerTransformer {
 			from.setBorderRadius( borderRadius.from );
 			to.setBorderRadius( borderRadius.to );
 
-			const left = from.left + ( dx * t );
-			const top = from.top + ( dy * t );
-
-			const fromTransform = getTransform( false, left, top, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
-			const toTransform = getTransform( false, left, top, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
-
-			from.setTransform( fromTransform );
-			to.setTransform( toTransform );
+			// transform
+			const transform = transformAt( t );
+			from.setTransform( transform.from );
+			to.setTransform( transform.to );
 
 			rAF( tick );
 		}
