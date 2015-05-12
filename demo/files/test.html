@@ -37,6 +37,7 @@
 		}
 
 		.a, .b {
+			position: relative;
 		    width: 100px;
 		    height: 100px;
 		    line-height: 100px;
@@ -65,6 +66,24 @@
 
 		text {
 			fill: white;
+		}
+
+		.transform-helper {
+			position: absolute;
+			left: 0;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			border: 2px solid red;
+			transition: all 0.6s ease-out;
+		}
+
+		.transform-helper-bg {
+			position: absolute;
+			width: 100px;
+			height: 100px;
+			border: 2px solid #999;
+			box-sizing: border-box;
 		}
 
 		button {
@@ -250,6 +269,49 @@
 
 			<div class='a'>a</div>
 			<div class='b' style='float: none; width: 80px; height: 80px; color: red'>b</div>
+		</article>
+
+		<article>
+			<h1>Starting transform on target</h1>
+
+			<button>go</button>
+
+			<div class='transform-helper-bg'></div>
+			<div class='a' style='-webkit-transform: translate(50px,50px) rotate(10deg) scale(2,1);'>
+				<div class='transform-helper'></div>
+				a
+			</div>
+			<div class='b'>b</div>
+		</article>
+
+		<article>
+			<h1>Starting transform on container</h1>
+
+			<button>go</button>
+
+			<div class='transform-helper-bg'></div>
+			<div class='container' style='-webkit-transform: scale(0.5);'>
+				<div class='a'>
+					<div id='helper' class='transform-helper'></div>
+					a
+				</div>
+			</div>
+			<div class='b'>b</div>
+		</article>
+
+		<article>
+			<h1>Starting transform on container and target</h1>
+
+			<button>go</button>
+
+			<div class='transform-helper-bg'></div>
+			<div class='container' style='-webkit-transform: translate(50px,50px) rotate(10deg) scale(0.8,1);'>
+				<div class='a' style='-webkit-transform: translate(50px,50px) rotate(10deg) scale(2,1);'>
+					<div class='transform-helper'></div>
+					a
+				</div>
+			</div>
+			<div class='b'>b</div>
 		</article>
 	</main>
 

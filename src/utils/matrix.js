@@ -9,7 +9,7 @@ export function multiply ( [ a1, b1, c1, d1, e1, f1 ], [ a2, b2, c2, d2, e2, f2 
 	];
 }
 
-export function invert ( { a, b, c, d, e, f } ) {
+export function invert ( [ a, b, c, d, e, f ] ) {
 	const determinant = ( a * d ) - ( c * b );
 
 	return [

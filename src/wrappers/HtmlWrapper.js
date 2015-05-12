@@ -9,6 +9,8 @@ import {
 } from '../utils/detect';
 import parseColor from '../utils/parseColor';
 import parseBorderRadius from '../utils/parseBorderRadius';
+import getCumulativeTransformMatrix from '../utils/getCumulativeTransformMatrix';
+import { invert } from '../utils/matrix';
 
 export default class HtmlWrapper {
 	constructor ( node, options ) {
@@ -16,11 +18,31 @@ export default class HtmlWrapper {
 	}
 
 	init ( node, options ) {
-		let bcr = node.getBoundingClientRect();
+		this.node = node;
 		const style = window.getComputedStyle( node );
-		const opacity = +( style.opacity );
 
-		let clone = cloneNode( node );
+		this.clone = cloneNode( node );
+
+
+
+		// insert immediately, so we can inspect bounding client rect etc
+		this.insert();
+
+		// we need to get the 'naked' boundingClientRect, i.e.
+		// without any transforms
+		const parentTransformMatrix = getCumulativeTransformMatrix( node.parentNode );
+
+		this.clone.style.webkitTransformOrigin = this.clone.style.transformOrigin = '0 0';
+		this.clone.style.webkitTransform = this.clone.style.transform = `matrix(${invert(parentTransformMatrix).join(',')})`;
+		console.log( 'this.clone.style.transform', this.clone.style.transform );
+
+		const nakedBcr = this.clone.getBoundingClientRect();
+		console.log( 'nakedBcr', nakedBcr );
+
+		let bcr = node.getBoundingClientRect();
+		console.log( 'bcr', bcr );
+
+		const opacity = +( style.opacity );
 
 		const rgba = parseColor( style.backgroundColor );
 
@@ -31,9 +53,9 @@ export default class HtmlWrapper {
 		const offsetParentStyle = window.getComputedStyle( offsetParent );
 		const offsetParentBcr = offsetParent.getBoundingClientRect();
 
-		clone.style.position = 'absolute';
-		clone.style.top = ( bcr.top - parseInt( style.marginTop, 10 ) - ( offsetParentBcr.top - parseInt( offsetParentStyle.marginTop, 10 ) ) ) + 'px';
-		clone.style.left = ( bcr.left - parseInt( style.marginLeft, 10 ) - ( offsetParentBcr.left - parseInt( offsetParentStyle.marginLeft, 10 ) ) ) + 'px';
+		this.clone.style.position = 'absolute';
+		this.clone.style.top = ( bcr.top - parseInt( style.marginTop, 10 ) - ( offsetParentBcr.top - parseInt( offsetParentStyle.marginTop, 10 ) ) ) + 'px';
+		this.clone.style.left = ( bcr.left - parseInt( style.marginLeft, 10 ) - ( offsetParentBcr.left - parseInt( offsetParentStyle.marginLeft, 10 ) ) ) + 'px';
 
 		// TODO use matrices all the way down, this is silly
 		//transform = `matrix(${transform.join(',')})`;
@@ -47,11 +69,8 @@ export default class HtmlWrapper {
 			bl: parseBorderRadius( style.borderBottomLeftRadius )
 		};
 
-		clone.style.webkitTransformOrigin = clone.style.transformOrigin = '0 0';
-
 		this.isSvg = false;
 		this.node = node;
-		this.clone = clone;
 		this.transform = transform;
 		this.borderRadius = borderRadius;
 		this.opacity = opacity;
@@ -85,11 +104,6 @@ export default class HtmlWrapper {
 
 	setBorderRadius ( borderRadius ) {
 		this.clone.style.borderRadius = borderRadius;
-		// TODO handle corners with two radii
-		// this.clone.style.borderTopLeftRadius     = borderRadius.topLeft;
-		// this.clone.style.borderTopRightRadius    = borderRadius.topRight;
-		// this.clone.style.borderBottomRightRadius = borderRadius.bottomRight;
-		// this.clone.style.borderBottomLeftRadius  = borderRadius.bottomLeft;
 	}
 
 	animateWithKeyframes ( id, duration, callback ) {

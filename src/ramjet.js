@@ -5,6 +5,10 @@ import KeyframeTransformer from './transformers/KeyframeTransformer';
 import { linear, easeIn, easeOut, easeInOut } from './easing';
 import { keyframesSupported } from './utils/detect';
 
+// TEMP
+import * as matrix from './utils/matrix';
+import getCumulativeTransformMatrix from './utils/getCumulativeTransformMatrix';
+
 export default {
 	transform ( fromNode, toNode, options = {} ) {
 		if ( typeof options === 'function' ) {
@@ -27,9 +31,6 @@ export default {
 		const toZIndex = parseFloat( to.clone.style.zIndex ) || 0;
 		to.clone.style.zIndex = Math.max( toZIndex, fromZIndex + 1 );
 
-		from.insert();
-		to.insert();
-
 		if ( !keyframesSupported || options.useTimer ) {
 			return new TimerTransformer( from, to, options );
 		} else {
@@ -46,5 +47,9 @@ export default {
 	},
 
 	// expose some basic easing functions
-	linear, easeIn, easeOut, easeInOut
+	linear, easeIn, easeOut, easeInOut,
+
+	// TEMP
+	matrix,
+	getCumulativeTransformMatrix
 };
