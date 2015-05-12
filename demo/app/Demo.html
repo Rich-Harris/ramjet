@@ -12,19 +12,14 @@
 			<p data-stage='2'>It doesn't care where they sit in the DOM tree, or what children they have...</p>
 		</div>
 
-		<svg class='container' data-container='3' viewBox='0 0 600 300'>
+		<!-- <svg class='container' data-container='3'>
 			<defs>
-				<path id='upper' d='M 90 150 C 200 80 400 80 510 150'/>
-				<path id='lower' d='M 90 150 C 200 220 400 220 510 150'/>
+				<path id='upper' d='M 40 100 C 150 30 350 30 460 100'/>
+				<path id='lower' d='M 40 100 C 150 170 350 170 460 100'/>
 			</defs>
 
-			<!-- TODO text on a path -->
-			<g data-stage='3'>
-				<!-- <ellipse fill='#2ECC40' cx='300' cy='150' rx='250' ry='100'/> -->
-				<rect fill='#85144b' x='50' y='50' width='500' height='200'/>
-
-				<!-- <use xlink:href='#upper'/>
-				<use xlink:href='#lower'/> -->
+			<g data-stage='3' transform='translate(50,50)'>
+				<rect fill='#85144b' width='500' height='200'/>
 
 				<text style='fill: white; font-size: 2rem; text-anchor: middle;'>
 					<textPath xlink:href="#upper" startOffset='50%'>
@@ -38,7 +33,11 @@
 					</textPath>
 				</text>
 			</g>
-		</svg>
+		</svg> -->
+
+		<div class='container' data-container='3'>
+			<p data-stage='3' style='transform: scale(1,1);'>...or if they've got existing transforms!</p>
+		</div>
 
 		<!-- I couldn't find a credit for this image -->
 		<div class='container' data-container='4' data-stage='4' style='background: url(ram.jpg) no-repeat 50% 50%; background-size: cover;'>
@@ -136,11 +135,24 @@
 		padding: 0.5em;
 	}
 
-	[data-container='3'] {
+	/*[data-container='3'] {
 		left: 33.333%;
 		top: 0;
 		width: 66.666%;
 		height: 100%;
+	}*/
+
+	[data-container='3'] {
+		left: 33.333%;
+		top: 0;
+		width: 33.333%;
+		height: 100%;
+	}
+
+	[data-stage='3'] {
+		background-color: #85144b;
+		color: white;
+		padding: 0.5em;
 	}
 
 	[data-container='4'] {
@@ -245,14 +257,32 @@
 			window.addEventListener( 'scroll', event => {
 				this.set( 'inView', inView() );
 			});
+
+			window.addEventListener( 'keydown', event => {
+				if ( event.which === 37 ) {
+					this.back( event.shiftKey );
+				}
+
+				else if ( event.which === 39 ) {
+					this.next( event.shiftKey );
+				}
+			});
 		},
 
-		next () {
+		next ( slow ) {
+			const stage = this.get( 'stage' );
+			this.goto( ( stage + 1 ) % 6, slow );
+		},
+
+		back ( slow ) {
+			const stage = this.get( 'stage' ) + 6;
+			this.goto( ( stage - 1 ) % 6, slow );
+		},
+
+		goto ( nextStage, slow ) {
 			if ( !this.get( 'inView' ) ) return;
 
 			const currentStage = this.get( 'stage' );
-			const nextStage = ( currentStage + 1 ) % 6;
-			//const nextStage = currentStage === 2 ? 3 : 2;
 
 			const a = this.find( `[data-stage='${currentStage}']` );
 			const b = this.find( `[data-stage='${nextStage}']` );
@@ -262,15 +292,15 @@
 
 			ramjet.transform( a, b, {
 				easing: eases[ this.get( 'easing' ) ],
-				duration: 400,
+				duration: slow ? 4000 : 400,
 				done: () => {
 					this.set( 'stage', nextStage );
 
 					addClass( b, 'visible' );
 
-					setTimeout( () => {
-						this.next();
-					}, 1500 );
+					// setTimeout( () => {
+					// 	this.next();
+					// }, 1500 );
 				}
 			});
 
