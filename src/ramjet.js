@@ -7,7 +7,6 @@ import { keyframesSupported } from './utils/detect';
 
 // TEMP
 import * as matrix from './utils/matrix';
-import getCumulativeTransformMatrix from './utils/getCumulativeTransformMatrix';
 
 export default {
 	transform ( fromNode, toNode, options = {} ) {
@@ -24,6 +23,9 @@ export default {
 
 		from.setOpacity( 1 );
 		to.setOpacity( 0 );
+
+		from.insert();
+		to.insert();
 
 		// This will fail if `from` is inside a different (higher)
 		// stacking context than `to`. Not much we can do ¯\_(ツ)_/¯
@@ -50,6 +52,5 @@ export default {
 	linear, easeIn, easeOut, easeInOut,
 
 	// TEMP
-	matrix,
-	getCumulativeTransformMatrix
+	matrix
 };

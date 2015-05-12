@@ -4,7 +4,7 @@ import getBorderRadiusInterpolator from '../interpolators/borderRadius';
 import getTransformInterpolator from '../interpolators/transform';
 import { linear } from '../easing';
 import {
-	TRANSFORM,
+	TRANSFORM_CSS,
 	KEYFRAMES
 } from '../utils/detect';
 
@@ -69,7 +69,8 @@ function getKeyframes ( from, to, options ) {
 	const opacityAt = getOpacityInterpolator( from.opacity, to.opacity );
 	const backgroundColorAt = getRgbaInterpolator( from.rgba, to.rgba );
 	const borderRadiusAt = getBorderRadiusInterpolator( from, to );
-	const transformAt = getTransformInterpolator( from, to );
+	const transformFromAt = getTransformInterpolator( from, to );
+	const transformToAt = getTransformInterpolator( to, from );
 
 	const numFrames = options.duration / 16;
 
@@ -80,12 +81,13 @@ function getKeyframes ( from, to, options ) {
 		const opacity = opacityAt( t );
 		const backgroundColor = backgroundColorAt ? backgroundColorAt( t ) : null;
 		const borderRadius = borderRadiusAt( t ); // TODO this needs to be optional, to avoid repaints
-		const transform = transformAt( t );
+		const transformFrom = transformFromAt( t );
+		const transformTo = transformToAt( 1 - t );
 
 		fromKeyframes += '\n' +
 			`${pc}% {` +
 				`opacity: ${opacity.from};` +
-				`${TRANSFORM}: ${transform.from};` +
+				`${TRANSFORM_CSS}: ${transformFrom};` +
 				( backgroundColor ? `background-color: ${backgroundColor.from};` : '' ) +
 				`border-radius: ${borderRadius.from};` +
 			`}`;
@@ -93,7 +95,7 @@ function getKeyframes ( from, to, options ) {
 		toKeyframes += '\n' +
 			`${pc}% {` +
 				`opacity: ${opacity.to};` +
-				`${TRANSFORM}: ${transform.to};` +
+				`${TRANSFORM_CSS}: ${transformTo};` +
 				( backgroundColor ? `background-color: ${backgroundColor.to};` : '' ) +
 				`border-radius: ${borderRadius.to};` +
 			`}`;

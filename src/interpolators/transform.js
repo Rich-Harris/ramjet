@@ -1,35 +1,29 @@
+import { multiply } from '../utils/matrix';
+
 // TODO refactor this, I have no idea how it works
 export default function getTransformInterpolator ( a, b ) {
-	const dx = b.left - a.left;
-	const dy = b.top - a.top;
 
-	const dsxf = ( b.width  / a.width  ) - 1;
-	const dsyf = ( b.height / a.height ) - 1;
+	const a_start = a.transform;
+	const a_to_b = [ b.width / a.width, 0, 0, b.height / a.height, b.left - a.left, b.top - a.top ];
+	const a_end = multiply( multiply( a.invertedParentCTM, a_to_b ), b.ctm );
 
-	const dsxt = ( a.width  / b.width  ) - 1;
-	const dsyt = ( a.height / b.height ) - 1;
-
-	let transform = {};
+	let transform = [];
 
 	return function ( t ) {
-		let x = t * dx;
-		let y = t * dy;
+		transform = a_start.map( ( from, i ) => {
+			const to = a_end[i];
 
-		let sx = 1 + t * dsxf;
-		let sy = 1 + t * dsyf;
-		//transform.from = `translate(${( t * dx )}px,${( t * dy )}px) scale(${( 1 + ( t * dsxf ) )},${( 1 + ( t * dsyf ) )})`;
-		transform.from = `matrix(${sx},0,0,${sy},${x},${y})`;
+			return from + t * ( to - from );
+		});
 
-		t = 1 - t;
-
-		x = t * -dx;
-		y = t * -dy;
-
-		sx = 1 + t * dsxt;
-		sy = 1 + t * dsyt;
-		//transform.to   = `translate(${( -t * dx )}px,${( -t * dy )}px) scale(${( 1 + ( t * dsxt ) )},${( 1 + ( t * dsyt ) )})`;
-		transform.to = `matrix(${sx},0,0,${sy},${x},${y})`;
-
-		return transform;
+		return `matrix(${transform.join(',')})`;
 	};
+}
+
+// TODO use decomposition for more natural interpolation? (i.e. better rotation)
+function getMatrixInterpolator ( a, b ) {
+
+	return function interpolate ( t ) {
+
+	}
 }

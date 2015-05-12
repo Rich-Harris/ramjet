@@ -2,6 +2,8 @@ const div = document.createElement( 'div' );
 
 let keyframesSupported = true;
 let TRANSFORM;
+let TRANSFORM_ORIGIN;
+let TRANSFORM_CSS;
 let KEYFRAMES;
 let ANIMATION_DIRECTION;
 let ANIMATION_DURATION;
@@ -23,7 +25,14 @@ if (
 ) {
 	keyframesSupported = true;
 
-	TRANSFORM = 'transform' in div.style ? 'transform' : '-webkit-transform';
+	if ( 'webkitTransform' in div.style ) {
+		TRANSFORM = 'webkitTransform';
+		TRANSFORM_CSS = '-webkit-transform';
+		TRANSFORM_ORIGIN = 'webkitTransformOrigin';
+	} else {
+		TRANSFORM = TRANSFORM_CSS = 'transform';
+		TRANSFORM_ORIGIN = 'transformOrigin';
+	}
 
 	if ( 'animation' in div.style ) {
 		KEYFRAMES = '@keyframes';
@@ -53,6 +62,8 @@ if (
 export {
 	keyframesSupported,
 	TRANSFORM,
+	TRANSFORM_ORIGIN,
+	TRANSFORM_CSS,
 	KEYFRAMES,
 	ANIMATION_DIRECTION,
 	ANIMATION_DURATION,

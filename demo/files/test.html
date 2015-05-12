@@ -271,20 +271,20 @@
 			<div class='b' style='float: none; width: 80px; height: 80px; color: red'>b</div>
 		</article>
 
-		<article>
+		<article data-params='{}'>
 			<h1>Starting transform on target</h1>
 
 			<button>go</button>
 
 			<div class='transform-helper-bg'></div>
-			<div class='a' style='-webkit-transform: translate(50px,50px) rotate(10deg) scale(2,1);'>
+			<div class='a' style='transform: translate(50px,50px) rotate(10deg) scale(2,1);'>
 				<div class='transform-helper'></div>
 				a
 			</div>
-			<div class='b'>b</div>
+			<div class='b' style='transform: scale(0.5,1);'>b</div>
 		</article>
 
-		<article>
+		<article data-params='{}'>
 			<h1>Starting transform on container</h1>
 
 			<button>go</button>
@@ -299,7 +299,7 @@
 			<div class='b'>b</div>
 		</article>
 
-		<article>
+		<article data-params='{}'>
 			<h1>Starting transform on container and target</h1>
 
 			<button>go</button>

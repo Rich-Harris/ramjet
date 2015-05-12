@@ -1,3 +1,7 @@
+import { TRANSFORM, TRANSFORM_ORIGIN } from './detect';
+
+export const IDENTITY = [ 1, 0, 0, 1, 0, 0 ];
+
 export function multiply ( [ a1, b1, c1, d1, e1, f1 ], [ a2, b2, c2, d2, e2, f2 ] ) {
 	return [
 		( a1 * a2 ) + ( c1 * b2 ),      // a
@@ -36,8 +40,43 @@ export function parseTransformString ( transform ) {
 
 	document.body.appendChild( div );
 	const style = getComputedStyle( div );
-	const matrix = parseMatrixTransformString( style.webkitTransform || style.transform );
+	const matrix = parseMatrixTransformString( style[ TRANSFORM ] );
 	document.body.removeChild( div );
+
+	return matrix;
+}
+
+export function getCumulativeTransformMatrix ( node ) {
+	let matrix = [ 1, 0, 0, 1, 0, 0 ];
+
+	while ( node instanceof Element ) {
+		const parentMatrix = getTransformMatrix( node );
+
+		if ( parentMatrix ) {
+			matrix = multiply( parentMatrix, matrix );
+		}
+
+		node = node.parentNode;
+	}
+
+	return matrix;
+}
+
+export function getTransformMatrix ( node ) {
+	const style = getComputedStyle( node );
+	const transform = style[ TRANSFORM ];
+
+	if ( transform === 'none' ) {
+		return null;
+	}
+
+	const origin = ( style[ TRANSFORM_ORIGIN ] ).split( ' ' ).map( parseFloat );
+
+	let matrix = parseMatrixTransformString( transform );
+
+	// compensate for the transform origin (we want to express everything in [0,0] terms)
+	matrix = multiply( [ 1, 0, 0, 1, origin[0], origin[1] ], matrix );
+	matrix = multiply( matrix, [ 1, 0, 0, 1, -origin[0], -origin[1] ] );
 
 	return matrix;
 }

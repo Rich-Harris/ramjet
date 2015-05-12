@@ -23,7 +23,8 @@ export default class TimerTransformer {
 		const opacityAt = getOpacityInterpolator( from.opacity, to.opacity );
 		const backgroundColorAt = getRgbaInterpolator( from.rgba, to.rgba );
 		const borderRadiusAt = getBorderRadiusInterpolator( from, to );
-		const transformAt = getTransformInterpolator( from, to );
+		const transformFromAt = getTransformInterpolator( from, to );
+		const transformToAt = getTransformInterpolator( to, from );
 
 		function tick () {
 			const timeNow = Date.now();
@@ -60,9 +61,10 @@ export default class TimerTransformer {
 			to.setBorderRadius( borderRadius.to );
 
 			// transform
-			const transform = transformAt( t );
-			from.setTransform( transform.from );
-			to.setTransform( transform.to );
+			const transformFrom = transformFromAt( t );
+			const transformTo = transformToAt( 1 - t );
+			from.setTransform( transformFrom );
+			to.setTransform( transformTo );
 
 			rAF( tick );
 		}

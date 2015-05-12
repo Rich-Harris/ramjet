@@ -5,12 +5,35 @@ import {
 	ANIMATION_ITERATION_COUNT,
 	ANIMATION_NAME,
 	ANIMATION_TIMING_FUNCTION,
-	ANIMATION_END
+	ANIMATION_END,
+	TRANSFORM,
+	TRANSFORM_ORIGIN
 } from '../utils/detect';
 import parseColor from '../utils/parseColor';
 import parseBorderRadius from '../utils/parseBorderRadius';
-import getCumulativeTransformMatrix from '../utils/getCumulativeTransformMatrix';
-import { invert } from '../utils/matrix';
+import {
+	invert,
+	getCumulativeTransformMatrix,
+	getTransformMatrix,
+	multiply,
+	IDENTITY
+} from '../utils/matrix';
+
+function getBoundingClientRect ( node, invertedParentCTM ) {
+	const originalTransformOrigin = node.style[ TRANSFORM_ORIGIN ];
+	const originalTransform = node.style[ TRANSFORM ];
+
+	node.style[ TRANSFORM_ORIGIN ] = '0 0';
+	node.style[ TRANSFORM ] = `matrix(${invertedParentCTM.join(',')})`;
+
+	const bcr = node.getBoundingClientRect();
+
+	// reset
+	node.style[ TRANSFORM_ORIGIN ] = originalTransformOrigin;
+	node.style[ TRANSFORM ] = originalTransform;
+
+	return bcr;
+}
 
 export default class HtmlWrapper {
 	constructor ( node, options ) {
@@ -18,60 +41,43 @@ export default class HtmlWrapper {
 	}
 
 	init ( node, options ) {
+		this.isSvg = false;
 		this.node = node;
-		const style = window.getComputedStyle( node );
 
 		this.clone = cloneNode( node );
 
-
-
-		// insert immediately, so we can inspect bounding client rect etc
-		this.insert();
+		const style = window.getComputedStyle( node );
 
 		// we need to get the 'naked' boundingClientRect, i.e.
 		// without any transforms
-		const parentTransformMatrix = getCumulativeTransformMatrix( node.parentNode );
+		const parentCTM = getCumulativeTransformMatrix( node.parentNode );
+		this.invertedParentCTM = invert( parentCTM );
+		this.transform = getTransformMatrix( node ) || IDENTITY;
+		this.ctm = multiply( parentCTM, this.transform );
 
-		this.clone.style.webkitTransformOrigin = this.clone.style.transformOrigin = '0 0';
-		this.clone.style.webkitTransform = this.clone.style.transform = `matrix(${invert(parentTransformMatrix).join(',')})`;
-		console.log( 'this.clone.style.transform', this.clone.style.transform );
-
-		const nakedBcr = this.clone.getBoundingClientRect();
-		console.log( 'nakedBcr', nakedBcr );
-
-		let bcr = node.getBoundingClientRect();
-		console.log( 'bcr', bcr );
+		const bcr = getBoundingClientRect( node, this.invertedParentCTM );
 
 		const opacity = +( style.opacity );
 
 		const rgba = parseColor( style.backgroundColor );
 
-		let transform;
-		let borderRadius;
-
-		const offsetParent = node.offsetParent;
-		const offsetParentStyle = window.getComputedStyle( offsetParent );
-		const offsetParentBcr = offsetParent.getBoundingClientRect();
+		const container = node.parentNode;
+		const containerStyle = window.getComputedStyle( container );
+		const containerBcr = getBoundingClientRect( container, invert( getCumulativeTransformMatrix( container.parentNode ) ) );
 
 		this.clone.style.position = 'absolute';
-		this.clone.style.top = ( bcr.top - parseInt( style.marginTop, 10 ) - ( offsetParentBcr.top - parseInt( offsetParentStyle.marginTop, 10 ) ) ) + 'px';
-		this.clone.style.left = ( bcr.left - parseInt( style.marginLeft, 10 ) - ( offsetParentBcr.left - parseInt( offsetParentStyle.marginLeft, 10 ) ) ) + 'px';
-
-		// TODO use matrices all the way down, this is silly
-		//transform = `matrix(${transform.join(',')})`;
-		transform = '';
+		this.clone.style[ TRANSFORM_ORIGIN ] = '0 0';
+		this.clone.style.top = ( bcr.top - parseInt( style.marginTop, 10 ) - ( containerBcr.top - parseInt( containerStyle.marginTop, 10 ) ) ) + 'px';
+		this.clone.style.left = ( bcr.left - parseInt( style.marginLeft, 10 ) - ( containerBcr.left - parseInt( containerStyle.marginLeft, 10 ) ) ) + 'px';
 
 		// TODO create a flat array? easier to work with later?
-		borderRadius = {
+		const borderRadius = {
 			tl: parseBorderRadius( style.borderTopLeftRadius ),
 			tr: parseBorderRadius( style.borderTopRightRadius ),
 			br: parseBorderRadius( style.borderBottomRightRadius ),
 			bl: parseBorderRadius( style.borderBottomLeftRadius )
 		};
 
-		this.isSvg = false;
-		this.node = node;
-		this.transform = transform;
 		this.borderRadius = borderRadius;
 		this.opacity = opacity;
 		this.rgba = rgba;
