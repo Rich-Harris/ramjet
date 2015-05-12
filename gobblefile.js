@@ -2,21 +2,8 @@ var gobble = require( 'gobble' );
 
 gobble.cwd( __dirname );
 
-var babelWhitelist = [
-	'es6.arrowFunctions',
-	'es6.blockScoping',
-	'es6.classes',
-	'es6.constants',
-	'es6.destructuring',
-	'es6.parameters.default',
-	'es6.parameters.rest',
-	'es6.properties.shorthand',
-	'es6.templateLiterals'
-];
-
 var lib = gobble( 'src' )
 	.transform( 'babel', {
-		whitelist: babelWhitelist,
 		sourceMap: false
 	})
 	.transform( 'esperanto-bundle', {
@@ -32,7 +19,6 @@ var demo = gobble([
 			type: 'es6'
 		})
 		.transform( 'babel', {
-			whitelist: babelWhitelist,
 			inputSourceMap: false
 		})
 		.transform( 'esperanto-bundle', {
