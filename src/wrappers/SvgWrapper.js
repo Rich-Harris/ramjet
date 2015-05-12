@@ -3,6 +3,24 @@ import { svgns } from '../utils/svg';
 import cloneNode from './cloneNode';
 import { invert } from '../utils/matrix';
 import parseColor from '../utils/parseColor';
+import { findParentByTagName } from '../utils/findParent';
+
+// TODO refactor this
+function wrapWithSvg ( node, width, height, { a, b, c, d, e, f } ) {
+	const svg = document.createElementNS( svgns, 'svg' );
+	svg.style.position = 'absolute';
+	svg.style.width = width + 'px';
+	svg.style.height = height + 'px';
+	svg.style.overflow = 'visible';
+
+	const g = document.createElementNS( svgns, 'g' );
+	g.setAttribute( 'transform', `matrix(${a},${b},${c},${d},${e},${f})` );
+	g.appendChild( node );
+
+	svg.appendChild( g );
+
+	return svg;
+}
 
 export default class SvgWrapper extends HtmlWrapper {
 	constructor ( node, options ) {
@@ -10,6 +28,12 @@ export default class SvgWrapper extends HtmlWrapper {
 	}
 
 	init ( node, options ) {
+		const clone = wrapWithSvg( cloneNode( node ), width, height, ctm );
+
+		this._node = node;
+		this._clone = clone;
+
+
 		let { top, right, bottom, left } = node.getBoundingClientRect();
 		const width = right - left;
 		const height = bottom - top;
@@ -18,8 +42,6 @@ export default class SvgWrapper extends HtmlWrapper {
 		const opacity = style.opacity;
 
 		const ctm = node.getCTM();
-
-		let clone = wrapWithSvg( cloneNode( node ), width, height, ctm );
 
 		const rgba = parseColor( style.fill );
 
@@ -44,9 +66,8 @@ export default class SvgWrapper extends HtmlWrapper {
 
 		clone.style.webkitTransformOrigin = clone.style.transformOrigin = '0 0';
 
-		this.isSvg = false;
-		this.node = node;
-		this.clone = clone;
+		this._node = node;
+		this._clone = clone;
 		this.transform = transform;
 		this.borderRadius = borderRadius;
 		this.opacity = opacity;
@@ -59,8 +80,8 @@ export default class SvgWrapper extends HtmlWrapper {
 	}
 
 	insert () {
-		const svg = findParent( this.node, 'svg' );
-		svg.parentNode.appendChild( this.clone );
+		const svg = findParentByTagName( this._node, 'svg' );
+		svg.parentNode.appendChild( this._clone );
 	}
 
 	setBackgroundColor ( color ) {
@@ -71,31 +92,4 @@ export default class SvgWrapper extends HtmlWrapper {
 		// noop. TODO we can make this work with <rect>, <circle> and possible <ellipse> elements.
 		// would only work in timer mode
 	}
-}
-
-function findParent ( node, tagName ) {
-	while ( node ) {
-		if ( node.tagName === tagName ) {
-			return node;
-		}
-
-		node = node.parentNode;
-	}
-}
-
-// TODO refactor this
-function wrapWithSvg ( node, width, height, { a, b, c, d, e, f } ) {
-	const svg = document.createElementNS( svgns, 'svg' );
-	svg.style.position = 'absolute';
-	svg.style.width = width + 'px';
-	svg.style.height = height + 'px';
-	svg.style.overflow = 'visible';
-
-	const g = document.createElementNS( svgns, 'g' );
-	g.setAttribute( 'transform', `matrix(${a},${b},${c},${d},${e},${f})` );
-	g.appendChild( node );
-
-	svg.appendChild( g );
-
-	return svg;
 }

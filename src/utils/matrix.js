@@ -1,4 +1,6 @@
+import { svgns } from './svg';
 import { TRANSFORM, TRANSFORM_ORIGIN } from './detect';
+import { findTransformParent } from './findParent';
 
 export const IDENTITY = [ 1, 0, 0, 1, 0, 0 ];
 
@@ -47,22 +49,34 @@ export function parseTransformString ( transform ) {
 }
 
 export function getCumulativeTransformMatrix ( node ) {
+	if ( node.namespaceURI === svgns ) {
+		const { a, b, c, d, e, f } = node.getCTM();
+		return [ a, b, c, d, e, f ];
+	}
+
 	let matrix = [ 1, 0, 0, 1, 0, 0 ];
 
 	while ( node instanceof Element ) {
-		const parentMatrix = getTransformMatrix( node );
+		const isSvg = node.namespaceURI === svgns && node.tagName !== 'svg';
+		const parentMatrix = isSvg ? getSvgTransformMatrix( node ) : getTransformMatrix( node );
 
 		if ( parentMatrix ) {
 			matrix = multiply( parentMatrix, matrix );
 		}
 
-		node = node.parentNode;
+		node = findTransformParent( node );
 	}
 
 	return matrix;
 }
 
 export function getTransformMatrix ( node ) {
+	if ( node.namespaceURI === svgns ) {
+		const ctm = getCumulativeTransformMatrix( node );
+		const parentCTM = getCumulativeTransformMatrix( node.parentNode );
+		return multiply( invert( parentCTM ), ctm );
+	}
+
 	const style = getComputedStyle( node );
 	const transform = style[ TRANSFORM ];
 
@@ -78,5 +92,14 @@ export function getTransformMatrix ( node ) {
 	matrix = multiply( [ 1, 0, 0, 1, origin[0], origin[1] ], matrix );
 	matrix = multiply( matrix, [ 1, 0, 0, 1, -origin[0], -origin[1] ] );
 
+	// TODO if is SVG, multiply by CTM, to account for viewBox
+
 	return matrix;
+}
+
+export function getSvgTransformMatrix ( node ) {
+	// const { a, b, c, d, e, f } = node.getCTM();
+	// return [ a, b, c, d, e, f ];
+
+	const transform = node.getAttribute( 'transform' );
 }

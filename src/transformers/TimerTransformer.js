@@ -51,8 +51,8 @@ export default class TimerTransformer {
 			// background color
 			if ( backgroundColorAt ) {
 				const backgroundColor = backgroundColorAt( t );
-				from.clone.style.backgroundColor = backgroundColor.from;
-				to.clone.style.backgroundColor = backgroundColor.to;
+				from.setBackgroundColor( backgroundColor.from );
+				to.setBackgroundColor( backgroundColor.to );
 			}
 
 			// border radius

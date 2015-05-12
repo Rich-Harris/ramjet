@@ -1,4 +1,8 @@
 import cloneNode from './cloneNode';
+import parseColor from '../utils/parseColor';
+import parseBorderRadius from '../utils/parseBorderRadius';
+import { svgns } from '../utils/svg';
+import { findTransformParent, findParentByTagName } from '../utils/findParent';
 import {
 	ANIMATION_DIRECTION,
 	ANIMATION_DURATION,
@@ -9,8 +13,6 @@ import {
 	TRANSFORM,
 	TRANSFORM_ORIGIN
 } from '../utils/detect';
-import parseColor from '../utils/parseColor';
-import parseBorderRadius from '../utils/parseBorderRadius';
 import {
 	invert,
 	getCumulativeTransformMatrix,
@@ -22,6 +24,7 @@ import {
 function getBoundingClientRect ( node, invertedParentCTM ) {
 	const originalTransformOrigin = node.style[ TRANSFORM_ORIGIN ];
 	const originalTransform = node.style[ TRANSFORM ];
+	const originalTransformAttribute = node.getAttribute( 'transform' ); // SVG
 
 	node.style[ TRANSFORM_ORIGIN ] = '0 0';
 	node.style[ TRANSFORM ] = `matrix(${invertedParentCTM.join(',')})`;
@@ -31,6 +34,7 @@ function getBoundingClientRect ( node, invertedParentCTM ) {
 	// reset
 	node.style[ TRANSFORM_ORIGIN ] = originalTransformOrigin;
 	node.style[ TRANSFORM ] = originalTransform;
+	node.setAttribute( 'transform', originalTransformAttribute || '' ); // TODO remove attribute altogether if null?
 
 	return bcr;
 }
@@ -41,34 +45,36 @@ export default class HtmlWrapper {
 	}
 
 	init ( node, options ) {
-		this.isSvg = false;
-		this.node = node;
+		this._node = node;
 
-		this.clone = cloneNode( node );
+		this._clone = cloneNode( node );
 
 		const style = window.getComputedStyle( node );
+		this.style = style;
 
 		// we need to get the 'naked' boundingClientRect, i.e.
 		// without any transforms
-		const parentCTM = getCumulativeTransformMatrix( node.parentNode );
+		const parentCTM = node.namespaceURI === 'svg' ? node.parentNode.getScreenCTM() : getCumulativeTransformMatrix( node.parentNode );
 		this.invertedParentCTM = invert( parentCTM );
 		this.transform = getTransformMatrix( node ) || IDENTITY;
 		this.ctm = multiply( parentCTM, this.transform );
 
 		const bcr = getBoundingClientRect( node, this.invertedParentCTM );
+		this.bcr = bcr;
+		window.draw( bcr.left, bcr.top, bcr.width, bcr.height );
+
+		console.group( node );
+		console.log( 'this.invertedParentCTM', this.invertedParentCTM );
+		console.log( 'this.transform', this.transform );
+		console.log( 'this.ctm', this.ctm );
+		console.log( 'bcr', bcr );
+		console.groupEnd();
 
 		const opacity = +( style.opacity );
 
 		const rgba = parseColor( style.backgroundColor );
 
-		const container = node.parentNode;
-		const containerStyle = window.getComputedStyle( container );
-		const containerBcr = getBoundingClientRect( container, invert( getCumulativeTransformMatrix( container.parentNode ) ) );
 
-		this.clone.style.position = 'absolute';
-		this.clone.style[ TRANSFORM_ORIGIN ] = '0 0';
-		this.clone.style.top = ( bcr.top - parseInt( style.marginTop, 10 ) - ( containerBcr.top - parseInt( containerStyle.marginTop, 10 ) ) ) + 'px';
-		this.clone.style.left = ( bcr.left - parseInt( style.marginLeft, 10 ) - ( containerBcr.left - parseInt( containerStyle.marginLeft, 10 ) ) ) + 'px';
 
 		// TODO create a flat array? easier to work with later?
 		const borderRadius = {
@@ -89,36 +95,55 @@ export default class HtmlWrapper {
 	}
 
 	insert () {
-		this.node.parentNode.appendChild( this.clone );
+		const container = findTransformParent( this._node );
+		const containerStyle = window.getComputedStyle( container );
+		const containerBcr = getBoundingClientRect( container, invert( getCumulativeTransformMatrix( container.parentNode ) ) );
+
+		const bcr = this.bcr;
+
+		this._clone.style.position = 'absolute';
+		this._clone.style[ TRANSFORM_ORIGIN ] = '0 0';
+		this._clone.style.top = ( bcr.top - parseInt( this.style.marginTop, 10 ) - ( containerBcr.top - parseInt( containerStyle.marginTop, 10 ) ) ) + 'px';
+		this._clone.style.left = ( bcr.left - parseInt( this.style.marginLeft, 10 ) - ( containerBcr.left - parseInt( containerStyle.marginLeft, 10 ) ) ) + 'px';
+
+		this._node.parentNode.appendChild( this._clone );
 	}
 
 	detach () {
-		this.clone.parentNode.removeChild( this.clone );
+		this._clone.parentNode.removeChild( this._clone );
+	}
+
+	getZIndex () {
+		return parseFloat( this._clone.style.zIndex ) || 0;
 	}
 
 	setOpacity ( opacity ) {
-		this.clone.style.opacity = opacity;
+		this._clone.style.opacity = opacity;
 	}
 
 	setTransform( transform ) {
-		this.clone.style.transform = this.clone.style.webkitTransform = this.clone.style.msTransform = transform;
+		this._clone.style.transform = this._clone.style.webkitTransform = this._clone.style.msTransform = transform;
 	}
 
 	setBackgroundColor ( color ) {
-		this.clone.style.backgroundColor = color;
+		this._clone.style.backgroundColor = color;
 	}
 
 	setBorderRadius ( borderRadius ) {
-		this.clone.style.borderRadius = borderRadius;
+		this._clone.style.borderRadius = borderRadius;
+	}
+
+	setZIndex ( index ) {
+		this._clone.style.zIndex = index;
 	}
 
 	animateWithKeyframes ( id, duration, callback ) {
-		this.clone.style[ ANIMATION_DIRECTION ] = 'alternate';
-		this.clone.style[ ANIMATION_DURATION ] = `${duration/1000}s`;
-		this.clone.style[ ANIMATION_ITERATION_COUNT ] = 1;
-		this.clone.style[ ANIMATION_NAME ] = id;
-		this.clone.style[ ANIMATION_TIMING_FUNCTION ] = 'linear';
+		this._clone.style[ ANIMATION_DIRECTION ] = 'alternate';
+		this._clone.style[ ANIMATION_DURATION ] = `${duration/1000}s`;
+		this._clone.style[ ANIMATION_ITERATION_COUNT ] = 1;
+		this._clone.style[ ANIMATION_NAME ] = id;
+		this._clone.style[ ANIMATION_TIMING_FUNCTION ] = 'linear';
 
-		this.clone.addEventListener( ANIMATION_END, callback );
+		this._clone.addEventListener( ANIMATION_END, callback );
 	}
 }

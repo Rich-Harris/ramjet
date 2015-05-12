@@ -29,9 +29,7 @@ export default {
 
 		// This will fail if `from` is inside a different (higher)
 		// stacking context than `to`. Not much we can do ¯\_(ツ)_/¯
-		const fromZIndex = parseFloat( from.clone.style.zIndex ) || 0;
-		const toZIndex = parseFloat( to.clone.style.zIndex ) || 0;
-		to.clone.style.zIndex = Math.max( toZIndex, fromZIndex + 1 );
+		to.setZIndex( Math.max( to.getZIndex(), from.getZIndex() + 1 ) );
 
 		if ( !keyframesSupported || options.useTimer ) {
 			return new TimerTransformer( from, to, options );

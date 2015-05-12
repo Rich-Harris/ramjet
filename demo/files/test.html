@@ -208,16 +208,16 @@
 			</div>
 		</article>
 
-		<article data-params='{duration:6000}'>
+		<article data-params='{duration:60000}'>
 			<h1>HTML to SVG</h1>
 
 			<button>go</button>
 
 			<div class='a'>a</div>
-			<svg style='float: right; width: 200px; height: 150px;' viewBox='0 0 250 175'>
-				<g class='b'>
-					<rect x='50' y='50' width='200' height='100'></rect>
-					<text x='100' y='100'>b</text>
+			<svg style='float: right; width: 200px; height: 150px; overflow: visible' viewBox='0 0 250 175'> <!-- TODO  -->
+				<g class='b' transform='scale(1.5)'> <!-- TODO transform='rotate(30)' - is problematic -->
+					<rect width='200' height='100'></rect>
+					<text x='100' y='50'>b</text>
 				</g>
 			</svg>
 		</article>
@@ -378,6 +378,39 @@
 
 				ramjet.hide( a, b );
 			});
+
+			window.rects = [];
+
+			window.draw = function ( x, y, width, height ) {
+				var div = document.createElement( 'div' );
+
+				div.style.position = 'absolute';
+				div.style.border = '2px solid purple';
+				div.style.boxSizing = 'border-box';
+
+				div.style.left = x + 'px';
+				div.style.top = ( y + window.scrollY ) + 'px';
+				div.style.width = width + 'px';
+				div.style.height = height + 'px';
+
+				document.body.appendChild( div );
+
+				rects.push( div );
+
+				return function () {
+					if ( ~rects.indexOf( div ) ) {
+						rects.splice( rects.indexOf( div ), 1 );
+					}
+					div.parentNode.removeChild( div );
+				};
+			};
+
+			window.clear = function () {
+				var i = rects.length;
+				while ( i-- ) {
+					rects[i].parentNode.removeChild( rects[i] );
+				}
+			}
 		}());
 	</script>
 </body>
