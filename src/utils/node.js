@@ -29,6 +29,8 @@ export function cloneNode ( node ) {
 export function wrapNode ( node ) {
 	const isSvg = node.namespaceURI === svgns;
 
+	node = convertIfJqueryObject(node);
+
 	const { left, right, top, bottom } = node.getBoundingClientRect();
 	const style = window.getComputedStyle( node );
 
@@ -71,6 +73,14 @@ export function wrapNode ( node ) {
 	}
 
 	return wrapper;
+}
+
+export function convertIfJqueryObject(node) {
+	if (jQuery && (node instanceof jQuery) && (node.length > 0)) {
+		return node.get(0);
+	}
+
+	return node;
 }
 
 export function hideNode ( node ) {
