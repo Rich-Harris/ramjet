@@ -16,8 +16,11 @@
 
 <script src='ramjet.js'></script>
 <script>
+  var element1 = document.getElementById('a'),
+      element2 = document.getElementById('b');
+
 	// to repeat, run this from the console!
-	ramjet.transform( a, b );
+	ramjet.transform( element1, element2 );
 </script>
 ```
 
