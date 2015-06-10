@@ -15,8 +15,9 @@ export default {
 			options.duration = 400;
 		}
 
-		const from = wrapNode( fromNode );
-		const to = wrapNode( toNode );
+		const isFixed = window.getComputedStyle(toNode).position === "fixed";
+		const from = wrapNode( fromNode, isFixed );
+		const to = wrapNode( toNode, isFixed );
 
 		if ( from.isSvg || to.isSvg && !appendedSvg ) {
 			appendSvg();
