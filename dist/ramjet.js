@@ -218,11 +218,11 @@
             		to.clone.style.opacity = t;
 
             		// border radius
-            		var borderRadius = utils_getBorderRadius(from.borderRadius, to.borderRadius, t);
-            		from.clone.style.borderTopLeftRadius = to.clone.style.borderTopLeftRadius = borderRadius[0];
-            		from.clone.style.borderTopRightRadius = to.clone.style.borderTopRightRadius = borderRadius[1];
-            		from.clone.style.borderBottomRightRadius = to.clone.style.borderBottomRightRadius = borderRadius[2];
-            		from.clone.style.borderBottomLeftRadius = to.clone.style.borderBottomLeftRadius = borderRadius[3];
+            		var fromBorderRadius = utils_getBorderRadius(from.borderRadius, to.borderRadius, dsxf, dsyf, t);
+            		var toBorderRadius = utils_getBorderRadius(to.borderRadius, from.borderRadius, dsxt, dsyt, 1 - t);
+
+            		applyBorderRadius(from.clone, fromBorderRadius);
+            		applyBorderRadius(to.clone, toBorderRadius);
 
             		var cx = from.cx + dx * t;
             		var cy = from.cy + dy * t;
@@ -249,6 +249,13 @@
             };
 
             var transformers_TimerTransformer = transformers_TimerTransformer__TimerTransformer;
+
+            function applyBorderRadius(node, borderRadius) {
+            	node.style.borderTopLeftRadius = borderRadius[0];
+            	node.style.borderTopRightRadius = borderRadius[1];
+            	node.style.borderBottomRightRadius = borderRadius[2];
+            	node.style.borderBottomLeftRadius = borderRadius[3];
+            }
 
             var div = document.createElement('div');
 

@@ -26,12 +26,11 @@ export function cloneNode ( node ) {
 	return clone;
 }
 
-export function wrapNode ( node ) {
+export function wrapNode ( node, isFixed ) {
 	const isSvg = node.namespaceURI === svgns;
 
 	const { left, right, top, bottom } = node.getBoundingClientRect();
 	const style = window.getComputedStyle( node );
-
 	const clone = cloneNode( node );
 
 	const wrapper = {
@@ -51,13 +50,18 @@ export function wrapNode ( node ) {
 
 		svg.appendChild( clone );
 	} else {
-		const offsetParent = node.offsetParent;
-		const offsetParentStyle = window.getComputedStyle( offsetParent );
-		const offsetParentBcr = offsetParent.getBoundingClientRect();
 
-		clone.style.position = 'absolute';
-		clone.style.top = ( top - parseInt( style.marginTop, 10 ) - ( offsetParentBcr.top - parseInt( offsetParentStyle.marginTop, 10 ) ) ) + 'px';
-		clone.style.left = ( left - parseInt( style.marginLeft, 10 ) - ( offsetParentBcr.left - parseInt( offsetParentStyle.marginLeft, 10 ) ) ) + 'px';
+    if ( isFixed ){
+			clone.style.position = 'fixed';
+			clone.style.top = ( top - parseInt( style.marginTop, 10 )) + 'px';
+			clone.style.left = ( left - parseInt( style.marginLeft, 10 )) + 'px';
+		}
+		else {
+			const docElem = document.documentElement;
+			clone.style.position = 'absolute';
+			clone.style.top = (top + window.pageYOffset - docElem.clientTop - parseInt( style.marginTop, 10 )) + 'px';
+			clone.style.left = (left + window.pageXOffset - docElem.clientLeft - parseInt( style.marginLeft, 10 )) + 'px';
+		}
 
 		wrapper.transform = ''; // TODO...?
 		wrapper.borderRadius = [
