@@ -62,7 +62,7 @@
             	return clone;
             }
 
-            function wrapNode(node) {
+            function wrapNode(node, destinationIsFixed) {
             	var isSvg = node.namespaceURI === svgns;
 
             	var _node$getBoundingClientRect = node.getBoundingClientRect();
@@ -73,7 +73,6 @@
             	var bottom = _node$getBoundingClientRect.bottom;
 
             	var style = window.getComputedStyle(node);
-
             	var clone = cloneNode(node);
 
             	var wrapper = {
@@ -93,13 +92,30 @@
 
             		svg.appendChild(clone);
             	} else {
-            		var offsetParent = node.offsetParent;
-            		var offsetParentStyle = window.getComputedStyle(offsetParent);
-            		var offsetParentBcr = offsetParent.getBoundingClientRect();
 
-            		clone.style.position = 'absolute';
-            		clone.style.top = top - parseInt(style.marginTop, 10) - (offsetParentBcr.top - parseInt(offsetParentStyle.marginTop, 10)) + 'px';
-            		clone.style.left = left - parseInt(style.marginLeft, 10) - (offsetParentBcr.left - parseInt(offsetParentStyle.marginLeft, 10)) + 'px';
+            		if (destinationIsFixed) {
+            			clone.style.position = 'fixed';
+            			clone.style.top = top - parseInt(style.marginTop, 10) + 'px';
+            			clone.style.left = left - parseInt(style.marginLeft, 10) + 'px';
+            		} else {
+            			var offsetParent = node.offsetParent;
+
+            			if (offsetParent === null || offsetParent === document.body) {
+            				// position fixed!
+            				var docElem = document.documentElement;
+            				clone.style.position = 'absolute';
+            				clone.style.top = top + window.pageYOffset - docElem.clientTop - parseInt(style.marginTop, 10) + 'px';
+            				clone.style.left = left + window.pageXOffset - docElem.clientLeft - parseInt(style.marginLeft, 10) + 'px';
+            			} else {
+            				//position relative to the parent
+            				var offsetParentStyle = window.getComputedStyle(offsetParent);
+            				var offsetParentBcr = offsetParent.getBoundingClientRect();
+
+            				clone.style.position = 'absolute';
+            				clone.style.top = top - parseInt(style.marginTop, 10) - (offsetParentBcr.top - parseInt(offsetParentStyle.marginTop, 10)) + 'px';
+            				clone.style.left = left - parseInt(style.marginLeft, 10) - (offsetParentBcr.left - parseInt(offsetParentStyle.marginLeft, 10)) + 'px';
+            			}
+            		}
 
             		wrapper.transform = ''; // TODO...?
             		wrapper.borderRadius = [parseFloat(style.borderTopLeftRadius), parseFloat(style.borderTopRightRadius), parseFloat(style.borderBottomRightRadius), parseFloat(style.borderBottomLeftRadius)];
@@ -126,6 +142,16 @@
             			node.style.transition = node.__ramjetOriginalTransition__;
             		});
             	}
+            }
+
+            function isNodeFixed(node) {
+            	while (node !== null) {
+            		if (window.getComputedStyle(node).position === 'fixed') {
+            			return true;
+            		}
+            		node = node.namespaceURI === svgns ? node.parentNode : node.offsetParent;
+            	}
+            	return false;
             }
 
             var utils_getTransform = getTransform;
@@ -443,8 +469,9 @@
             			options.duration = 400;
             		}
 
-            		var from = wrapNode(fromNode);
-            		var to = wrapNode(toNode);
+            		var destinationIsFixed = isNodeFixed(toNode);
+            		var from = wrapNode(fromNode, destinationIsFixed);
+            		var to = wrapNode(toNode, destinationIsFixed);
 
             		if (from.isSvg || to.isSvg && !appendedSvg) {
             			appendSvg();
