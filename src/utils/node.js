@@ -57,16 +57,16 @@ export function wrapNode ( node, destinationIsFixed ) {
 			clone.style.left = ( left - parseInt( style.marginLeft, 10 )) + 'px';
 		}
 		else {
-			if (style.position === "fixed"){
-				// position relative to the document
+			const offsetParent = node.offsetParent;
+
+			if (offsetParent === null || offsetParent === document.body){ // position fixed!
 				const docElem = document.documentElement;
 				clone.style.position = 'absolute';
 				clone.style.top = (top + window.pageYOffset - docElem.clientTop - parseInt( style.marginTop, 10 )) + 'px';
 				clone.style.left = (left + window.pageXOffset - docElem.clientLeft - parseInt( style.marginLeft, 10 )) + 'px';
 			}
 			else {
-				// position relative to the parent
-				const offsetParent = node.offsetParent;
+				//position relative to the parent
 				const offsetParentStyle = window.getComputedStyle( offsetParent );
 				const offsetParentBcr = offsetParent.getBoundingClientRect();
 
