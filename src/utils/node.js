@@ -107,3 +107,13 @@ export function showNode ( node ) {
 		});
 	}
 }
+
+export function isNodeFixed ( node ) {
+	while (node !== null){
+		if (window.getComputedStyle(node).position === "fixed"){
+			return true;
+		}
+		node = (node.namespaceURI === svgns) ? node.parentNode : node.offsetParent;
+	}
+	return false;
+}

@@ -1,4 +1,4 @@
-import { wrapNode, showNode, hideNode } from './utils/node';
+import { wrapNode, showNode, hideNode, isNodeFixed } from './utils/node';
 import TimerTransformer from './transformers/TimerTransformer';
 import KeyframeTransformer from './transformers/KeyframeTransformer';
 import { linear, easeIn, easeOut, easeInOut } from './easing';
@@ -15,7 +15,7 @@ export default {
 			options.duration = 400;
 		}
 
-		const destinationIsFixed = window.getComputedStyle(toNode).position === "fixed";
+		const destinationIsFixed = isNodeFixed(toNode);
 		const from = wrapNode( fromNode, destinationIsFixed );
 		const to = wrapNode( toNode, destinationIsFixed );
 
