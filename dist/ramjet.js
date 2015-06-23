@@ -37,7 +37,7 @@
             	appendedSvg = true;
             }
 
-            function cloneNode(node) {
+            function cloneNode(node, shallow) {
             	var clone = node.cloneNode();
 
             	var style = undefined;
@@ -53,6 +53,10 @@
             			clone.style[prop] = style[prop];
             		});
 
+            		if (shallow) {
+            			return clone;
+            		}
+
             		len = node.childNodes.length;
             		for (i = 0; i < len; i += 1) {
             			clone.appendChild(cloneNode(node.childNodes[i]));
@@ -62,7 +66,7 @@
             	return clone;
             }
 
-            function wrapNode(node, destinationIsFixed) {
+            function wrapNode(node, destinationIsFixed, shallowClone) {
             	var isSvg = node.namespaceURI === svgns;
 
             	var _node$getBoundingClientRect = node.getBoundingClientRect();
@@ -73,7 +77,7 @@
             	var bottom = _node$getBoundingClientRect.bottom;
 
             	var style = window.getComputedStyle(node);
-            	var clone = cloneNode(node);
+            	var clone = cloneNode(node, shallowClone);
 
             	var wrapper = {
             		node: node, clone: clone, isSvg: isSvg,
@@ -469,9 +473,10 @@
             			options.duration = 400;
             		}
 
+            		var shallowClone = !!options.shallowClone;
             		var destinationIsFixed = isNodeFixed(toNode);
-            		var from = wrapNode(fromNode, destinationIsFixed);
-            		var to = wrapNode(toNode, destinationIsFixed);
+            		var from = wrapNode(fromNode, destinationIsFixed, shallowClone);
+            		var to = wrapNode(toNode, destinationIsFixed, shallowClone);
 
             		if (from.isSvg || to.isSvg && !appendedSvg) {
             			appendSvg();
