@@ -66,7 +66,7 @@
             	return clone;
             }
 
-            function wrapNode(node, destinationIsFixed, shallowClone) {
+            function wrapNode(node, destinationIsFixed, shallowClone, appendToBody) {
             	var isSvg = node.namespaceURI === svgns;
 
             	var _node$getBoundingClientRect = node.getBoundingClientRect();
@@ -98,14 +98,16 @@
             	} else {
 
             		if (destinationIsFixed) {
+            			// position relative to the viewport
             			clone.style.position = 'fixed';
             			clone.style.top = top - parseInt(style.marginTop, 10) + 'px';
             			clone.style.left = left - parseInt(style.marginLeft, 10) + 'px';
             		} else {
             			var offsetParent = node.offsetParent;
 
-            			if (offsetParent === null || offsetParent === document.body) {
-            				// position fixed!
+            			if (offsetParent === null || offsetParent === document.body || appendToBody) {
+            				// parent is fixed, or I want to append the node to the body
+            				// position relative to the document
             				var docElem = document.documentElement;
             				clone.style.position = 'absolute';
             				clone.style.top = top + window.pageYOffset - docElem.clientTop - parseInt(style.marginTop, 10) + 'px';
@@ -124,7 +126,11 @@
             		wrapper.transform = ''; // TODO...?
             		wrapper.borderRadius = [parseFloat(style.borderTopLeftRadius), parseFloat(style.borderTopRightRadius), parseFloat(style.borderBottomRightRadius), parseFloat(style.borderBottomLeftRadius)];
 
-            		node.parentNode.appendChild(clone);
+            		if (appendToBody) {
+            			document.body.appendChild(clone);
+            		} else {
+            			node.parentNode.appendChild(clone);
+            		}
             	}
 
             	return wrapper;
@@ -473,10 +479,11 @@
             			options.duration = 400;
             		}
 
+            		var appendToBody = !!options.appendToBody;
             		var shallowClone = !!options.shallowClone;
             		var destinationIsFixed = isNodeFixed(toNode);
-            		var from = wrapNode(fromNode, destinationIsFixed, shallowClone);
-            		var to = wrapNode(toNode, destinationIsFixed, shallowClone);
+            		var from = wrapNode(fromNode, destinationIsFixed, shallowClone, appendToBody);
+            		var to = wrapNode(toNode, destinationIsFixed, shallowClone, appendToBody);
 
             		if (from.isSvg || to.isSvg && !appendedSvg) {
             			appendSvg();

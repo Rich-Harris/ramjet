@@ -15,10 +15,11 @@ export default {
 			options.duration = 400;
 		}
 
+    const appendToBody = !!options.appendToBody;
     const shallowClone = !!options.shallowClone;
 		const destinationIsFixed = isNodeFixed(toNode);
-		const from = wrapNode( fromNode, destinationIsFixed, shallowClone );
-		const to = wrapNode( toNode, destinationIsFixed, shallowClone );
+		const from = wrapNode( fromNode, destinationIsFixed, shallowClone, appendToBody);
+		const to = wrapNode( toNode, destinationIsFixed, shallowClone, appendToBody );
 
 		if ( from.isSvg || to.isSvg && !appendedSvg ) {
 			appendSvg();

@@ -30,7 +30,7 @@ export function cloneNode ( node , shallow) {
 	return clone;
 }
 
-export function wrapNode ( node, destinationIsFixed, shallowClone ) {
+export function wrapNode ( node, destinationIsFixed, shallowClone, appendToBody ) {
 	const isSvg = node.namespaceURI === svgns;
 
 	const { left, right, top, bottom } = node.getBoundingClientRect();
@@ -56,6 +56,7 @@ export function wrapNode ( node, destinationIsFixed, shallowClone ) {
 	} else {
 
     if ( destinationIsFixed ){
+			// position relative to the viewport
 			clone.style.position = 'fixed';
 			clone.style.top = ( top - parseInt( style.marginTop, 10 )) + 'px';
 			clone.style.left = ( left - parseInt( style.marginLeft, 10 )) + 'px';
@@ -63,7 +64,8 @@ export function wrapNode ( node, destinationIsFixed, shallowClone ) {
 		else {
 			const offsetParent = node.offsetParent;
 
-			if (offsetParent === null || offsetParent === document.body){ // position fixed!
+			if (offsetParent === null || offsetParent === document.body || appendToBody){ // parent is fixed, or I want to append the node to the body
+				// position relative to the document
 				const docElem = document.documentElement;
 				clone.style.position = 'absolute';
 				clone.style.top = (top + window.pageYOffset - docElem.clientTop - parseInt( style.marginTop, 10 )) + 'px';
@@ -88,7 +90,12 @@ export function wrapNode ( node, destinationIsFixed, shallowClone ) {
 			parseFloat( style.borderBottomLeftRadius )
 		];
 
-		node.parentNode.appendChild( clone );
+		if(appendToBody){
+			document.body.appendChild( clone );
+		}
+		else {
+			node.parentNode.appendChild( clone );
+		}
 	}
 
 	return wrapper;
