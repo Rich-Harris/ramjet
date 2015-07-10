@@ -166,8 +166,8 @@
 
             var utils_getTransform = getTransform;
 
-            function getTransform(isSvg, cx, cy, dx, dy, dsx, dsy, t) {
-            	var transform = isSvg ? "translate(" + cx + " " + cy + ") scale(" + (1 + t * dsx) + " " + (1 + t * dsy) + ") translate(" + -cx + " " + -cy + ") translate(" + t * dx + " " + t * dy + ")" : "translate(" + t * dx + "px," + t * dy + "px) scale(" + (1 + t * dsx) + "," + (1 + t * dsy) + ")";
+            function getTransform(isSvg, cx, cy, dx, dy, dsx, dsy, t, t_scale) {
+            	var transform = isSvg ? "translate(" + cx + " " + cy + ") scale(" + (1 + t_scale * dsx) + " " + (1 + t_scale * dsy) + ") translate(" + -cx + " " + -cy + ") translate(" + t * dx + " " + t * dy + ")" : "translate(" + t * dx + "px," + t * dy + "px) scale(" + (1 + t_scale * dsx) + "," + (1 + t_scale * dsy) + ")";
 
             	return transform;
             }
@@ -231,6 +231,7 @@
             	var startTime = Date.now();
             	var duration = options.duration || 400;
             	var easing = options.easing || linear;
+            	var easingScale = options.easingScale || easing;
 
             	function tick() {
             		var timeNow = Date.now();
@@ -248,6 +249,7 @@
             		}
 
             		var t = easing(elapsed / duration);
+            		var t_scale = easingScale(elapsed / duration);
 
             		// opacity
             		from.clone.style.opacity = 1 - t;
@@ -263,8 +265,8 @@
             		var cx = from.cx + dx * t;
             		var cy = from.cy + dy * t;
 
-            		var fromTransform = utils_getTransform(from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t) + ' ' + from.transform;
-            		var toTransform = utils_getTransform(to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t) + ' ' + to.transform;
+            		var fromTransform = utils_getTransform(from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t, t_scale) + ' ' + from.transform;
+            		var toTransform = utils_getTransform(to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t, 1 - t_scale) + ' ' + to.transform;
 
             		if (from.isSvg) {
             			from.clone.setAttribute('transform', fromTransform);
@@ -430,6 +432,7 @@
             	var dsyt = from.height / to.height - 1;
 
             	var easing = options.easing || linear;
+            	var easingScale = options.easingScale || easing;
 
             	var numFrames = options.duration / 50; // one keyframe per 50ms is probably enough... this may prove not to be the case though
 
@@ -437,15 +440,15 @@
             	var toKeyframes = [];
             	var i;
 
-            	function addKeyframes(pc, t) {
+            	function addKeyframes(pc, t, t_scale) {
             		var cx = from.cx + dx * t;
             		var cy = from.cy + dy * t;
 
             		var fromBorderRadius = utils_getBorderRadius(from.borderRadius, to.borderRadius, dsxf, dsyf, t);
             		var toBorderRadius = utils_getBorderRadius(to.borderRadius, from.borderRadius, dsxt, dsyt, 1 - t);
 
-            		var fromTransform = utils_getTransform(false, cx, cy, dx, dy, dsxf, dsyf, t) + ' ' + from.transform;
-            		var toTransform = utils_getTransform(false, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t) + ' ' + to.transform;
+            		var fromTransform = utils_getTransform(false, cx, cy, dx, dy, dsxf, dsyf, t, t_scale) + ' ' + from.transform;
+            		var toTransform = utils_getTransform(false, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t, 1 - t_scale) + ' ' + to.transform;
 
             		fromKeyframes.push('\n\t\t\t' + pc + '% {\n\t\t\t\topacity: ' + (1 - t) + ';\n\t\t\t\tborder-top-left-radius: ' + fromBorderRadius[0] + ';\n\t\t\t\tborder-top-right-radius: ' + fromBorderRadius[1] + ';\n\t\t\t\tborder-bottom-right-radius: ' + fromBorderRadius[2] + ';\n\t\t\t\tborder-bottom-left-radius: ' + fromBorderRadius[3] + ';\n\t\t\t\t' + TRANSFORM + ': ' + fromTransform + ';\n\t\t\t}');
 
@@ -455,11 +458,12 @@
             	for (i = 0; i < numFrames; i += 1) {
             		var pc = 100 * (i / numFrames);
             		var t = easing(i / numFrames);
+            		var t_scale = easingScale(i / numFrames);
 
-            		addKeyframes(pc, t);
+            		addKeyframes(pc, t, t_scale);
             	}
 
-            	addKeyframes(100, 1);
+            	addKeyframes(100, 1, 1);
 
             	fromKeyframes = fromKeyframes.join('\n');
             	toKeyframes = toKeyframes.join('\n');
