@@ -15,8 +15,12 @@ export default {
 			options.duration = 400;
 		}
 
-		const from = wrapNode( fromNode );
-		const to = wrapNode( toNode );
+		if ( !( 'visionNodesHandler' in options ) ) {
+			options.vNodesHandler = () => {};
+		}
+
+		const from = wrapNode( fromNode , vNodesHandler);
+		const to = wrapNode( toNode , vNodesHandler);
 
 		if ( from.isSvg || to.isSvg && !appendedSvg ) {
 			appendSvg();

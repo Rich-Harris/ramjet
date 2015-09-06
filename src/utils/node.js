@@ -26,13 +26,15 @@ export function cloneNode ( node ) {
 	return clone;
 }
 
-export function wrapNode ( node ) {
+export function wrapNode ( node , vNodesHandler) {
 	const isSvg = node.namespaceURI === svgns;
 
 	const { left, right, top, bottom } = node.getBoundingClientRect();
 	const style = window.getComputedStyle( node );
 
 	const clone = cloneNode( node );
+
+	vNodesHandler(clone);
 
 	const wrapper = {
 		node, clone, isSvg,
