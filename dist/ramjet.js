@@ -21,14 +21,19 @@
             var utils_styleKeys = styleKeys;
 
             var svgns = 'http://www.w3.org/2000/svg';
-            var svg = document.createElementNS(svgns, 'svg');
+            var svg = undefined;
+            try {
+            	svg = document.createElementNS(svgns, 'svg');
 
-            svg.style.position = 'fixed';
-            svg.style.top = svg.style.left = '0';
-            svg.style.width = svg.style.height = '100%';
-            svg.style.overflow = 'visible';
-            svg.style.pointerEvents = 'none';
-            svg.setAttribute('class', 'mogrify-svg');
+            	svg.style.position = 'fixed';
+            	svg.style.top = svg.style.left = '0';
+            	svg.style.width = svg.style.height = '100%';
+            	svg.style.overflow = 'visible';
+            	svg.style.pointerEvents = 'none';
+            	svg.setAttribute('class', 'mogrify-svg');
+            } catch (e) {
+            	console.log('The current browser doesn\'t support SVG');
+            }
 
             var appendedSvg = false;
 
@@ -37,7 +42,7 @@
             	appendedSvg = true;
             }
 
-            function cloneNode(node) {
+            function cloneNode(node, shallow) {
             	var clone = node.cloneNode();
 
             	var style = undefined;
@@ -53,6 +58,10 @@
             			clone.style[prop] = style[prop];
             		});
 
+            		if (shallow) {
+            			return clone;
+            		}
+
             		len = node.childNodes.length;
             		for (i = 0; i < len; i += 1) {
             			clone.appendChild(cloneNode(node.childNodes[i]));
@@ -62,7 +71,7 @@
             	return clone;
             }
 
-            function wrapNode(node) {
+            function wrapNode(node, destinationIsFixed, shallowClone, appendToBody) {
             	var isSvg = node.namespaceURI === svgns;
 
             	var _node$getBoundingClientRect = node.getBoundingClientRect();
@@ -73,8 +82,7 @@
             	var bottom = _node$getBoundingClientRect.bottom;
 
             	var style = window.getComputedStyle(node);
-
-            	var clone = cloneNode(node);
+            	var clone = cloneNode(node, shallowClone);
 
             	var wrapper = {
             		node: node, clone: clone, isSvg: isSvg,
@@ -93,18 +101,41 @@
 
             		svg.appendChild(clone);
             	} else {
-            		var offsetParent = node.offsetParent;
-            		var offsetParentStyle = window.getComputedStyle(offsetParent);
-            		var offsetParentBcr = offsetParent.getBoundingClientRect();
 
-            		clone.style.position = 'absolute';
-            		clone.style.top = top - parseInt(style.marginTop, 10) - (offsetParentBcr.top - parseInt(offsetParentStyle.marginTop, 10)) + 'px';
-            		clone.style.left = left - parseInt(style.marginLeft, 10) - (offsetParentBcr.left - parseInt(offsetParentStyle.marginLeft, 10)) + 'px';
+            		if (destinationIsFixed) {
+            			// position relative to the viewport
+            			clone.style.position = 'fixed';
+            			clone.style.top = top - parseInt(style.marginTop, 10) + 'px';
+            			clone.style.left = left - parseInt(style.marginLeft, 10) + 'px';
+            		} else {
+            			var offsetParent = node.offsetParent;
+
+            			if (offsetParent === null || offsetParent === document.body || appendToBody) {
+            				// parent is fixed, or I want to append the node to the body
+            				// position relative to the document
+            				var docElem = document.documentElement;
+            				clone.style.position = 'absolute';
+            				clone.style.top = top + window.pageYOffset - docElem.clientTop - parseInt(style.marginTop, 10) + 'px';
+            				clone.style.left = left + window.pageXOffset - docElem.clientLeft - parseInt(style.marginLeft, 10) + 'px';
+            			} else {
+            				//position relative to the parent
+            				var offsetParentStyle = window.getComputedStyle(offsetParent);
+            				var offsetParentBcr = offsetParent.getBoundingClientRect();
+
+            				clone.style.position = 'absolute';
+            				clone.style.top = top - parseInt(style.marginTop, 10) - (offsetParentBcr.top - parseInt(offsetParentStyle.marginTop, 10)) + 'px';
+            				clone.style.left = left - parseInt(style.marginLeft, 10) - (offsetParentBcr.left - parseInt(offsetParentStyle.marginLeft, 10)) + 'px';
+            			}
+            		}
 
             		wrapper.transform = ''; // TODO...?
             		wrapper.borderRadius = [parseFloat(style.borderTopLeftRadius), parseFloat(style.borderTopRightRadius), parseFloat(style.borderBottomRightRadius), parseFloat(style.borderBottomLeftRadius)];
 
-            		node.parentNode.appendChild(clone);
+            		if (appendToBody) {
+            			document.body.appendChild(clone);
+            		} else {
+            			node.parentNode.appendChild(clone);
+            		}
             	}
 
             	return wrapper;
@@ -128,10 +159,20 @@
             	}
             }
 
+            function isNodeFixed(node) {
+            	while (node !== null) {
+            		if (window.getComputedStyle(node).position === 'fixed') {
+            			return true;
+            		}
+            		node = node.namespaceURI === svgns ? node.parentNode : node.offsetParent;
+            	}
+            	return false;
+            }
+
             var utils_getTransform = getTransform;
 
-            function getTransform(isSvg, cx, cy, dx, dy, dsx, dsy, t) {
-            	var transform = isSvg ? "translate(" + cx + " " + cy + ") scale(" + (1 + t * dsx) + " " + (1 + t * dsy) + ") translate(" + -cx + " " + -cy + ") translate(" + t * dx + " " + t * dy + ")" : "translate(" + t * dx + "px," + t * dy + "px) scale(" + (1 + t * dsx) + "," + (1 + t * dsy) + ")";
+            function getTransform(isSvg, cx, cy, dx, dy, dsx, dsy, t, t_scale) {
+            	var transform = isSvg ? "translate(" + cx + " " + cy + ") scale(" + (1 + t_scale * dsx) + " " + (1 + t_scale * dsy) + ") translate(" + -cx + " " + -cy + ") translate(" + t * dx + " " + t * dy + ")" : "translate(" + t * dx + "px," + t * dy + "px) scale(" + (1 + t_scale * dsx) + "," + (1 + t_scale * dsy) + ")";
 
             	return transform;
             }
@@ -195,6 +236,7 @@
             	var startTime = Date.now();
             	var duration = options.duration || 400;
             	var easing = options.easing || linear;
+            	var easingScale = options.easingScale || easing;
 
             	function tick() {
             		var timeNow = Date.now();
@@ -212,23 +254,24 @@
             		}
 
             		var t = easing(elapsed / duration);
+            		var t_scale = easingScale(elapsed / duration);
 
             		// opacity
             		from.clone.style.opacity = 1 - t;
             		to.clone.style.opacity = t;
 
             		// border radius
-            		var borderRadius = utils_getBorderRadius(from.borderRadius, to.borderRadius, t);
-            		from.clone.style.borderTopLeftRadius = to.clone.style.borderTopLeftRadius = borderRadius[0];
-            		from.clone.style.borderTopRightRadius = to.clone.style.borderTopRightRadius = borderRadius[1];
-            		from.clone.style.borderBottomRightRadius = to.clone.style.borderBottomRightRadius = borderRadius[2];
-            		from.clone.style.borderBottomLeftRadius = to.clone.style.borderBottomLeftRadius = borderRadius[3];
+            		var fromBorderRadius = utils_getBorderRadius(from.borderRadius, to.borderRadius, dsxf, dsyf, t);
+            		var toBorderRadius = utils_getBorderRadius(to.borderRadius, from.borderRadius, dsxt, dsyt, 1 - t);
+
+            		applyBorderRadius(from.clone, fromBorderRadius);
+            		applyBorderRadius(to.clone, toBorderRadius);
 
             		var cx = from.cx + dx * t;
             		var cy = from.cy + dy * t;
 
-            		var fromTransform = utils_getTransform(from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t) + ' ' + from.transform;
-            		var toTransform = utils_getTransform(to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t) + ' ' + to.transform;
+            		var fromTransform = utils_getTransform(from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t, t_scale) + ' ' + from.transform;
+            		var toTransform = utils_getTransform(to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t, 1 - t_scale) + ' ' + to.transform;
 
             		if (from.isSvg) {
             			from.clone.setAttribute('transform', fromTransform);
@@ -249,6 +292,13 @@
             };
 
             var transformers_TimerTransformer = transformers_TimerTransformer__TimerTransformer;
+
+            function applyBorderRadius(node, borderRadius) {
+            	node.style.borderTopLeftRadius = borderRadius[0];
+            	node.style.borderTopRightRadius = borderRadius[1];
+            	node.style.borderBottomRightRadius = borderRadius[2];
+            	node.style.borderBottomLeftRadius = borderRadius[3];
+            }
 
             var div = document.createElement('div');
 
@@ -387,6 +437,7 @@
             	var dsyt = from.height / to.height - 1;
 
             	var easing = options.easing || linear;
+            	var easingScale = options.easingScale || easing;
 
             	var numFrames = options.duration / 50; // one keyframe per 50ms is probably enough... this may prove not to be the case though
 
@@ -394,15 +445,15 @@
             	var toKeyframes = [];
             	var i;
 
-            	function addKeyframes(pc, t) {
+            	function addKeyframes(pc, t, t_scale) {
             		var cx = from.cx + dx * t;
             		var cy = from.cy + dy * t;
 
             		var fromBorderRadius = utils_getBorderRadius(from.borderRadius, to.borderRadius, dsxf, dsyf, t);
             		var toBorderRadius = utils_getBorderRadius(to.borderRadius, from.borderRadius, dsxt, dsyt, 1 - t);
 
-            		var fromTransform = utils_getTransform(false, cx, cy, dx, dy, dsxf, dsyf, t) + ' ' + from.transform;
-            		var toTransform = utils_getTransform(false, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t) + ' ' + to.transform;
+            		var fromTransform = utils_getTransform(false, cx, cy, dx, dy, dsxf, dsyf, t, t_scale) + ' ' + from.transform;
+            		var toTransform = utils_getTransform(false, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t, 1 - t_scale) + ' ' + to.transform;
 
             		fromKeyframes.push('\n\t\t\t' + pc + '% {\n\t\t\t\topacity: ' + (1 - t) + ';\n\t\t\t\tborder-top-left-radius: ' + fromBorderRadius[0] + ';\n\t\t\t\tborder-top-right-radius: ' + fromBorderRadius[1] + ';\n\t\t\t\tborder-bottom-right-radius: ' + fromBorderRadius[2] + ';\n\t\t\t\tborder-bottom-left-radius: ' + fromBorderRadius[3] + ';\n\t\t\t\t' + TRANSFORM + ': ' + fromTransform + ';\n\t\t\t}');
 
@@ -412,11 +463,12 @@
             	for (i = 0; i < numFrames; i += 1) {
             		var pc = 100 * (i / numFrames);
             		var t = easing(i / numFrames);
+            		var t_scale = easingScale(i / numFrames);
 
-            		addKeyframes(pc, t);
+            		addKeyframes(pc, t, t_scale);
             	}
 
-            	addKeyframes(100, 1);
+            	addKeyframes(100, 1, 1);
 
             	fromKeyframes = fromKeyframes.join('\n');
             	toKeyframes = toKeyframes.join('\n');
@@ -436,8 +488,11 @@
             			options.duration = 400;
             		}
 
-            		var from = wrapNode(fromNode);
-            		var to = wrapNode(toNode);
+            		var appendToBody = !!options.appendToBody;
+            		var shallowClone = !!options.shallowClone;
+            		var destinationIsFixed = isNodeFixed(toNode);
+            		var from = wrapNode(fromNode, destinationIsFixed, shallowClone, appendToBody);
+            		var to = wrapNode(toNode, destinationIsFixed, shallowClone, appendToBody);
 
             		if (from.isSvg || to.isSvg && !appendedSvg) {
             			appendSvg();

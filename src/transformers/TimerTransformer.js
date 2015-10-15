@@ -17,6 +17,7 @@ export default class TimerTransformer {
 		const startTime = Date.now();
 		const duration = options.duration || 400;
 		const easing = options.easing || linear;
+		const easingScale = options.easingScale || easing;
 
 		function tick () {
 			const timeNow = Date.now();
@@ -34,6 +35,7 @@ export default class TimerTransformer {
 			}
 
 			const t = easing( elapsed / duration );
+			const t_scale = easingScale( elapsed / duration );
 
 			// opacity
 			from.clone.style.opacity = 1 - t;
@@ -49,8 +51,8 @@ export default class TimerTransformer {
 			const cx = from.cx + ( dx * t );
 			const cy = from.cy + ( dy * t );
 
-			const fromTransform = getTransform( from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
-			const toTransform = getTransform( to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
+			const fromTransform = getTransform( from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t, t_scale ) + ' ' + from.transform;
+			const toTransform = getTransform( to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t, 1 - t_scale ) + ' ' + to.transform;
 
 			if ( from.isSvg ) {
 				from.clone.setAttribute( 'transform', fromTransform );

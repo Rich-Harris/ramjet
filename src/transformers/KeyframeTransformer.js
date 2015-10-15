@@ -92,6 +92,8 @@ function getKeyframes ( from, to, options ) {
 	var dsyt = ( from.height / to.height ) - 1;
 
 	var easing = options.easing || linear;
+	var easingScale = options.easingScale || easing;
+
 
 	var numFrames = options.duration / 50; // one keyframe per 50ms is probably enough... this may prove not to be the case though
 
@@ -99,15 +101,15 @@ function getKeyframes ( from, to, options ) {
 	var toKeyframes = [];
 	var i;
 
-	function addKeyframes ( pc, t ) {
+	function addKeyframes ( pc, t, t_scale ) {
 		const cx = from.cx + ( dx * t );
 		const cy = from.cy + ( dy * t );
 
 		const fromBorderRadius = getBorderRadius( from.borderRadius, to.borderRadius, dsxf, dsyf, t );
 		const toBorderRadius = getBorderRadius( to.borderRadius, from.borderRadius, dsxt, dsyt, 1 - t );
 
-		const fromTransform = getTransform( false, cx, cy, dx, dy, dsxf, dsyf, t ) + ' ' + from.transform;
-		const toTransform = getTransform( false, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t ) + ' ' + to.transform;
+		const fromTransform = getTransform( false, cx, cy, dx, dy, dsxf, dsyf, t, t_scale ) + ' ' + from.transform;
+		const toTransform = getTransform( false, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t, 1 - t_scale ) + ' ' + to.transform;
 
 		fromKeyframes.push( `
 			${pc}% {
@@ -135,11 +137,12 @@ function getKeyframes ( from, to, options ) {
 	for ( i = 0; i < numFrames; i += 1 ) {
 		const pc = 100 * ( i / numFrames );
 		const t = easing( i / numFrames );
+		const t_scale = easingScale( i / numFrames );
 
-		addKeyframes( pc, t );
+		addKeyframes( pc, t, t_scale );
 	}
 
-	addKeyframes( 100, 1 );
+	addKeyframes( 100, 1, 1);
 
 	fromKeyframes = fromKeyframes.join( '\n' );
 	toKeyframes = toKeyframes.join( '\n' );
