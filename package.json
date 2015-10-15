@@ -31,5 +31,9 @@
     "ractive": "^0.7.2",
     "ractive-events-tap": "^0.2.0",
     "ractive-transitions-fade": "^0.2.0"
+  },
+  "spm": {
+    "main": "dist/ramjet.js",
+    "ignore": ["demo", "test", "src", "scripts"]
   }
 }
