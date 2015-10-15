@@ -32,7 +32,7 @@
             	svg.style.pointerEvents = 'none';
             	svg.setAttribute('class', 'mogrify-svg');
             } catch (e) {
-            	console.log('The current browser doesn\'t support SVG');
+            	console.log("The current browser doesn't support SVG");
             }
 
             var appendedSvg = false;
@@ -161,7 +161,7 @@
 
             function isNodeFixed(node) {
             	while (node !== null) {
-            		if (window.getComputedStyle(node).position === 'fixed') {
+            		if (window.getComputedStyle(node).position === "fixed") {
             			return true;
             		}
             		node = node.namespaceURI === svgns ? node.parentNode : node.offsetParent;
@@ -189,7 +189,7 @@
             		var rx = (from + t * (to - from)) / sx;
             		var ry = (from + t * (to - from)) / sy;
 
-            		return "" + rx + "px " + ry + "px";
+            		return rx + "px " + ry + "px";
             	});
             }
 
@@ -361,17 +361,17 @@
             	var fromId = '_' + ~ ~(Math.random() * 1000000);
             	var toId = '_' + ~ ~(Math.random() * 1000000);
 
-            	var css = '' + KEYFRAMES + ' ' + fromId + ' { ' + fromKeyframes + ' } ' + KEYFRAMES + ' ' + toId + ' { ' + toKeyframes + ' }';
+            	var css = KEYFRAMES + ' ' + fromId + ' { ' + fromKeyframes + ' } ' + KEYFRAMES + ' ' + toId + ' { ' + toKeyframes + ' }';
             	var dispose = addCss(css);
 
             	from.clone.style[ANIMATION_DIRECTION] = 'alternate';
-            	from.clone.style[ANIMATION_DURATION] = '' + options.duration / 1000 + 's';
+            	from.clone.style[ANIMATION_DURATION] = options.duration / 1000 + 's';
             	from.clone.style[ANIMATION_ITERATION_COUNT] = 1;
             	from.clone.style[ANIMATION_NAME] = fromId;
             	from.clone.style[ANIMATION_TIMING_FUNCTION] = 'linear';
 
             	to.clone.style[ANIMATION_DIRECTION] = 'alternate';
-            	to.clone.style[ANIMATION_DURATION] = '' + options.duration / 1000 + 's';
+            	to.clone.style[ANIMATION_DURATION] = options.duration / 1000 + 's';
             	to.clone.style[ANIMATION_ITERATION_COUNT] = 1;
             	to.clone.style[ANIMATION_NAME] = toId;
             	to.clone.style[ANIMATION_TIMING_FUNCTION] = 'linear';
@@ -478,7 +478,7 @@
 
             var ramjet = {
             	transform: function (fromNode, toNode) {
-            		var options = arguments[2] === undefined ? {} : arguments[2];
+            		var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
             		if (typeof options === 'function') {
             			options = { done: options };

@@ -131,7 +131,7 @@
 		</article>
 
 		<article data-params='{shallowClone:true,duration: 1000}'>
-			<p>shallow clone</p>
+			<p>using postclone for removing the children from the cloned nodes</p>
 
 			<button>go</button>
 
@@ -188,6 +188,13 @@
 				var to = reverse ? a : b;
 
 				var params = eval( '(' + ( article.dataset.params || '{}' ) + ')' );
+
+				if (params.shallowClone){
+					params.postClone = function (node){
+						node.innerHTML = '';
+						return node;
+					};
+				}
 
 				button.disabled = true;
 

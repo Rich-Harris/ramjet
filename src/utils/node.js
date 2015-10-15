@@ -1,14 +1,12 @@
 import styleKeys from './styleKeys';
 import { svg, svgns } from './svg';
 
-export function cloneNode ( node , shallow) {
+export function cloneNode ( node ) {
 	const clone = node.cloneNode();
 
 	let style;
 	let len;
 	let i;
-
-	let attr;
 
 	if ( node.nodeType === 1 ) {
 		style = window.getComputedStyle( node );
@@ -16,10 +14,6 @@ export function cloneNode ( node , shallow) {
 		styleKeys.forEach( function ( prop ) {
 			clone.style[ prop ] = style[ prop ];
 		});
-
-		if (shallow) {
-			return clone;
-		}
 
 		len = node.childNodes.length;
 		for ( i = 0; i < len; i += 1 ) {
@@ -30,12 +24,12 @@ export function cloneNode ( node , shallow) {
 	return clone;
 }
 
-export function wrapNode ( node, destinationIsFixed, shallowClone, appendToBody ) {
+export function wrapNode ( node, destinationIsFixed, postClone, appendToBody ) {
 	const isSvg = node.namespaceURI === svgns;
 
 	const { left, right, top, bottom } = node.getBoundingClientRect();
 	const style = window.getComputedStyle( node );
-	const clone = cloneNode( node, shallowClone );
+	const clone = postClone(cloneNode( node ));
 
 	const wrapper = {
 		node, clone, isSvg,
