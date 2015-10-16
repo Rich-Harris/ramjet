@@ -130,13 +130,31 @@
 			<div class='b' style='width: 300px; height: 100px; border: 2px solid red; border-top-left-radius: 1em;; border-bottom-right-radius: 1em; position: fixed; bottom: 10px; right: 10px;'>b</div>
 		</article>
 
-		<article data-params='{shallowClone:true,duration: 1000}'>
-			<p>using postclone for removing the children from the cloned nodes</p>
+		<article data-params='{overrideClone :function (node, depth){ if (depth === 0) return node.cloneNode();},duration: 1000}'>
+			<p>using overrideClone for removing the children from the cloned nodes</p>
 
 			<button>go</button>
 
 			<div class='a'>a</div>
 			<div class='b'>b</div>
+		</article>
+
+		<article data-params='{easing: ramjet.easeInOut, duration: 2000}'>
+			<p>Easing</p>
+
+			<button>go</button>
+
+			<div class='a' style='border-radius: 1em;'>a</div>
+			<div class='b' style='width: 300px; height: 100px; border: 2px solid red; border-top-left-radius: 1em;; border-bottom-right-radius: 1em;'>b</div>
+		</article>
+
+		<article data-params='{easing: ramjet.easeInOut, easingScale: ramjet.easeIn, duration: 2000}'>
+			<p>Easing, different easing scale</p>
+
+			<button>go</button>
+
+			<div class='a' style='border-radius: 1em;'>a</div>
+			<div class='b' style='width: 300px; height: 100px; border: 2px solid red; border-top-left-radius: 1em;; border-bottom-right-radius: 1em;'>b</div>
 		</article>
 	</main>
 
@@ -190,9 +208,10 @@
 				var params = eval( '(' + ( article.dataset.params || '{}' ) + ')' );
 
 				if (params.shallowClone){
-					params.postClone = function (node){
-						node.innerHTML = '';
-						return node;
+					params.overrideClone = function (node, depth){
+						if (depth === 0){
+							return node.cloneNode();
+						}
 					};
 				}
 
