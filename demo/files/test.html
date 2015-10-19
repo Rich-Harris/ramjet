@@ -207,14 +207,6 @@
 
 				var params = eval( '(' + ( article.dataset.params || '{}' ) + ')' );
 
-				if (params.shallowClone){
-					params.overrideClone = function (node, depth){
-						if (depth === 0){
-							return node.cloneNode();
-						}
-					};
-				}
-
 				button.disabled = true;
 
 				ramjet.show( a, b );

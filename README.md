@@ -48,8 +48,8 @@ In modern browsers, it uses CSS animations, so everything happens off the main t
     * `easing` - a function used to control the animation. Should take a number between 0 and 1, and return something similar (though it can return a number outside those bounds, if you're doing e.g. an [elastic easing function](http://easings.net/#easeOutElastic)). I highly recommend [eases](https://www.npmjs.com/package/eases) by [Matt DesLauriers](https://github.com/mattdesl), which is a handy collection of these functions
     * `easingScale` - if defined it will use a different easing function for scaling. It can be used to create cartoonish effects.
     * `useTimer` - by default, ramjet will use CSS animations. Sometimes (when transitioning to or from SVG elements, or in very old browsers) it will fall back to timer-based animations (i.e. with `requestAnimationFrame` or `setTimeout`). If you want to always use timers, make this option `true` - but I don't recommend it (it's much more juddery on mobile)
-    * `overrideClone` (advanced) - look at the section `how ramjet works`
-    * `appendToBody` (advanced) - look at the section `how ramjet works`
+    * `overrideClone` (advanced) - look at the section `Advanced options`
+    * `appendToBody` (advanced) - look at the section `Advanced options`
 
 ### ramjet.hide( ...nodes )
 
@@ -78,9 +78,8 @@ To build, do `npm run build`.
 Reliable automated tests of a library like ramjet are all but impossible. Instead `npm test` will start the development server and navigate you to [localhost:4567/test.html](http://localhost:4567/test.html), where you can visually check that the library behaves as expected.
 
 
-## How ramjet works
-Ramjet operates on two DOM elements. It clones both of these nodes and, using CSS transformation (and border radius), it places one on the top of the other, in the same position as the first element (the second element has opacity 0 at the beginning). Then both elements transition to the position/size of the second element crossfading into each other.
-The option `overrideClone` is a function called recursively for cloning any cloned node (it uses a simple node.cloneNode() by default). It takes as a parameters the current node and the depth of this node compared to the original element. It can be useful for removing annoying attributes or children from the cloned node. For example if a node contains a playing video element this can be removed before starting the animation because it may be heavy to animate and you can heard the audio of it. Examples:
+## Advanced options
+The option `overrideClone` (function) overrides the function used to clone nodes (the default implementation uses a simple node.cloneNode()). It takes as a parameters the current node and the depth of this node compared to the original element (it is called recursively on the node subtree). It can be useful for removing annoying attributes or children from the cloned node. For example if a node contains a video element with autoplay, this can be excluded because it may be heavy to animate and you can heard the audio of it. Examples:
 
 ```html
     // cloning only the root node

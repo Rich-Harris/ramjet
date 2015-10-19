@@ -1,5 +1,13 @@
 # changelog
 
+## 0.4.7
+
+* fixed "position: fixed" issues [sithmel]
+* added easingScale options [sithmel]
+* fixed exceptions fired by IE8 [sithmel]
+* added appendToBody, overrideClone options [sithmel]
+* added spm support [afc163]
+
 ## 0.4.6
 
 * Extend border-radius morphing to timer-based transformations
