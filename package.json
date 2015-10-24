@@ -5,8 +5,8 @@
   "author": "Rich Harris",
   "license": "MIT",
   "repository": "https://github.com/rich-harris/ramjet",
-  "main": "dist/ramjet.js",
-  "jsnext:main": "src/ramjet.js",
+  "main": "dist/ramjet.umd.js",
+  "jsnext:main": "dist/ramjet.es6.js",
   "files": [
     "src",
     "dist",
@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "start": "gobble",
-    "build": "sh ./scripts/build.sh",
+    "build": "gobble build -f dist",
     "prepublish": "npm run build",
     "test": "open http://localhost:4567/test.html; npm start"
   },

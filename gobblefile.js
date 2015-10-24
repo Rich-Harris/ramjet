@@ -1,44 +1,41 @@
 var gobble = require( 'gobble' );
+var babel = require( 'rollup-plugin-babel' );
 
 gobble.cwd( __dirname );
 
-var babelWhitelist = [
-	'es6.arrowFunctions',
-	'es6.blockScoping',
-	'es6.classes',
-	'es6.constants',
-	'es6.destructuring',
-	'es6.parameters.default',
-	'es6.parameters.rest',
-	'es6.properties.shorthand',
-	'es6.templateLiterals'
-];
+var lib = gobble([
+	gobble( 'src' ).transform( 'rollup', {
+		entry: 'ramjet.js',
+		dest: 'ramjet.umd.js',
+		format: 'umd',
+		moduleName: 'ramjet',
+		plugins: [
+			babel({ sourceMap: true })
+		],
+		sourceMap: true
+	}),
 
-var lib = gobble( 'src' )
-	.transform( 'babel', {
-		whitelist: babelWhitelist,
-		sourceMap: false
+	gobble( 'src' ).transform( 'rollup', {
+		entry: 'ramjet.js',
+		dest: 'ramjet.es6.js',
+		format: 'es6',
+		plugins: [
+			babel({ sourceMap: true })
+		],
+		sourceMap: true
 	})
-	.transform( 'esperanto-bundle', {
-		entry: 'ramjet',
-		type: 'umd',
-		name: 'ramjet',
-		sourceMap: false
-	});
+]);
 
 var demo = gobble([
 	gobble([ 'src', 'demo/app' ])
 		.transform( 'ractive', {
 			type: 'es6'
 		})
-		.transform( 'babel', {
-			whitelist: babelWhitelist,
-			inputSourceMap: false
-		})
-		.transform( 'esperanto-bundle', {
-			entry: 'main',
+		.transform( 'rollup', {
+			entry: 'main.js',
 			dest: 'app.js',
-			type: 'cjs'
+			format: 'cjs',
+			plugins: [ babel() ]
 		})
 		.transform( 'derequire' )
 		.transform( 'browserify', {
@@ -52,9 +49,8 @@ var demo = gobble([
 
 if ( gobble.env() === 'production' ) {
 	built = gobble([
-		demo.transform( 'uglifyjs' ),
 		lib,
-		lib.transform( 'uglifyjs', { ext: '.min.js' })
+		lib.include( 'ramjet.umd.js' ).transform( 'uglifyjs', { ext: '.min.js' })
 	]);
 } else {
 	built = gobble([
