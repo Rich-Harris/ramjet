@@ -19,8 +19,8 @@
   var element1 = document.getElementById('a'),
       element2 = document.getElementById('b');
 
-	// to repeat, run this from the console!
-	ramjet.transform( element1, element2 );
+  // to repeat, run this from the console!
+  ramjet.transform( element1, element2 );
 </script>
 ```
 
@@ -81,33 +81,33 @@ Reliable automated tests of a library like ramjet are all but impossible. Instea
 ## Advanced options
 The option `overrideClone` (function) overrides the function used to clone nodes (the default implementation uses a simple node.cloneNode()). It takes as a parameters the current node and the depth of this node compared to the original element (it is called recursively on the node subtree). It can be useful for removing annoying attributes or children from the cloned node. For example if a node contains a video element with autoplay, this can be excluded because it may be heavy to animate and you can heard the audio of it. Examples:
 
-```html
-    // cloning only the root node
-  	ramjet.transform( element1, element2, {
-      overrideClone: function (node, depth){
-        if (depth == 0){
-          return node.cloneNode(); // copy only the root node
-        }
-      }
-    });
+```js
+// cloning only the root node
+ramjet.transform( element1, element2, {
+  overrideClone: function (node, depth){
+    if (depth == 0){
+      return node.cloneNode(); // copy only the root node
+    }
+  }
+});
 
-    // cloning everything but the id attribute
-    ramjet.transform( element1, element2, {
-      overrideClone: function (node, depth){
-        var clone = node.cloneNode();
-        clone.removeAttr('id');
-      }
-    });
+// cloning everything but the id attribute
+ramjet.transform( element1, element2, {
+  overrideClone: function (node, depth){
+    var clone = node.cloneNode();
+    clone.removeAttr('id');
+  }
+});
 
-    // not cloning the video element
-    ramjet.transform( element1, element2, {
-      overrideClone: function (node, depth){
-        if (node.nodeType === 1 && node.tagName === "VIDEO"){
-          return;
-        }
-        return node.cloneNode();
-      }
-    });
+// not cloning the video element
+ramjet.transform( element1, element2, {
+  overrideClone: function (node, depth){
+    if (node.nodeType === 1 && node.tagName === "VIDEO"){
+      return;
+    }
+    return node.cloneNode();
+  }
+});
 ```
 
 By default the cloned nodes are appended to the parent to the original node. Inheriting the positioning and css inherited rules, they can behave in an unexpected way. For this reason you can use the flag `appendToBody` to append these nodes to the boby instead. I invite everyone to set this to true and open an issue if it doesn't work, it may become the default in one of the next releases.
