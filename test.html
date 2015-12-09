@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='utf-8'>
+	<title>ramjet tests</title>
+
+	<meta name='viewport' content='width=device-width, initial-scale=0.5'>
+
+	<link rel='stylesheet' href='main.css'>
+
+	<style>
+		body {
+		    font-family: 'Helvetica Neue', arial;
+		    overflow-x: visible;
+		}
+
+		article {
+			display: block;
+			border-bottom: 1px solid #eee;
+			padding: 0 0 1em 0;
+			margin: 0 0 2em 0;
+		}
+
+		article:before,
+		article:after {
+			content: " ";
+			display: table;
+		}
+
+		article:after {
+			clear: both;
+		}
+
+		.a, .b {
+		    width: 100px;
+		    height: 100px;
+		    line-height: 100px;
+		    color: white;
+		    text-align: center;
+		    font-size: 2em;
+		    box-sizing: border-box;
+		}
+
+		.a {
+		    background-color: #0074D9;
+		    float: left;
+		}
+
+		.b {
+		    background-color: #2ECC40;
+		    float: right;
+		}
+
+		button {
+		    display: block;
+		    padding: 1em 2em;
+		    background-color: #eee;
+		    border: none;
+		    font-family: inherit;
+		    font-size: inherit;
+		    margin: 0 0 1em 0;
+		    cursor: pointer;
+		    color: #666;
+		    outline: none;
+		}
+
+		button:hover {
+		    background-color: #ddd;
+		    color: #333;
+		}
+
+		button:disabled {
+		    background-color: #eee;
+		    color: #666;
+		    opacity: 0.2;
+		    cursor: default;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>ramjet tests</h1>
+
+	<p>Click 'go' in each block to visually verify that ramjet works as per the description.</p>
+
+	<main>
+		<article>
+			<p>Basic transformation</p>
+
+			<button>go</button>
+
+			<div class='a'>a</div>
+			<div class='b'>b</div>
+		</article>
+
+		<article data-params='{duration:1000}'>
+			<p>duration = 1000ms</p>
+
+			<button>go</button>
+
+			<div class='a'>a</div>
+			<div class='b'>b</div>
+		</article>
+
+		<article data-params='{duration:2000}'>
+			<p>border radius</p>
+
+			<button>go</button>
+
+			<div class='a' style='border-radius: 1em;'>a</div>
+			<div class='b' style='width: 300px; height: 100px; border: 2px solid red; border-top-left-radius: 1em;; border-bottom-right-radius: 1em;'>b</div>
+		</article>
+
+		<article data-params='{duration:2000,useTimer:true}'>
+			<p>border radius (useTimer: true)</p>
+
+			<button>go</button>
+
+			<div class='a' style='border-radius: 1em;'>a</div>
+			<div class='b' style='width: 300px; height: 100px; border: 2px solid red; border-top-left-radius: 1em;; border-bottom-right-radius: 1em;'>b</div>
+		</article>
+
+		<article data-params='{duration:2000}'>
+			<p>position fixed</p>
+
+			<button>go</button>
+
+			<div class='a' style='border-radius: 1em;'>a</div>
+			<div class='b' style='width: 300px; height: 100px; border: 2px solid red; border-top-left-radius: 1em;; border-bottom-right-radius: 1em; position: fixed; bottom: 10px; right: 10px;'>b</div>
+		</article>
+
+		<article data-params='{overrideClone :function (node, depth){ if (depth === 0) return node.cloneNode();},duration: 1000}'>
+			<p>using overrideClone for removing the children from the cloned nodes</p>
+
+			<button>go</button>
+
+			<div class='a'>a</div>
+			<div class='b'>b</div>
+		</article>
+
+		<article data-params='{easing: ramjet.easeInOut, duration: 2000}'>
+			<p>Easing</p>
+
+			<button>go</button>
+
+			<div class='a' style='border-radius: 1em;'>a</div>
+			<div class='b' style='width: 300px; height: 100px; border: 2px solid red; border-top-left-radius: 1em;; border-bottom-right-radius: 1em;'>b</div>
+		</article>
+
+		<article data-params='{easing: ramjet.easeInOut, easingScale: ramjet.easeIn, duration: 2000}'>
+			<p>Easing, different easing scale</p>
+
+			<button>go</button>
+
+			<div class='a' style='border-radius: 1em;'>a</div>
+			<div class='b' style='width: 300px; height: 100px; border: 2px solid red; border-top-left-radius: 1em;; border-bottom-right-radius: 1em;'>b</div>
+		</article>
+	</main>
+
+	<!-- <script src='app.js'></script> -->
+	<script src='ramjet.js'></script>
+	<script>
+		(function () {
+			function findParent ( target, tagName ) {
+				do {
+					if ( target.tagName === tagName ) {
+						return target;
+					}
+
+					target = target.parentNode;
+				} while ( target );
+			}
+
+			function extend ( target ) {
+				var sources = [].slice.call( arguments, 1 );
+				sources.forEach( function ( source ) {
+					Object.keys( source ).forEach( function ( key ) {
+						target[ key ] = source[ key ];
+					});
+				});
+
+				return target;
+			}
+
+			var defaults = {
+				useTimer: false,
+				duration: 400
+			};
+
+			[].forEach.call( document.querySelectorAll( '.b' ), function ( node ) {
+				ramjet.hide( node );
+			});
+
+			document.querySelector( 'main' ).addEventListener( 'click', function ( event ) {
+				var button = findParent( event.target, 'BUTTON' );
+
+				if ( !button ) return;
+
+				var article = findParent( button, 'ARTICLE' );
+				var a = article.querySelector( '.a' );
+				var b = article.querySelector( '.b' );
+
+				var reverse = !!article.reverse;
+				var from = reverse ? b : a;
+				var to = reverse ? a : b;
+
+				var params = eval( '(' + ( article.dataset.params || '{}' ) + ')' );
+
+				button.disabled = true;
+
+				ramjet.show( a, b );
+
+				ramjet.transform( from, to, extend( {}, defaults, params, {
+					done: function () {
+						ramjet.show( to );
+						button.disabled = false;
+						article.reverse = !reverse;
+					}
+				}));
+
+				ramjet.hide( a, b );
+			});
+		}());
+	</script>
+</body>
+</html>
