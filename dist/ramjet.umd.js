@@ -1,8 +1,18 @@
 (function (global, factory) {
             typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
             typeof define === 'function' && define.amd ? define(factory) :
-            global.ramjet = factory()
+            (global.ramjet = factory());
 }(this, function () { 'use strict';
+
+            var babelHelpers = {};
+
+            babelHelpers.classCallCheck = function (instance, Constructor) {
+              if (!(instance instanceof Constructor)) {
+                throw new TypeError("Cannot call a class as a function");
+              }
+            };
+
+            babelHelpers;
 
             // for the sake of Safari, may it burn in hell
             var BLACKLIST = ['length', 'parentRule'];
@@ -18,7 +28,7 @@
             	});
             }
 
-            var utils_styleKeys = styleKeys;
+            var styleKeys$1 = styleKeys;
 
             var svgns = 'http://www.w3.org/2000/svg';
             var svg = undefined;
@@ -42,47 +52,49 @@
             	appendedSvg = true;
             }
 
-            function cloneNode(node, shallow) {
-            	var clone = node.cloneNode();
+            function cloneNode(node, depth, overrideClone) {
+            	var clone = overrideClone ? overrideClone(node, depth) : node.cloneNode();
+
+            	if (typeof clone === "undefined") {
+            		return;
+            	}
 
             	var style = undefined;
             	var len = undefined;
             	var i = undefined;
-
-            	var attr = undefined;
+            	var clonedNode = undefined;
 
             	if (node.nodeType === 1) {
             		style = window.getComputedStyle(node);
 
-            		utils_styleKeys.forEach(function (prop) {
+            		styleKeys$1.forEach(function (prop) {
             			clone.style[prop] = style[prop];
             		});
 
-            		if (shallow) {
-            			return clone;
-            		}
-
             		len = node.childNodes.length;
             		for (i = 0; i < len; i += 1) {
-            			clone.appendChild(cloneNode(node.childNodes[i]));
+            			clonedNode = cloneNode(node.childNodes[i], depth + 1, overrideClone);
+            			if (clonedNode) {
+            				clone.appendChild(clonedNode);
+            			}
             		}
             	}
 
             	return clone;
             }
 
-            function wrapNode(node, destinationIsFixed, shallowClone, appendToBody) {
+            function wrapNode(node, destinationIsFixed, overrideClone, appendToBody) {
             	var isSvg = node.namespaceURI === svgns;
 
-            	var _node$getBoundingClientRect = node.getBoundingClientRect();
+            	var _node$getBoundingClie = node.getBoundingClientRect();
 
-            	var left = _node$getBoundingClientRect.left;
-            	var right = _node$getBoundingClientRect.right;
-            	var top = _node$getBoundingClientRect.top;
-            	var bottom = _node$getBoundingClientRect.bottom;
+            	var left = _node$getBoundingClie.left;
+            	var right = _node$getBoundingClie.right;
+            	var top = _node$getBoundingClie.top;
+            	var bottom = _node$getBoundingClie.bottom;
 
             	var style = window.getComputedStyle(node);
-            	var clone = cloneNode(node, shallowClone);
+            	var clone = cloneNode(node, 0, overrideClone);
 
             	var wrapper = {
             		node: node, clone: clone, isSvg: isSvg,
@@ -169,15 +181,11 @@
             	return false;
             }
 
-            var utils_getTransform = getTransform;
-
             function getTransform(isSvg, cx, cy, dx, dy, dsx, dsy, t, t_scale) {
             	var transform = isSvg ? "translate(" + cx + " " + cy + ") scale(" + (1 + t_scale * dsx) + " " + (1 + t_scale * dsy) + ") translate(" + -cx + " " + -cy + ") translate(" + t * dx + " " + t * dy + ")" : "translate(" + t * dx + "px," + t * dy + "px) scale(" + (1 + t_scale * dsx) + "," + (1 + t_scale * dsy) + ")";
 
             	return transform;
             }
-
-            var utils_getBorderRadius = getBorderRadius;
 
             function getBorderRadius(a, b, dsx, dsy, t) {
             	var sx = 1 + t * dsx;
@@ -217,12 +225,8 @@
                         return setTimeout(fn, 16);
             };
 
-            var utils_rAF = rAF;
-
-            function transformers_TimerTransformer___classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-            var transformers_TimerTransformer__TimerTransformer = function TimerTransformer(from, to, options) {
-            	transformers_TimerTransformer___classCallCheck(this, transformers_TimerTransformer__TimerTransformer);
+            var TimerTransformer = function TimerTransformer(from, to, options) {
+            	babelHelpers.classCallCheck(this, TimerTransformer);
 
             	var dx = to.cx - from.cx;
             	var dy = to.cy - from.cy;
@@ -261,8 +265,8 @@
             		to.clone.style.opacity = t;
 
             		// border radius
-            		var fromBorderRadius = utils_getBorderRadius(from.borderRadius, to.borderRadius, dsxf, dsyf, t);
-            		var toBorderRadius = utils_getBorderRadius(to.borderRadius, from.borderRadius, dsxt, dsyt, 1 - t);
+            		var fromBorderRadius = getBorderRadius(from.borderRadius, to.borderRadius, dsxf, dsyf, t);
+            		var toBorderRadius = getBorderRadius(to.borderRadius, from.borderRadius, dsxt, dsyt, 1 - t);
 
             		applyBorderRadius(from.clone, fromBorderRadius);
             		applyBorderRadius(to.clone, toBorderRadius);
@@ -270,8 +274,8 @@
             		var cx = from.cx + dx * t;
             		var cy = from.cy + dy * t;
 
-            		var fromTransform = utils_getTransform(from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t, t_scale) + ' ' + from.transform;
-            		var toTransform = utils_getTransform(to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t, 1 - t_scale) + ' ' + to.transform;
+            		var fromTransform = getTransform(from.isSvg, cx, cy, dx, dy, dsxf, dsyf, t, t_scale) + ' ' + from.transform;
+            		var toTransform = getTransform(to.isSvg, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t, 1 - t_scale) + ' ' + to.transform;
 
             		if (from.isSvg) {
             			from.clone.setAttribute('transform', fromTransform);
@@ -285,13 +289,11 @@
             			to.clone.style.transform = to.clone.style.webkitTransform = to.clone.style.msTransform = toTransform;
             		}
 
-            		utils_rAF(tick);
+            		rAF(tick);
             	}
 
             	tick();
             };
-
-            var transformers_TimerTransformer = transformers_TimerTransformer__TimerTransformer;
 
             function applyBorderRadius(node, borderRadius) {
             	node.style.borderTopLeftRadius = borderRadius[0];
@@ -348,10 +350,8 @@
             	keyframesSupported = false;
             }
 
-            function transformers_KeyframeTransformer___classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-            var transformers_KeyframeTransformer__KeyframeTransformer = function KeyframeTransformer(from, to, options) {
-            	transformers_KeyframeTransformer___classCallCheck(this, transformers_KeyframeTransformer__KeyframeTransformer);
+            var KeyframeTransformer = function KeyframeTransformer(from, to, options) {
+            	babelHelpers.classCallCheck(this, KeyframeTransformer);
 
             	var _getKeyframes = getKeyframes(from, to, options);
 
@@ -401,8 +401,6 @@
             	});
             };
 
-            var transformers_KeyframeTransformer = transformers_KeyframeTransformer__KeyframeTransformer;
-
             function addCss(css) {
             	var styleElement = document.createElement('style');
             	styleElement.type = 'text/css';
@@ -449,11 +447,11 @@
             		var cx = from.cx + dx * t;
             		var cy = from.cy + dy * t;
 
-            		var fromBorderRadius = utils_getBorderRadius(from.borderRadius, to.borderRadius, dsxf, dsyf, t);
-            		var toBorderRadius = utils_getBorderRadius(to.borderRadius, from.borderRadius, dsxt, dsyt, 1 - t);
+            		var fromBorderRadius = getBorderRadius(from.borderRadius, to.borderRadius, dsxf, dsyf, t);
+            		var toBorderRadius = getBorderRadius(to.borderRadius, from.borderRadius, dsxt, dsyt, 1 - t);
 
-            		var fromTransform = utils_getTransform(false, cx, cy, dx, dy, dsxf, dsyf, t, t_scale) + ' ' + from.transform;
-            		var toTransform = utils_getTransform(false, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t, 1 - t_scale) + ' ' + to.transform;
+            		var fromTransform = getTransform(false, cx, cy, dx, dy, dsxf, dsyf, t, t_scale) + ' ' + from.transform;
+            		var toTransform = getTransform(false, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t, 1 - t_scale) + ' ' + to.transform;
 
             		fromKeyframes.push('\n\t\t\t' + pc + '% {\n\t\t\t\topacity: ' + (1 - t) + ';\n\t\t\t\tborder-top-left-radius: ' + fromBorderRadius[0] + ';\n\t\t\t\tborder-top-right-radius: ' + fromBorderRadius[1] + ';\n\t\t\t\tborder-bottom-right-radius: ' + fromBorderRadius[2] + ';\n\t\t\t\tborder-bottom-left-radius: ' + fromBorderRadius[3] + ';\n\t\t\t\t' + TRANSFORM + ': ' + fromTransform + ';\n\t\t\t}');
 
@@ -477,7 +475,7 @@
             }
 
             var ramjet = {
-            	transform: function (fromNode, toNode) {
+            	transform: function transform(fromNode, toNode) {
             		var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
             		if (typeof options === 'function') {
@@ -489,31 +487,28 @@
             		}
 
             		var appendToBody = !!options.appendToBody;
-            		var shallowClone = !!options.shallowClone;
             		var destinationIsFixed = isNodeFixed(toNode);
-            		var from = wrapNode(fromNode, destinationIsFixed, shallowClone, appendToBody);
-            		var to = wrapNode(toNode, destinationIsFixed, shallowClone, appendToBody);
+            		var from = wrapNode(fromNode, destinationIsFixed, options.overrideClone, appendToBody);
+            		var to = wrapNode(toNode, destinationIsFixed, options.overrideClone, appendToBody);
 
             		if (from.isSvg || to.isSvg && !appendedSvg) {
             			appendSvg();
             		}
 
             		if (!keyframesSupported || options.useTimer || from.isSvg || to.isSvg) {
-            			return new transformers_TimerTransformer(from, to, options);
+            			return new TimerTransformer(from, to, options);
             		} else {
-            			return new transformers_KeyframeTransformer(from, to, options);
+            			return new KeyframeTransformer(from, to, options);
             		}
             	},
-
-            	hide: function () {
+            	hide: function hide() {
             		for (var _len = arguments.length, nodes = Array(_len), _key = 0; _key < _len; _key++) {
             			nodes[_key] = arguments[_key];
             		}
 
             		nodes.forEach(hideNode);
             	},
-
-            	show: function () {
+            	show: function show() {
             		for (var _len2 = arguments.length, nodes = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
             			nodes[_key2] = arguments[_key2];
             		}
@@ -528,3 +523,4 @@
             return ramjet;
 
 }));
+//# sourceMappingURL=ramjet.umd.js.map
