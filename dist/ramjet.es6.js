@@ -5,26 +5,10 @@ babelHelpers.classCallCheck = function (instance, Constructor) {
     throw new TypeError("Cannot call a class as a function");
   }
 };
-function linear(pos) {
-	return pos;
-}
 
-function easeIn(pos) {
-	return Math.pow(pos, 3);
-}
+babelHelpers;
 
-function easeOut(pos) {
-	return Math.pow(pos - 1, 3) + 1;
-}
-
-function easeInOut(pos) {
-	if ((pos /= 0.5) < 1) {
-		return 0.5 * Math.pow(pos, 3);
-	}
-
-	return 0.5 * (Math.pow(pos - 2, 3) + 2);
-}
-
+// for the sake of Safari, may it burn in hell
 var BLACKLIST = ['length', 'parentRule'];
 
 var styleKeys = undefined;
@@ -96,12 +80,12 @@ function cloneNode(node, depth, overrideClone) {
 function wrapNode(node, destinationIsFixed, overrideClone, appendToBody) {
 	var isSvg = node.namespaceURI === svgns;
 
-	var _node$getBoundingClientRect = node.getBoundingClientRect();
+	var _node$getBoundingClie = node.getBoundingClientRect();
 
-	var left = _node$getBoundingClientRect.left;
-	var right = _node$getBoundingClientRect.right;
-	var top = _node$getBoundingClientRect.top;
-	var bottom = _node$getBoundingClientRect.bottom;
+	var left = _node$getBoundingClie.left;
+	var right = _node$getBoundingClie.right;
+	var top = _node$getBoundingClie.top;
+	var bottom = _node$getBoundingClie.bottom;
 
 	var style = window.getComputedStyle(node);
 	var clone = cloneNode(node, 0, overrideClone);
@@ -209,6 +193,26 @@ function getBorderRadius(a, b, dsx, dsy, t) {
 
 		return rx + "px " + ry + "px";
 	});
+}
+
+function linear(pos) {
+	return pos;
+}
+
+function easeIn(pos) {
+	return Math.pow(pos, 3);
+}
+
+function easeOut(pos) {
+	return Math.pow(pos - 1, 3) + 1;
+}
+
+function easeInOut(pos) {
+	if ((pos /= 0.5) < 1) {
+		return 0.5 * Math.pow(pos, 3);
+	}
+
+	return 0.5 * (Math.pow(pos - 2, 3) + 2);
 }
 
 var rAF = window.requestAnimationFrame || window.webkitRequestAnimationFrame || function (fn) {
@@ -491,7 +495,6 @@ var ramjet = {
 			return new KeyframeTransformer(from, to, options);
 		}
 	},
-
 	hide: function hide() {
 		for (var _len = arguments.length, nodes = Array(_len), _key = 0; _key < _len; _key++) {
 			nodes[_key] = arguments[_key];
@@ -499,7 +502,6 @@ var ramjet = {
 
 		nodes.forEach(hideNode);
 	},
-
 	show: function show() {
 		for (var _len2 = arguments.length, nodes = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
 			nodes[_key2] = arguments[_key2];

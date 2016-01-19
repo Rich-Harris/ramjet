@@ -9,9 +9,7 @@ var lib = gobble([
 		dest: 'ramjet.umd.js',
 		format: 'umd',
 		moduleName: 'ramjet',
-		plugins: [
-			babel({ sourceMap: true })
-		],
+		plugins: [ babel() ],
 		sourceMap: true
 	}),
 
@@ -19,9 +17,7 @@ var lib = gobble([
 		entry: 'ramjet.js',
 		dest: 'ramjet.es6.js',
 		format: 'es6',
-		plugins: [
-			babel({ sourceMap: true })
-		],
+		plugins: [ babel() ],
 		sourceMap: true
 	})
 ]);
