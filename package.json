@@ -19,21 +19,28 @@
     "test": "open http://localhost:4567/test.html; npm start"
   },
   "devDependencies": {
-    "eases": "^1.0.6",
-    "gobble": "^0.9.0",
-    "gobble-babel": "^5.0.0",
-    "gobble-browserify": "^0.3.0",
-    "gobble-cli": "^0.3.5",
-    "gobble-derequire": "^0.1.1",
-    "gobble-esperanto-bundle": "^0.1.7",
+    "babel-preset-es2015-rollup": "^1.1.1",
+    "eases": "^1.0.8",
+    "gobble": "^0.10.2",
+    "gobble-babel": "^5.5.8",
+    "gobble-browserify": "^0.6.1",
+    "gobble-cli": "^0.6.0",
+    "gobble-derequire": "^0.1.2",
     "gobble-ractive": "^0.2.0",
+    "gobble-rollup": "^0.25.0",
     "gobble-uglifyjs": "^0.2.1",
-    "ractive": "^0.7.2",
-    "ractive-events-tap": "^0.2.0",
-    "ractive-transitions-fade": "^0.2.0"
+    "ractive": "^0.7.3",
+    "ractive-events-tap": "^0.3.0",
+    "ractive-transitions-fade": "^0.3.1",
+    "rollup-plugin-babel": "^2.3.9"
   },
   "spm": {
     "main": "dist/ramjet.js",
-    "ignore": ["demo", "test", "src", "scripts"]
+    "ignore": [
+      "demo",
+      "test",
+      "src",
+      "scripts"
+    ]
   }
 }
