@@ -1,5 +1,9 @@
 # changelog
 
+## 0.5.0
+
+* Change `jsnext:main` build to point to Babelified bundle with ES6 export ([#45](https://github.com/Rich-Harris/ramjet/pull/45))
+
 ## 0.4.7
 
 * fixed "position: fixed" issues [sithmel]
