@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+	<head>
+		<title>duration</title>
+		<link rel='stylesheet' href='../../shared/test.css'>
+		<script src='../../shared/test-helpers.js'></script>
+		<script src='../../../dist/ramjet.umd.js'></script>
+	</head>
+
+	<body>
+		<div class='a'><span>a</a></div>
+		<div class='b hidden'><span>b</a></div>
+
+		<script>
+		function test () {
+			var a = document.querySelector( '.a' );
+			var b = document.querySelector( '.b' );
+
+			screenshot( 0 )
+				.then( () => {
+					b.classList.remove( 'hidden' );
+
+					ramjet.transform( a, b, {
+						duration: 1000,
+						done: function () {
+							b.classList.remove( 'hidden' );
+
+							screenshot( 1 ).then( next );
+						}
+					});
+
+					a.classList.add( 'hidden' );
+					b.classList.add( 'hidden' );
+				})
+				.catch( err => {
+					setTimeout( () => {
+						throw err;
+					});
+				});
+		}
+		</script>
+	</body>
+</html>

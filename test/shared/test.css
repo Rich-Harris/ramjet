@@ -1,0 +1,43 @@
+body {
+	font-family: 'arial';
+}
+
+.a, .b {
+	position: relative;
+	width: 100px;
+	height: 100px;
+	border: 1px solid;
+}
+
+.a span, .b span {
+	position: absolute;
+	display: block;
+	text-align: center;
+	width: 100%;
+	top: 50%;
+	color: white;
+	-webkit-transform: translate(0,-50%);
+	transform: translate(0,-50%);
+	font-size: 2em;
+	text-shadow: 0 0 7px rgba(0,0,0,0.1);
+}
+
+.hidden span {
+	text-shadow: none;
+}
+
+.a {
+	float: left;
+	background-color: #0074D9;
+	border-color: #0074D9;
+}
+
+.b {
+	float: right;
+	background-color: #01FF70;
+	border-color: #01FF70;
+}
+
+.hidden {
+	background: white;
+}
