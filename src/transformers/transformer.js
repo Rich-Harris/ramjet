@@ -15,6 +15,8 @@ export default function timer ( from, to, options ) {
 	const duration = options.duration || 400;
 	const easing = options.easing || linear;
 
+	const useTimer = !keyframesSupported || !!options.useTimer;
+
 	const opacityAt = getOpacityInterpolator( from.opacity, to.opacity );
 	const backgroundColorAt = getRgbaInterpolator( from.rgba, to.rgba );
 	const borderRadiusAt = getBorderRadiusInterpolator( from, to );
@@ -57,9 +59,13 @@ export default function timer ( from, to, options ) {
 
 			from = null;
 			to = null;
+
+			return transformer;
 		},
 
 		goto ( pos ) {
+			transformer.pause();
+
 			const t = easing( pos );
 
 			// opacity
@@ -84,31 +90,37 @@ export default function timer ( from, to, options ) {
 			const transformTo = transformToAt( 1 - t );
 			from.setTransform( transformFrom );
 			to.setTransform( transformTo );
+
+			return transformer;
 		},
 
 		pause () {
-			if ( !keyframesSupported || options.useTimer ) {
-				running = false;
-			}
+			if ( !running ) return transformer;
+			running = false;
 
-			else {
+			if ( !useTimer ) {
+				// TODO derive current position somehow, use that rather than
+				// current computed style (from and to get out of sync in
+				// some browsers?)
 				remaining = endTime - Date.now();
 
 				from.freeze();
 				to.freeze();
 				disposeCss();
 			}
+
+			return transformer;
 		},
 
 		play () {
+			if ( running ) return transformer;
+			running = true;
+
 			endTime = Date.now() + remaining;
 
-			if ( !keyframesSupported || options.useTimer ) {
-				running = true;
+			if ( useTimer ) {
 				rAF( tick );
-			}
-
-			else {
+			} else {
 				const { fromKeyframes, toKeyframes } = getKeyframes( from, to, options.easing || linear, remaining, duration );
 
 				const fromId = generateId();
@@ -123,12 +135,14 @@ export default function timer ( from, to, options ) {
 				from.animateWithKeyframes( fromId, remaining );
 				to.animateWithKeyframes( toId, remaining );
 			}
+
+			return transformer;
 		}
 	};
 
 
 	// handle animation end
-	if ( keyframesSupported && !options.useTimer ) {
+	if ( !useTimer ) {
 		let animating = 2;
 
 		const done = () => {
