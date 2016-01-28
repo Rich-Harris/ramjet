@@ -1,66 +1,10 @@
 import * as sander from 'sander';
 import * as path from 'path';
 import Nightmare from 'nightmare';
-import compareScreenshots from './compareScreenshots.js';
 
-const samples = sander.readdirSync( 'test/samples' )
-	.filter( file => file[0] !== '.' )
-	.map( file => {
-		return {
-			file: path.resolve( 'test/samples', file ),
-			title: file.replace( '.html', '' ),
-			html: sander.readFileSync( 'test/samples', file, { encoding: 'utf-8' })
-		};
-	});
-
-const templates = {
-	standalone: sander.readFileSync( 'test/templates/standalone.html', { encoding: 'utf-8' }),
-	viewer: sander.readFileSync( 'test/templates/viewer.html', { encoding: 'utf-8' })
-};
-
-const ramjetSrc = sander.readFileSync( 'dist/ramjet.umd.js' );
-const ramjetDataUri = `data:application/javascript;base64,${ramjetSrc.toString( 'base64' )}`;
-
-
-// create viewer
-const blocks = samples.map( sample => {
-	const screenshots = [ 'actual', 'expected', 'diff' ].map( type => `
-		<div class='screenshot-column'>
-			<h2>${type}</h2>
-
-			<img src='screenshots/${sample.title}/${type}/000.png'>
-			<img src='screenshots/${sample.title}/${type}/020.png'>
-			<img src='screenshots/${sample.title}/${type}/040.png'>
-			<img src='screenshots/${sample.title}/${type}/060.png'>
-			<img src='screenshots/${sample.title}/${type}/080.png'>
-			<img src='screenshots/${sample.title}/${type}/100.png'>
-		</div>
-	` ).join( '\n' );
-
-	return `
-		<article>
-			<h1>${sample.title}</h1>
-			<button class='go'>go</button>
-			<button class='show-all'>show start and end</button>
-
-			<!--<div class='test-area'>-->
-				${sample.html}
-			<!--</div>-->
-
-			<div class='screenshots'>
-				${screenshots}
-			</div>
-		</article>
-	`;
-});
-
-const viewer = templates.viewer
-	.replace( '__TESTS__', blocks.join( '\n' ) )
-	.replace( '__RAMJET__', ramjetDataUri );
-
-sander.writeFileSync( 'test/viewer.html', viewer );
-
-
+import compareScreenshots from './utils/compareScreenshots.js';
+import samples from './utils/samples.js';
+import * as templates from './utils/templates.js';
 
 // run automated tests
 const nightmare = Nightmare({ show: true })
@@ -125,9 +69,7 @@ function runNextTest () {
 	sander.mkdirSync( 'test/screenshots', currentTest, 'actual' );
 	sander.mkdirSync( 'test/screenshots', currentTest, 'diff' );
 
-	const html = templates.standalone
-		.replace( '__TEST__', sample.html )
-		.replace( '__RAMJET__', ramjetDataUri );
+	const html = templates.standalone.replace( '__TEST__', sample.html );
 
 	const url = `data:text/html,${encodeURIComponent(html)}`;
 
