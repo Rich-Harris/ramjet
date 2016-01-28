@@ -499,13 +499,21 @@
 
 				ramjet.show( a, b );
 
-				ramjet.transform( from, to, extend( {}, defaults, params, {
+				const transformer = ramjet.transform( from, to, extend( {}, defaults, params, {
 					done: function () {
 						ramjet.show( to );
 						button.disabled = false;
 						article.reverse = !reverse;
 					}
 				}));
+
+				setTimeout( () => {
+					transformer.pause();
+
+					setTimeout( () => {
+						transformer.play();
+					}, 500 );
+				}, 200 );
 
 				ramjet.hide( a, b );
 			});

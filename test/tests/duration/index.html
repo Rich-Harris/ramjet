@@ -20,7 +20,7 @@
 				.then( () => {
 					b.classList.remove( 'hidden' );
 
-					ramjet.transform( a, b, {
+					var transformer = ramjet.transform( a, b, {
 						duration: 1000,
 						done: function () {
 							b.classList.remove( 'hidden' );
@@ -28,6 +28,10 @@
 							screenshot( 1 ).then( next );
 						}
 					});
+
+					setTimeout( () => {
+						transformer.pause();
+					}, 300 );
 
 					a.classList.add( 'hidden' );
 					b.classList.add( 'hidden' );

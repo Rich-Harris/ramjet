@@ -20,7 +20,7 @@
 					.then( () => {
 						b.classList.remove( 'hidden' );
 
-						ramjet.transform( a, b, {
+						var transformer = ramjet.transform( a, b, {
 							done: function () {
 								b.classList.remove( 'hidden' );
 

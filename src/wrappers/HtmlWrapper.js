@@ -4,6 +4,7 @@ import parseBorderRadius from '../utils/parseBorderRadius';
 import { svgns } from '../utils/svg';
 import { findTransformParent, findParentByTagName } from '../utils/findParent';
 import {
+	ANIMATION,
 	ANIMATION_DIRECTION,
 	ANIMATION_DURATION,
 	ANIMATION_ITERATION_COUNT,
@@ -44,7 +45,7 @@ export default class HtmlWrapper {
 		this.init( node, options );
 	}
 
-	init ( node, options ) {
+	init ( node ) {
 		this._node = node;
 
 		this._clone = cloneNode( node );
@@ -148,7 +149,16 @@ export default class HtmlWrapper {
 		this._clone.style[ ANIMATION_ITERATION_COUNT ] = 1;
 		this._clone.style[ ANIMATION_NAME ] = id;
 		this._clone.style[ ANIMATION_TIMING_FUNCTION ] = 'linear';
+	}
 
-		this._clone.addEventListener( ANIMATION_END, callback );
+	freeze () {
+		const computedStyle = getComputedStyle( this._clone );
+
+		this.setOpacity( computedStyle.opacity );
+		this.setTransform( computedStyle.transform );
+		this.setBackgroundColor( computedStyle.backgroundColor );
+		this.setBorderRadius( computedStyle.borderRadius );
+
+		this._clone.style[ ANIMATION ] = 'none';
 	}
 }
