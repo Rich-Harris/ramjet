@@ -3,7 +3,7 @@ import * as path from 'path';
 import Jimp from 'jimp';
 
 export default function compareScreenshots ( test ) {
-	const dir = path.resolve( 'test/tests', test, 'screenshots' );
+	const dir = path.resolve( 'test/screenshots', test );
 
 	const expected = path.resolve( dir, 'expected' );
 	const actual = path.resolve( dir, 'actual' );
@@ -13,7 +13,7 @@ export default function compareScreenshots ( test ) {
 	return files.reduce( ( promise, file ) => {
 		return promise.then( () => {
 			if ( !sander.existsSync( expected, file ) ) {
-				console.log( `Missing ${test}/screenshots/expected/${file}` );
+				console.log( `Missing test/screenshots/${test}/expected/${file}` );
 				return null;
 			}
 

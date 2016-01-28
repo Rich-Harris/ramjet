@@ -1,0 +1,171 @@
+<!doctype html>
+<html>
+	<head>
+		<title>ramjet tests</title>
+
+		<style>
+			body {
+				font-family: 'arial';
+				max-width: 800px;
+				padding: 0 2em;
+				margin: 0 auto;
+				overflow-x: visible;
+			}
+
+			article {
+				position: relative;
+				width: 100%;
+				border-bottom: 1px solid #eee;
+			}
+
+			article::before, article::after {
+				content: ' ';
+				display: table;
+			}
+
+			article::after {
+				clear: both;
+			}
+
+			button {
+				display: block;
+				padding: 1em 2em;
+				background-color: #eee;
+				border: none;
+				font-family: inherit;
+				font-size: inherit;
+				margin: 0 0 1em 0;
+				cursor: pointer;
+				color: #666;
+				outline: none;
+			}
+
+			button:hover {
+				background-color: #ddd;
+				color: #333;
+			}
+
+			button:disabled {
+				background-color: #eee;
+				color: #666;
+				opacity: 0.2;
+				cursor: default;
+			}
+
+			.test-area {
+				position: relative;
+			}
+
+			.a, .b {
+				position: relative;
+				width: 100px;
+				height: 100px;
+				line-height: 100px;
+				color: white;
+				text-align: center;
+				font-size: 2em;
+				box-sizing: border-box;
+			}
+
+			.a {
+				float: left;
+				background-color: #0074D9;
+				border-color: #0074D9;
+				fill: #0074D9;
+			}
+
+			.b {
+				float: right;
+				background-color: #01FF70;
+				border-color: #01FF70;
+				fill: #01FF70;
+			}
+
+			text {
+				fill: white;
+			}
+
+			.container {
+				position: absolute;
+			}
+
+			.transform-helper {
+				position: absolute;
+				left: 0;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				border: 2px solid red;
+				transition: all 0.6s ease-out;
+			}
+
+			.transform-helper-bg {
+				position: absolute;
+				width: 100px;
+				height: 100px;
+				border: 2px solid #999;
+				box-sizing: border-box;
+			}
+
+			.screenshots {
+				clear: both;
+			}
+
+			.screenshot-column {
+				width: 33.333%;
+				max-width: 200px;
+				float: left;
+				padding: 0 1em 0 0;
+				box-sizing: border-box;
+			}
+
+			.screenshot-column img {
+				width: 100%;
+			}
+		</style>
+
+		<script src='__RAMJET__'></script>
+	</head>
+
+	<body>
+		__TESTS__
+
+		<script>
+			[].forEach.call( document.querySelectorAll( 'article' ), function ( article ) {
+				var go = article.querySelector( '.go' );
+				var showAll = article.querySelector( '.show-all' );
+
+				var a = article.querySelector( '.a' ) || article.querySelector( '[data-a]' );
+				var b = article.querySelector( '.b' ) || article.querySelector( '[data-b]' );
+
+				var reversed;
+
+				ramjet.hide( b );
+
+				go.addEventListener( 'click', function ( event ) {
+					var from = reversed ? b : a;
+					var to = reversed ? a : b;
+
+					go.disabled = true;
+
+					ramjet.show( a, b );
+
+					ramjet.transform( from, to, {
+						duration: 1000,
+						done: function () {
+							go.disabled = false;
+							reversed = !reversed;
+							ramjet.show( to );
+						}
+					});
+
+					ramjet.hide( a, b );
+				});
+
+				showAll.addEventListener( 'click', function ( event ) {
+					ramjet.show( a, b );
+				});
+			});
+		</script>
+	</body>
+</html>

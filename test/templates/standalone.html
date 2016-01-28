@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+	<head>
+		<title>ramjet test</title>
+
+		<style>
+			body {
+				font-family: 'arial';
+			}
+
+			.a, .b {
+				position: relative;
+				width: 100px;
+				height: 100px;
+				line-height: 100px;
+				color: white;
+				text-align: center;
+				font-size: 2em;
+				box-sizing: border-box;
+			}
+
+			.a {
+				float: left;
+				background-color: #0074D9;
+				border-color: #0074D9;
+			}
+
+			.b {
+				float: right;
+				background-color: #01FF70;
+				border-color: #01FF70;
+			}
+
+			text {
+				fill: white;
+			}
+
+			.transform-helper {
+				position: absolute;
+				left: 0;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				border: 2px solid red;
+				transition: all 0.6s ease-out;
+			}
+
+			.transform-helper-bg {
+				position: absolute;
+				width: 100px;
+				height: 100px;
+				border: 2px solid #999;
+				box-sizing: border-box;
+			}
+		</style>
+
+		<script>
+			(function () {
+				window.actionHandlers = {};
+				window.action = action;
+				window.next = next;
+				window.screenshot = screenshot;
+				window.wait = wait;
+
+				var uid = 1;
+
+				function action ( type, options ) {
+					return new Promise( ( fulfil, reject ) => {
+						var id = '_' + uid++;
+
+						window.actionHandlers[ id ] = wrap( fulfil, reject, id );
+
+						console.log( '__action', {
+							type,
+							options,
+							id
+						});
+					});
+				}
+
+				function next () {
+					return action( 'next' );
+				}
+
+				function screenshot ( name ) {
+					return wait( 100 ).then( () => action( 'screenshot', { name }) );
+				}
+
+				function wait ( ms ) {
+					return new Promise( fulfil => setTimeout( fulfil, ms ) );
+				}
+
+				function wrap ( fulfil, reject, id ) {
+					return function ( err, result ) {
+						if ( err ) {
+							reject( err );
+						} else {
+							fulfil( result );
+						}
+
+						delete window.actionHandlers[ id ];
+					};
+				}
+			})();
+		</script>
+		<script src='__RAMJET__'></script>
+	</head>
+
+	<body>
+		__TEST__
+
+		<script>
+			function test () {
+				var a = document.querySelector( '.a' ) || document.querySelector( '[data-a]' );
+				var b = document.querySelector( '.b' ) || document.querySelector( '[data-b]' );
+
+				var transformer = ramjet.transform( a, b ).pause();
+
+				ramjet.hide( a, b );
+
+				[ 0, 20, 40, 60, 80, 100 ].reduce( ( promise, pc ) => {
+					return promise.then( () => {
+						transformer.goto( pc / 100 );
+
+						pc = String( pc );
+						while ( pc.length < 3 ) pc = '0' + pc;
+
+						return screenshot( pc );
+					});
+				}, Promise.resolve() ).then( next );
+			}
+		</script>
+	</body>
+</html>

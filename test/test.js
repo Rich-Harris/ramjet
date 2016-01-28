@@ -3,9 +3,68 @@ import * as path from 'path';
 import Nightmare from 'nightmare';
 import compareScreenshots from './compareScreenshots.js';
 
-const tests = sander.readdirSync( 'test/tests' ).filter( dir => dir[0] !== '.' );
+const samples = sander.readdirSync( 'test/samples' )
+	.filter( file => file[0] !== '.' )
+	.map( file => {
+		return {
+			file: path.resolve( 'test/samples', file ),
+			title: file.replace( '.html', '' ),
+			html: sander.readFileSync( 'test/samples', file, { encoding: 'utf-8' })
+		};
+	});
 
-const nightmare = Nightmare({ show: true });
+const templates = {
+	standalone: sander.readFileSync( 'test/templates/standalone.html', { encoding: 'utf-8' }),
+	viewer: sander.readFileSync( 'test/templates/viewer.html', { encoding: 'utf-8' })
+};
+
+const ramjetSrc = sander.readFileSync( 'dist/ramjet.umd.js' );
+const ramjetDataUri = `data:application/javascript;base64,${ramjetSrc.toString( 'base64' )}`;
+
+
+// create viewer
+const blocks = samples.map( sample => {
+	const screenshots = [ 'actual', 'expected', 'diff' ].map( type => `
+		<div class='screenshot-column'>
+			<h2>${type}</h2>
+
+			<img src='screenshots/${sample.title}/${type}/000.png'>
+			<img src='screenshots/${sample.title}/${type}/020.png'>
+			<img src='screenshots/${sample.title}/${type}/040.png'>
+			<img src='screenshots/${sample.title}/${type}/060.png'>
+			<img src='screenshots/${sample.title}/${type}/080.png'>
+			<img src='screenshots/${sample.title}/${type}/100.png'>
+		</div>
+	` ).join( '\n' );
+
+	return `
+		<article>
+			<h1>${sample.title}</h1>
+			<button class='go'>go</button>
+			<button class='show-all'>show start and end</button>
+
+			<!--<div class='test-area'>-->
+				${sample.html}
+			<!--</div>-->
+
+			<div class='screenshots'>
+				${screenshots}
+			</div>
+		</article>
+	`;
+});
+
+const viewer = templates.viewer
+	.replace( '__TESTS__', blocks.join( '\n' ) )
+	.replace( '__RAMJET__', ramjetDataUri );
+
+sander.writeFileSync( 'test/viewer.html', viewer );
+
+
+
+// run automated tests
+const nightmare = Nightmare({ show: true })
+	.viewport( 800, 400 );
 
 let currentTest;
 
@@ -15,7 +74,7 @@ const handlers = {
 	},
 
 	screenshot ({ name }) {
-		const dest = path.resolve( 'test/tests', currentTest, 'screenshots/actual', name + '.png' );
+		const dest = path.resolve( 'test/screenshots', currentTest, 'actual', name + '.png' );
 		nightmare.screenshot( dest );
 	}
 };
@@ -51,24 +110,29 @@ nightmare.on( 'page', ( type, message, data ) => {
 });
 
 function runNextTest () {
-	const test = tests.shift();
+	const sample = samples.shift();
 
-	if ( !test ) {
+	if ( !sample ) {
 		nightmare.end( function () {
 			console.log( 'all done!' );
 		});
 		return;
 	}
 
-	currentTest = test;
-	const dir = path.resolve( 'test/tests', test );
+	currentTest = sample.title;
 
-	sander.rimrafSync( dir, 'screenshots/actual' );
-	sander.mkdirSync( dir, 'screenshots/actual' );
-	sander.mkdirSync( dir, 'screenshots/diff' );
+	sander.rimrafSync( 'test/screenshots', currentTest, 'actual' );
+	sander.mkdirSync( 'test/screenshots', currentTest, 'actual' );
+	sander.mkdirSync( 'test/screenshots', currentTest, 'diff' );
+
+	const html = templates.standalone
+		.replace( '__TEST__', sample.html )
+		.replace( '__RAMJET__', ramjetDataUri );
+
+	const url = `data:text/html,${encodeURIComponent(html)}`;
 
 	nightmare
-		.goto( 'file://' + path.resolve( 'test/tests', test, 'index.html' ) )
+		.goto( url )
 		.evaluate( () => {
 			setTimeout( test );
 		})
