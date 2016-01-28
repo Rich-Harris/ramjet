@@ -4,7 +4,7 @@ import { svg, svgns } from './svg';
 export function cloneNode ( node, depth, overrideClone ) {
 	const clone = overrideClone ? overrideClone(node, depth) : node.cloneNode();
 
-  if (typeof clone === "undefined"){
+	if ( typeof clone === 'undefined' ) {
 		return;
 	}
 
@@ -56,14 +56,12 @@ export function wrapNode ( node, destinationIsFixed, overrideClone, appendToBody
 
 		svg.appendChild( clone );
 	} else {
-
-    if ( destinationIsFixed ){
+		if ( destinationIsFixed ) {
 			// position relative to the viewport
 			clone.style.position = 'fixed';
 			clone.style.top = ( top - parseInt( style.marginTop, 10 )) + 'px';
 			clone.style.left = ( left - parseInt( style.marginLeft, 10 )) + 'px';
-		}
-		else {
+		} else {
 			const offsetParent = node.offsetParent;
 
 			if (offsetParent === null || offsetParent === document.body || appendToBody){ // parent is fixed, or I want to append the node to the body
@@ -123,10 +121,11 @@ export function showNode ( node ) {
 
 export function isNodeFixed ( node ) {
 	while (node !== null){
-		if (window.getComputedStyle(node).position === "fixed"){
+		if ( window.getComputedStyle( node ).position === 'fixed' ) {
 			return true;
 		}
 		node = (node.namespaceURI === svgns) ? node.parentNode : node.offsetParent;
 	}
+
 	return false;
 }

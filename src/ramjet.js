@@ -15,7 +15,7 @@ export default {
 			options.duration = 400;
 		}
 
-    const appendToBody = !!options.appendToBody;
+		const appendToBody = !!options.appendToBody;
 		const destinationIsFixed = isNodeFixed(toNode);
 		const from = wrapNode( fromNode, destinationIsFixed, options.overrideClone, appendToBody);
 		const to = wrapNode( toNode, destinationIsFixed, options.overrideClone, appendToBody );
