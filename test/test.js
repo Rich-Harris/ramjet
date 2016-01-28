@@ -1,7 +1,7 @@
 import * as sander from 'sander';
 import * as path from 'path';
-
 import Nightmare from 'nightmare';
+import compareScreenshots from './compareScreenshots.js';
 
 const tests = sander.readdirSync( 'test/tests' ).filter( dir => dir[0] !== '.' );
 
@@ -10,7 +10,9 @@ const nightmare = Nightmare({ show: true });
 let currentTest;
 
 const handlers = {
-	next: runNextTest,
+	next () {
+		compareScreenshots( currentTest ).then( runNextTest );
+	},
 
 	screenshot ({ name }) {
 		const dest = path.resolve( 'test/tests', currentTest, 'screenshots/actual', name + '.png' );
@@ -52,8 +54,9 @@ function runNextTest () {
 	const test = tests.shift();
 
 	if ( !test ) {
-		console.log( 'all done!' );
-		nightmare.end();
+		nightmare.end( function () {
+			console.log( 'all done!' );
+		});
 		return;
 	}
 
@@ -62,6 +65,7 @@ function runNextTest () {
 
 	sander.rimrafSync( dir, 'screenshots/actual' );
 	sander.mkdirSync( dir, 'screenshots/actual' );
+	sander.mkdirSync( dir, 'screenshots/diff' );
 
 	nightmare
 		.goto( 'file://' + path.resolve( 'test/tests', test, 'index.html' ) )

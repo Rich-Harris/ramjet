@@ -3,3 +3,5 @@ node_modules
 .gobble
 .gobble-build
 .tmp
+screenshots/actual
+screenshots/diff
