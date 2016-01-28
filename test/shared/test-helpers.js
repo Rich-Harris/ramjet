@@ -3,6 +3,7 @@
 	window.action = action;
 	window.next = next;
 	window.screenshot = screenshot;
+	window.wait = wait;
 
 	var uid = 1;
 
@@ -25,7 +26,11 @@
 	}
 
 	function screenshot ( name ) {
-		return action( 'screenshot', { name });
+		return wait().then( () => action( 'screenshot', { name }) );
+	}
+
+	function wait ( ms ) {
+		return new Promise( fulfil => setTimeout( fulfil, ms ) );
 	}
 
 	function wrap ( fulfil, reject, id ) {
