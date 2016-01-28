@@ -1,3 +1,4 @@
+/*global require, module, __dirname */
 var gobble = require( 'gobble' );
 var babel = require( 'rollup-plugin-babel' );
 
@@ -42,6 +43,8 @@ var demo = gobble([
 
 	gobble( 'demo/files' )
 ]);
+
+var built;
 
 if ( gobble.env() === 'production' ) {
 	built = gobble([

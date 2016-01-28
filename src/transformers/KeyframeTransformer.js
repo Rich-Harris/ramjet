@@ -1,62 +1,44 @@
-import getTransform from '../utils/getTransform';
-import getBorderRadius from '../utils/getBorderRadius';
+import getOpacityInterpolator from '../interpolators/opacity';
+import getRgbaInterpolator from '../interpolators/rgba';
+import getBorderRadiusInterpolator from '../interpolators/borderRadius';
+import getTransformInterpolator from '../interpolators/transform';
 import { linear } from '../easing';
 import {
-	TRANSFORM,
-	KEYFRAMES,
-	ANIMATION_DIRECTION,
-	ANIMATION_DURATION,
-	ANIMATION_ITERATION_COUNT,
-	ANIMATION_NAME,
-	ANIMATION_TIMING_FUNCTION,
-	ANIMATION_END
+	TRANSFORM_CSS,
+	KEYFRAMES
 } from '../utils/detect';
+
+function generateId () {
+	return 'ramjet' + ~~( Math.random() * 1000000 );
+}
 
 export default class KeyframeTransformer {
 	constructor ( from, to, options ) {
 		const { fromKeyframes, toKeyframes } = getKeyframes( from, to, options );
 
-		const fromId = '_' + ~~( Math.random() * 1000000 );
-		const toId = '_' + ~~( Math.random() * 1000000 );
+		const fromId = generateId();
+		const toId = generateId();
 
-		const css = `${KEYFRAMES} ${fromId} { ${fromKeyframes} } ${KEYFRAMES} ${toId} { ${toKeyframes} }`;
+		const css = `
+			${KEYFRAMES} ${fromId}      { ${fromKeyframes} }
+			${KEYFRAMES} ${toId}        { ${toKeyframes} }`;
 		const dispose = addCss( css );
 
-		from.clone.style[ ANIMATION_DIRECTION ] = 'alternate';
-		from.clone.style[ ANIMATION_DURATION ] = `${options.duration/1000}s`;
-		from.clone.style[ ANIMATION_ITERATION_COUNT ] = 1;
-		from.clone.style[ ANIMATION_NAME ] = fromId;
-		from.clone.style[ ANIMATION_TIMING_FUNCTION ] = 'linear';
+		let animating = 2;
 
-		to.clone.style[ ANIMATION_DIRECTION ] = 'alternate';
-		to.clone.style[ ANIMATION_DURATION ] = `${options.duration/1000}s`;
-		to.clone.style[ ANIMATION_ITERATION_COUNT ] = 1;
-		to.clone.style[ ANIMATION_NAME ] = toId;
-		to.clone.style[ ANIMATION_TIMING_FUNCTION ] = 'linear';
-
-		let fromDone;
-		let toDone;
+		from.animateWithKeyframes( fromId, options.duration, done );
+		to.animateWithKeyframes( toId, options.duration, done );
 
 		function done () {
-			if ( fromDone && toDone ) {
-				from.clone.parentNode.removeChild( from.clone );
-				to.clone.parentNode.removeChild( to.clone );
+			if ( !--animating ) {
+				from.detach();
+				to.detach();
 
 				if ( options.done ) options.done();
 
 				dispose();
 			}
 		}
-
-		from.clone.addEventListener( ANIMATION_END, () => {
-			fromDone = true;
-			done();
-		});
-
-		to.clone.addEventListener( ANIMATION_END, () => {
-			toDone = true;
-			done();
-		});
 	}
 }
 
@@ -82,70 +64,53 @@ function addCss ( css ) {
 }
 
 function getKeyframes ( from, to, options ) {
-	var dx = to.cx - from.cx;
-	var dy = to.cy - from.cy;
+	const easing = options.easing || linear;
 
-	var dsxf = ( to.width / from.width ) - 1;
-	var dsyf = ( to.height / from.height ) - 1;
+	const opacityAt = getOpacityInterpolator( from.opacity, to.opacity );
+	const backgroundColorAt = getRgbaInterpolator( from.rgba, to.rgba );
+	const borderRadiusAt = getBorderRadiusInterpolator( from, to );
+	const transformFromAt = getTransformInterpolator( from, to );
+	const transformToAt = getTransformInterpolator( to, from );
 
-	var dsxt = ( from.width / to.width ) - 1;
-	var dsyt = ( from.height / to.height ) - 1;
+	const numFrames = options.duration / 16;
 
-	var easing = options.easing || linear;
-	var easingScale = options.easingScale || easing;
+	let fromKeyframes = '';
+	let toKeyframes = '';
 
+	function addKeyframes ( pc, t ) {
+		const opacity = opacityAt( t );
+		const backgroundColor = backgroundColorAt ? backgroundColorAt( t ) : null;
+		const borderRadius = borderRadiusAt( t ); // TODO this needs to be optional, to avoid repaints
+		const transformFrom = transformFromAt( t );
+		const transformTo = transformToAt( 1 - t );
 
-	var numFrames = options.duration / 50; // one keyframe per 50ms is probably enough... this may prove not to be the case though
+		fromKeyframes += '\n' +
+			`${pc}% {` +
+				`opacity: ${opacity.from};` +
+				`${TRANSFORM_CSS}: ${transformFrom};` +
+				( backgroundColor ? `background-color: ${backgroundColor.from};` : '' ) +
+				`border-radius: ${borderRadius.from};` +
+			`}`;
 
-	var fromKeyframes = [];
-	var toKeyframes = [];
-	var i;
-
-	function addKeyframes ( pc, t, t_scale ) {
-		const cx = from.cx + ( dx * t );
-		const cy = from.cy + ( dy * t );
-
-		const fromBorderRadius = getBorderRadius( from.borderRadius, to.borderRadius, dsxf, dsyf, t );
-		const toBorderRadius = getBorderRadius( to.borderRadius, from.borderRadius, dsxt, dsyt, 1 - t );
-
-		const fromTransform = getTransform( false, cx, cy, dx, dy, dsxf, dsyf, t, t_scale ) + ' ' + from.transform;
-		const toTransform = getTransform( false, cx, cy, -dx, -dy, dsxt, dsyt, 1 - t, 1 - t_scale ) + ' ' + to.transform;
-
-		fromKeyframes.push( `
-			${pc}% {
-				opacity: ${1-t};
-				border-top-left-radius: ${fromBorderRadius[0]};
-				border-top-right-radius: ${fromBorderRadius[1]};
-				border-bottom-right-radius: ${fromBorderRadius[2]};
-				border-bottom-left-radius: ${fromBorderRadius[3]};
-				${TRANSFORM}: ${fromTransform};
-			}`
-		);
-
-		toKeyframes.push( `
-			${pc}% {
-				opacity: ${t};
-				border-top-left-radius: ${toBorderRadius[0]};
-				border-top-right-radius: ${toBorderRadius[1]};
-				border-bottom-right-radius: ${toBorderRadius[2]};
-				border-bottom-left-radius: ${toBorderRadius[3]};
-				${TRANSFORM}: ${toTransform};
-			}`
-		);
+		toKeyframes += '\n' +
+			`${pc}% {` +
+				`opacity: ${opacity.to};` +
+				`${TRANSFORM_CSS}: ${transformTo};` +
+				( backgroundColor ? `background-color: ${backgroundColor.to};` : '' ) +
+				`border-radius: ${borderRadius.to};` +
+			`}`;
 	}
+
+	let i;
 
 	for ( i = 0; i < numFrames; i += 1 ) {
 		const pc = 100 * ( i / numFrames );
 		const t = easing( i / numFrames );
-		const t_scale = easingScale( i / numFrames );
 
-		addKeyframes( pc, t, t_scale );
+		addKeyframes( pc, t );
 	}
 
-	addKeyframes( 100, 1, 1);
-
-	fromKeyframes = fromKeyframes.join( '\n' );
-	toKeyframes = toKeyframes.join( '\n' );
+	addKeyframes( 100, 1 );
 
 	return { fromKeyframes, toKeyframes };
 }

@@ -1,9 +1,12 @@
-import { wrapNode, showNode, hideNode, isNodeFixed } from './utils/node';
+import { showNode, hideNode } from './utils/node';
+import wrapNode from './wrappers/wrapNode';
 import TimerTransformer from './transformers/TimerTransformer';
 import KeyframeTransformer from './transformers/KeyframeTransformer';
 import { linear, easeIn, easeOut, easeInOut } from './easing';
 import { keyframesSupported } from './utils/detect';
-import { appendedSvg, appendSvg } from './utils/svg';
+
+// TEMP
+import * as matrix from './utils/matrix';
 
 export default {
 	transform ( fromNode, toNode, options = {} ) {
@@ -15,16 +18,20 @@ export default {
 			options.duration = 400;
 		}
 
-		const appendToBody = !!options.appendToBody;
-		const destinationIsFixed = isNodeFixed(toNode);
-		const from = wrapNode( fromNode, destinationIsFixed, options.overrideClone, appendToBody);
-		const to = wrapNode( toNode, destinationIsFixed, options.overrideClone, appendToBody );
+		const from = wrapNode( fromNode, options );
+		const to = wrapNode( toNode, options );
 
-		if ( from.isSvg || to.isSvg && !appendedSvg ) {
-			appendSvg();
-		}
+		from.setOpacity( 1 );
+		to.setOpacity( 0 );
 
-		if ( !keyframesSupported || options.useTimer || from.isSvg || to.isSvg ) {
+		from.insert();
+		to.insert();
+
+		// This will fail if `from` is inside a different (higher)
+		// stacking context than `to`. Not much we can do ¯\_(ツ)_/¯
+		to.setZIndex( Math.max( to.getZIndex(), from.getZIndex() + 1 ) );
+
+		if ( !keyframesSupported || options.useTimer ) {
 			return new TimerTransformer( from, to, options );
 		} else {
 			return new KeyframeTransformer( from, to, options );
@@ -40,5 +47,8 @@ export default {
 	},
 
 	// expose some basic easing functions
-	linear, easeIn, easeOut, easeInOut
+	linear, easeIn, easeOut, easeInOut,
+
+	// TEMP
+	matrix
 };
