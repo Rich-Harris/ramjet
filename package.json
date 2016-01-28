@@ -16,7 +16,8 @@
     "start": "gobble",
     "build": "gobble build -f dist",
     "prepublish": "npm run build",
-    "test": "babel-node test/test.js"
+    "test": "babel-node test/test.js",
+    "pretest": "npm run build"
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",
