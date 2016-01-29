@@ -1,0 +1,55 @@
+<style>
+	article {
+		margin: 0;
+	}
+
+	.incident {
+		position: absolute;
+		z-index: 2;
+		display: inline-block;
+		width: 200px;
+		height: 200px;
+	}
+
+	.record-inner {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+
+	.max {
+		width: 100%;
+		height: 100%;
+	}
+
+	.details-container {
+		position: absolute;
+		left: 200px;
+		z-index: 999;
+	}
+
+	.details-container-inner {
+		background-color: #fb0;
+		width: 200px;
+		height: 200px;
+		font-size: 24px;
+		font-weight: 900;
+		color: white;
+		padding: 50px;
+		box-sizing: border-box;
+	}
+</style>
+
+<div style='position: relative; height: 200px;'>
+	<article class="incident">
+		<div data-a class="record-inner">
+			<div class="max" style="background:#d00"></div>
+		</div>
+	</article>
+
+	<article class="details-container">
+		<div data-b class="details-container-inner">
+			this text should fade out
+		</div>
+	</article>
+</div>
