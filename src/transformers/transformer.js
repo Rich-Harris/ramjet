@@ -11,7 +11,7 @@ import {
 } from '../utils/detect';
 import rAF from '../utils/rAF';
 
-export default function timer ( from, to, options ) {
+export default function transformer ( from, to, options ) {
 	const duration = options.duration || 400;
 	const easing = options.easing || linear;
 
@@ -51,6 +51,8 @@ export default function timer ( from, to, options ) {
 
 	const transformer = {
 		teardown () {
+			if ( torndown ) return transformer;
+
 			running = false;
 			torndown = true;
 
@@ -190,6 +192,7 @@ function addCss ( css ) {
 }
 
 function getKeyframes ( from, to, easing, remaining, duration ) {
+	// TODO we already have these interpolators...
 	const opacityAt = getOpacityInterpolator( from.opacity, to.opacity );
 	const backgroundColorAt = getRgbaInterpolator( from.rgba, to.rgba );
 	const borderRadiusAt = getBorderRadiusInterpolator( from, to );
