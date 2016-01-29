@@ -1,3 +1,5 @@
+import interpolateArray from './array.js';
+
 // Border radius is given as a string in the following form
 //
 //     tl.x tr.x br.x bl.x / tl.y tr.y br.y bl.y
@@ -52,19 +54,5 @@ export default function getBorderRadiusInterpolator ( a, b ) {
 		borderRadius.to = `${x.join('px ')}px / ${y.join('px ')}px`;
 
 		return borderRadius;
-	};
-}
-
-function interpolateArray ( a, b ) {
-	const len = a.length;
-	let array = new Array( len );
-
-	return function ( t ) {
-		let i = len;
-		while ( i-- ) {
-			array[i] = a[i] + t * ( b[i] - a[i] );
-		}
-
-		return array;
 	};
 }
