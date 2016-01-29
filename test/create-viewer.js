@@ -1,4 +1,5 @@
-import { writeFileSync } from 'fs';
+import { resolve } from 'path';
+import { writeFileSync, mkdirSync } from 'fs';
 import samples from './utils/samples.js';
 import * as templates from './utils/templates.js';
 
@@ -8,18 +9,18 @@ const blocks = samples.map( sample => {
 		<div class='screenshot-column'>
 			<h2>${type}</h2>
 
-			<img src='screenshots/${sample.title}/${type}/000.png'>
-			<img src='screenshots/${sample.title}/${type}/020.png'>
-			<img src='screenshots/${sample.title}/${type}/040.png'>
-			<img src='screenshots/${sample.title}/${type}/060.png'>
-			<img src='screenshots/${sample.title}/${type}/080.png'>
-			<img src='screenshots/${sample.title}/${type}/100.png'>
+			${
+				[ '000', '020', '040', '060', '080', '100' ].map( pos => {
+					const src = `../screenshots/${sample.title}/${type}/${pos}.png`;
+					return `<a href='${src}'><img src='${src}'></a>`;
+				}).join( '\n' )
+			}
 		</div>
 	` ).join( '\n' );
 
 	return `
 		<article>
-			<h1>${sample.title}</h1>
+			<h1><a href='${sample.title}.html'>${sample.title}</a></h1>
 
 			<div class='controls'>
 				<button class='go'>go</button>
@@ -41,6 +42,12 @@ const blocks = samples.map( sample => {
 	`;
 });
 
-const viewer = templates.viewer.replace( '__TESTS__', blocks.join( '\n' ) );
+blocks.forEach( ( block, i ) => {
+	const { title } = samples[i];
+	const html = templates.viewer.replace( '__TESTS__', block );
 
-writeFileSync( 'test/viewer.html', viewer );
+	writeFileSync( resolve( 'test/viewer', `${title}.html` ), html );
+});
+
+const viewer = templates.viewer.replace( '__TESTS__', blocks.join( '\n' ) );
+writeFileSync( 'test/viewer/index.html', viewer );
