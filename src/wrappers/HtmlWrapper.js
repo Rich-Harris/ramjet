@@ -10,7 +10,6 @@ import {
 	ANIMATION_ITERATION_COUNT,
 	ANIMATION_NAME,
 	ANIMATION_TIMING_FUNCTION,
-	ANIMATION_END,
 	TRANSFORM,
 	TRANSFORM_ORIGIN
 } from '../utils/detect';
@@ -55,6 +54,7 @@ export default class HtmlWrapper {
 
 		// we need to get the 'naked' boundingClientRect, i.e.
 		// without any transforms
+		// TODO what if the node is the root <svg> node?
 		const parentCTM = node.namespaceURI === 'svg' ? node.parentNode.getScreenCTM() : getCumulativeTransformMatrix( node.parentNode );
 		this.invertedParentCTM = invert( parentCTM );
 		this.transform = getTransformMatrix( node ) || IDENTITY;
@@ -143,7 +143,7 @@ export default class HtmlWrapper {
 		this._clone.style.zIndex = index;
 	}
 
-	animateWithKeyframes ( id, duration, callback ) {
+	animateWithKeyframes ( id, duration ) {
 		this._clone.style[ ANIMATION_DIRECTION ] = 'alternate';
 		this._clone.style[ ANIMATION_DURATION ] = `${duration/1000}s`;
 		this._clone.style[ ANIMATION_ITERATION_COUNT ] = 1;
