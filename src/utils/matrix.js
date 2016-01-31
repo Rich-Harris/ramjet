@@ -57,8 +57,7 @@ export function getCumulativeTransformMatrix ( node ) {
 	let matrix = [ 1, 0, 0, 1, 0, 0 ];
 
 	while ( node instanceof Element ) {
-		const isSvg = node.namespaceURI === svgns && node.tagName !== 'svg';
-		const parentMatrix = isSvg ? getSvgTransformMatrix( node ) : getTransformMatrix( node );
+		const parentMatrix = getTransformMatrix( node );
 
 		if ( parentMatrix ) {
 			matrix = multiply( parentMatrix, matrix );
@@ -95,11 +94,4 @@ export function getTransformMatrix ( node ) {
 	// TODO if is SVG, multiply by CTM, to account for viewBox
 
 	return matrix;
-}
-
-export function getSvgTransformMatrix ( node ) {
-	// const { a, b, c, d, e, f } = node.getCTM();
-	// return [ a, b, c, d, e, f ];
-
-	const transform = node.getAttribute( 'transform' );
 }
