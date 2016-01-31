@@ -23,7 +23,7 @@ export default function transformer ( from, to, options ) {
 	const interpolators = {
 		opacity: getOpacityInterpolator( from.opacity, to.opacity, order ),
 		backgroundColor: options.interpolateBackgroundColor ? getRgbaInterpolator( from.rgba, to.rgba, order ) : null,
-		borderRadius: getBorderRadiusInterpolator( from, to ),
+		borderRadius: options.interpolateBorderRadius ? getBorderRadiusInterpolator( from, to ) : null,
 		transformFrom: getTransformInterpolator( from, to ),
 		transformTo: getTransformInterpolator( to, from )
 	};
@@ -80,6 +80,12 @@ export default function transformer ( from, to, options ) {
 			from.setOpacity( opacity.from );
 			to.setOpacity( opacity.to );
 
+			// transform
+			const transformFrom = interpolators.transformFrom( t );
+			const transformTo = interpolators.transformTo( 1 - t );
+			from.setTransform( transformFrom );
+			to.setTransform( transformTo );
+
 			// background color
 			if ( interpolators.backgroundColor ) {
 				const backgroundColor = interpolators.backgroundColor( t );
@@ -88,15 +94,11 @@ export default function transformer ( from, to, options ) {
 			}
 
 			// border radius
-			const borderRadius = interpolators.borderRadius( t );
-			from.setBorderRadius( borderRadius.from );
-			to.setBorderRadius( borderRadius.to );
-
-			// transform
-			const transformFrom = interpolators.transformFrom( t );
-			const transformTo = interpolators.transformTo( 1 - t );
-			from.setTransform( transformFrom );
-			to.setTransform( transformTo );
+			if ( interpolators.borderRadius ) {
+				const borderRadius = interpolators.borderRadius( t );
+				from.setBorderRadius( borderRadius.from );
+				to.setBorderRadius( borderRadius.to );
+			}
 
 			return transformer;
 		},
@@ -205,7 +207,7 @@ function getKeyframes ( from, to, interpolators, easing, remaining, duration ) {
 	function addKeyframes ( pc, t ) {
 		const opacity = interpolators.opacity( t );
 		const backgroundColor = interpolators.backgroundColor ? interpolators.backgroundColor( t ) : null;
-		const borderRadius = interpolators.borderRadius( t ); // TODO this needs to be optional, to avoid repaints
+		const borderRadius = interpolators.borderRadius ? interpolators.borderRadius( t ) : null;
 		const transformFrom = interpolators.transformFrom( t );
 		const transformTo = interpolators.transformTo( 1 - t );
 
@@ -214,7 +216,7 @@ function getKeyframes ( from, to, interpolators, easing, remaining, duration ) {
 				`opacity: ${opacity.from};` +
 				`${TRANSFORM_CSS}: ${transformFrom};` +
 				( backgroundColor ? `background-color: ${backgroundColor.from};` : '' ) +
-				`border-radius: ${borderRadius.from};` +
+				( borderRadius ? `border-radius: ${borderRadius.from};` : '' ) +
 			`}`;
 
 		toKeyframes += '\n' +
@@ -222,7 +224,7 @@ function getKeyframes ( from, to, interpolators, easing, remaining, duration ) {
 				`opacity: ${opacity.to};` +
 				`${TRANSFORM_CSS}: ${transformTo};` +
 				( backgroundColor ? `background-color: ${backgroundColor.to};` : '' ) +
-				`border-radius: ${borderRadius.to};` +
+				( borderRadius ? `border-radius: ${borderRadius.to};` : '' ) +
 			`}`;
 	}
 
