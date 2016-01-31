@@ -19,10 +19,10 @@ export function invert ( [ a, b, c, d, e, f ] ) {
 	const determinant = ( a * d ) - ( c * b );
 
 	return [
-		 d / determinant,
-		-b / determinant,
-		-c / determinant,
-		 a / determinant,
+		d /  determinant,
+		b / -determinant,
+		c / -determinant,
+		a /  determinant,
 		( ( c * f ) - ( e * d ) ) / determinant,
 		( ( e * b ) - ( a * f ) ) / determinant
 	];
