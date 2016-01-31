@@ -28,6 +28,42 @@ export function invert ( [ a, b, c, d, e, f ] ) {
 	];
 }
 
+function pythag ( a, b ) {
+	return Math.sqrt( a * a + b * b );
+}
+
+export function decompose ( [ a, b, c, d, e, f ] ) {
+	// If determinant equals zero (e.g. x scale or y scale equals zero),
+	// the matrix cannot be decomposed
+	if ( ( ( a * d ) - ( b * c ) ) === 0 ) return null;
+
+	// See https://github.com/Rich-Harris/Neo/blob/master/Neo.js for
+	// an explanation of the following
+	const scaleX = pythag( a, b );
+	a /= scaleX;
+	b /= scaleX;
+
+	let scaledShear = a * c + b * d;
+	const desheared = [ a * -scaledShear + c, b * -scaledShear + d ];
+
+	const scaleY = pythag( desheared[0], desheared[1] );
+
+	const skewX = scaledShear / scaleY;
+
+	const rotate = b > 0 ?
+		Math.acos( a ) :
+		( ( 2 * Math.PI ) - Math.acos( a ) );
+
+	return {
+		rotate,
+		scaleX,
+		scaleY,
+		skewX,
+		translateX: e,
+		translateY: f
+	};
+}
+
 export function parseMatrixTransformString ( transform ) {
 	if ( transform.slice( 0, 7 ) !== 'matrix(' ) {
 		throw new Error( 'Could not parse transform string (' + transform + ')' );
