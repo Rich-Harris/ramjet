@@ -1,13 +1,13 @@
 import getOpacityInterpolator from './opacity';
 
-export default function getRgbaInterpolator ( a, b ) {
+export default function getRgbaInterpolator ( a, b, order ) {
 	if ( a.alpha === 1 && b.alpha === 1 ) {
 		// no need to animate anything
 		return null;
 	}
 
 	let rgba = {};
-	let opacityAt = getOpacityInterpolator( a.alpha, b.alpha );
+	let opacityAt = getOpacityInterpolator( a.alpha, b.alpha, order );
 
 	return function interpolator ( t ) {
 		const opacity = opacityAt( t );

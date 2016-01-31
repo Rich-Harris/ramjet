@@ -1,3 +1,4 @@
+import { compare } from 'stacking-order';
 import { showNode, hideNode } from './utils/node';
 import wrapNode from './wrappers/wrapNode';
 import transformer from './transformers/transformer.js';
@@ -20,15 +21,21 @@ export default {
 		const from = wrapNode( fromNode, options );
 		const to = wrapNode( toNode, options );
 
+		const order = compare( from._node, to._node );
+
 		from.setOpacity( 1 );
 		to.setOpacity( 0 );
 
-		from.insert();
-		to.insert();
-
-		// This will fail if `from` is inside a different (higher)
-		// stacking context than `to`. Not much we can do ¯\_(ツ)_/¯
-		to.setZIndex( Math.max( to.getZIndex(), from.getZIndex() + 1 ) );
+		// in many cases, the stacking order of `from` and `to` is
+		// determined by their relative location in the document –
+		// so we need to preserve it
+		if ( order === 1 ) {
+			to.insert();
+			from.insert();
+		} else {
+			from.insert();
+			to.insert();
+		}
 
 		return transformer( from, to, options );
 	},

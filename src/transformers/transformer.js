@@ -1,3 +1,4 @@
+import { compare } from 'stacking-order';
 import getOpacityInterpolator from '../interpolators/opacity';
 import getRgbaInterpolator from '../interpolators/rgba';
 import getBorderRadiusInterpolator from '../interpolators/borderRadius';
@@ -17,9 +18,11 @@ export default function transformer ( from, to, options ) {
 
 	const useTimer = !keyframesSupported || !!options.useTimer;
 
+	const order = compare( from._node, to._node );
+
 	const interpolators = {
-		opacity: getOpacityInterpolator( from.opacity, to.opacity ),
-		backgroundColor: getRgbaInterpolator( from.rgba, to.rgba ),
+		opacity: getOpacityInterpolator( from.opacity, to.opacity, order ),
+		backgroundColor: options.interpolateBackgroundColor ? getRgbaInterpolator( from.rgba, to.rgba, order ) : null,
 		borderRadius: getBorderRadiusInterpolator( from, to ),
 		transformFrom: getTransformInterpolator( from, to ),
 		transformTo: getTransformInterpolator( to, from )

@@ -119,10 +119,6 @@ export default class HtmlWrapper {
 		this._clone.parentNode.removeChild( this._clone );
 	}
 
-	getZIndex () {
-		return parseFloat( this._clone.style.zIndex ) || 0;
-	}
-
 	setOpacity ( opacity ) {
 		this._clone.style.opacity = opacity;
 	}
@@ -137,10 +133,6 @@ export default class HtmlWrapper {
 
 	setBorderRadius ( borderRadius ) {
 		this._clone.style.borderRadius = borderRadius;
-	}
-
-	setZIndex ( index ) {
-		this._clone.style.zIndex = index;
 	}
 
 	animateWithKeyframes ( id, duration ) {
