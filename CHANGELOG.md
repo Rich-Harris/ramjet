@@ -1,5 +1,14 @@
 # changelog
 
+## 0.6.0
+
+* Use `cssText` instead of property enumeration when cloning computed styles, for better initial performance
+* Disable `background-color` and `border-radius` interpolation by default, for faster transitions. `interpolateBorderRadius` and `interpolateBackgroundColor` options enable these transformations
+* Total opacity is preserved ([#10](https://github.com/Rich-Harris/ramjet/issues/10))
+* Starting opacities are respected ([#11](https://github.com/Rich-Harris/ramjet/issues/11))
+* Handle pre-existing transforms
+* Decompose matrices for natural-looking transforms
+
 ## 0.5.0
 
 * Change `jsnext:main` build to point to Babelified bundle with ES6 export ([#45](https://github.com/Rich-Harris/ramjet/pull/45))
