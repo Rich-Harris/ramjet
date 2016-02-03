@@ -15,6 +15,7 @@
 		}
 
 		article {
+			position: relative;
 			display: block;
 			border-bottom: 1px solid #eee;
 			padding: 0 0 1em 0;
@@ -31,7 +32,12 @@
 			clear: both;
 		}
 
+		article h1 {
+			font-size: 1.2em;
+		}
+
 		.a, .b {
+			position: relative;
 		    width: 100px;
 		    height: 100px;
 		    line-height: 100px;
@@ -45,10 +51,39 @@
 		    background-color: #0074D9;
 		    float: left;
 		}
+		.a.transparent {
+			background-color: rgba(0, 116, 217, 0.3);
+		}
 
 		.b {
 		    background-color: #2ECC40;
+		    fill: #2ECC40;
 		    float: right;
+		}
+		.b.transparent {
+			background-color: rgba(46, 204, 64, 1)
+		}
+
+		text {
+			fill: white;
+		}
+
+		.transform-helper {
+			position: absolute;
+			left: 0;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			border: 2px solid red;
+			transition: all 0.6s ease-out;
+		}
+
+		.transform-helper-bg {
+			position: absolute;
+			width: 100px;
+			height: 100px;
+			border: 2px solid #999;
+			box-sizing: border-box;
 		}
 
 		button {
@@ -86,7 +121,7 @@
 
 	<main>
 		<article>
-			<p>Basic transformation</p>
+			<h1>Basic transformation</h1>
 
 			<button>go</button>
 
@@ -95,7 +130,7 @@
 		</article>
 
 		<article data-params='{duration:1000}'>
-			<p>duration = 1000ms</p>
+			<h1>duration = 1000ms</h1>
 
 			<button>go</button>
 
@@ -104,21 +139,127 @@
 		</article>
 
 		<article data-params='{duration:2000}'>
-			<p>border radius</p>
+			<h1>border radius</h1>
 
 			<button>go</button>
 
 			<div class='a' style='border-radius: 1em;'>a</div>
-			<div class='b' style='width: 300px; height: 100px; border: 2px solid red; border-top-left-radius: 1em;; border-bottom-right-radius: 1em;'>b</div>
+			<div class='b' style='width: 300px; height: 100px; border: 2px solid red; border-top-left-radius: 1em; border-bottom-right-radius: 1em;'>b</div>
 		</article>
 
 		<article data-params='{duration:2000,useTimer:true}'>
-			<p>border radius (useTimer: true)</p>
+			<h1>border radius (useTimer: true)</h1>
 
 			<button>go</button>
 
 			<div class='a' style='border-radius: 1em;'>a</div>
-			<div class='b' style='width: 300px; height: 100px; border: 2px solid red; border-top-left-radius: 1em;; border-bottom-right-radius: 1em;'>b</div>
+			<div class='b' style='width: 300px; height: 100px; border: 2px solid red; border-top-left-radius: 1em; border-bottom-right-radius: 1em;'>b</div>
+		</article>
+
+		<article data-params='{duration:1000}'>
+			<h1>Total opacity is preserved (text should not be visible beneath box)</h1>
+
+			<button>go</button>
+
+			<p style='position: absolute'>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+			<div style='position: relative;'>
+				<div class='a'>a</div>
+				<div class='b'>b</div>
+			</div>
+		</article>
+
+		<article data-params='{duration:1000, useTimer:true}'>
+			<h1>Total opacity is preserved (timer)</h1>
+
+			<button>go</button>
+
+			<p style='position: absolute'>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+			<div style='position: relative;'>
+				<div class='a'>a</div>
+				<div class='b'>b</div>
+			</div>
+		</article>
+
+		<article data-params='{duration:1000}'>
+			<h1>Starting opacities are respected (keyframes)</h1>
+
+			<button>go</button>
+
+			<p style='position: absolute'>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+			<div style='position: relative;'>
+				<div class='a' style='opacity: 0.8;'>a</div>
+				<div class='b' style='opacity: 0.4;'>b</div>
+			</div>
+		</article>
+
+		<article data-params='{duration:1000,useTimer:true}'>
+			<h1>Starting opacities are respected (timer)</h1>
+
+			<button>go</button>
+
+			<p style='position: absolute'>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+			<div style='position: relative;'>
+				<div class='a' style='opacity: 0.8;'>a</div>
+				<div class='b' style='opacity: 0.4;'>b</div>
+			</div>
+		</article>
+
+		<article data-params='{duration:600}'>
+			<h1>HTML to SVG</h1>
+
+			<button>go</button>
+
+			<div class='a'>a</div>
+			<svg style='float: right; width: 200px; height: 150px; overflow: visible' viewBox='0 0 250 175'> <!-- TODO  -->
+				<g class='b' transform='scale(1.5)'> <!-- TODO transform='rotate(30)' - is problematic -->
+					<rect width='200' height='100'></rect>
+					<text x='100' y='50'>b</text>
+				</g>
+			</svg>
+		</article>
+
+		<article data-params='{duration:1000, easing: ramjet.easeInOut}'>
+			<h1>Background rgba opacities are respected (keyframes)</h1>
+
+			<button>go</button>
+
+			<p style='position: absolute'>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+			<div style='position: relative;'>
+				<div class='a transparent'>a</div>
+				<div class='b transparent'>b</div>
+			</div>
+		</article>
+
+		<article data-params='{duration:1000,useTimer:true}'>
+			<h1>Background rgba opacities are respected (timer)</h1>
+
+			<button>go</button>
+
+			<p style='position: absolute'>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+			<div style='position: relative;'>
+				<div class='a transparent'>a</div>
+				<div class='b transparent'>b</div>
+			</div>
+		</article>
+
+		<article data-params='{duration:3000}'>
+			<h1>'to' element is given a higher z-index than 'from', when they are not siblings</h1>
+
+			<button>go</button>
+
+			<div class='container' style='position: relative;'>
+				<div class='a' style='display: block; float: none;'>a</div>
+			</div>
+
+			<div class='container' style='position: relative;'>
+				<div class='b' style='display: block; float: none;'>b</div>
+			</div>
 		</article>
 
 		<article data-params='{duration:2000}'>
@@ -155,6 +296,153 @@
 
 			<div class='a' style='border-radius: 1em;'>a</div>
 			<div class='b' style='width: 300px; height: 100px; border: 2px solid red; border-top-left-radius: 1em;; border-bottom-right-radius: 1em;'>b</div>
+		</article>
+
+		<article data-params='{}'>
+			<h1>weird as-yet-uncategorised bug</h1>
+
+			<button>go</button>
+
+			<div class='a'>a</div>
+			<div class='b' style='float: none; width: 80px; height: 80px; color: red'>b</div>
+		</article>
+
+		<article data-params='{}'>
+			<h1>Starting transform on target</h1>
+
+			<button>go</button>
+
+			<div class='transform-helper-bg'></div>
+			<div class='a' style='transform: translate(50px,50px) rotate(10deg) scale(2,1);'>
+				<div class='transform-helper'></div>
+				a
+			</div>
+			<div class='b' style='transform: scale(0.5,1);'>b</div>
+		</article>
+
+		<article data-params='{}'>
+			<h1>Starting transform on container</h1>
+
+			<button>go</button>
+
+			<div class='transform-helper-bg'></div>
+			<div class='container' style='-webkit-transform: scale(0.5);'>
+				<div class='a'>
+					<div id='helper' class='transform-helper'></div>
+					a
+				</div>
+			</div>
+			<div class='b'>b</div>
+		</article>
+
+		<article data-params='{}'>
+			<h1>Starting transform on container and target</h1>
+
+			<button>go</button>
+
+			<div class='transform-helper-bg'></div>
+			<div class='container' style='-webkit-transform: translate(50px,50px) rotate(10deg) scale(0.8,1);'>
+				<div class='a' style='-webkit-transform: translate(50px,50px) rotate(10deg) scale(2,1);'>
+					<div class='transform-helper'></div>
+					a
+				</div>
+			</div>
+			<div class='b'>b</div>
+		</article>
+
+		<!-- <article data-params='{}'>
+		<h1>Transform and absolute positioning</h1>
+
+			<button>go</button>
+
+			[data-container='2'] {
+				left: 33.333%;
+				top: 50%;
+				width: 66.666%;
+				height: 50%;
+			}
+
+			[data-stage='2'] {
+				background-color: #2ECC40;
+				color: white;
+				padding: 0.5em;
+			}
+
+			[data-container='3'] {
+				left: 33.333%;
+				top: 0;
+				width: 33.333%;
+				height: 100%;
+			}
+
+			[data-stage='3'] {
+				background-color: #85144b;
+				color: white;
+				padding: 0.5em;
+			}
+
+			<div class='container' style='position: absolute; left: 0; width: 300px; height: 200px;'>
+				<p class='a'>a</p>
+			</div>
+
+			<div class='container' style='position: absolute; left: 0; width: 100px; height: 50px;'>
+				<p class='b' style='transform: scale(0.5,1);'>b</p>
+			</div>
+		</article> -->
+
+		<article data-params='{}'>
+			<h1>Transform and absolute positioning</h1>
+
+			<button>go</button>
+
+			<style>
+				.intro {
+					position: relative;
+					width: 100%;
+					height: 20em;
+					margin: 0 0 1em 0;
+				}
+
+				.container {
+					position: absolute; /* TODO non-relative is fooked */
+				}
+
+				[data-container='2'] {
+					left: 33.333%;
+					top: 50%;
+					width: 66.666%;
+					height: 50%;
+				}
+
+				[data-stage='2'] {
+					background-color: #2ECC40;
+					color: white;
+					padding: 0.5em;
+				}
+
+				[data-container='3'] {
+					left: 33.333%;
+					top: 0;
+					width: 33.333%;
+					height: 100%;
+				}
+
+				[data-stage='3'] {
+					background-color: #85144b;
+					color: white;
+					padding: 0.5em;
+				}
+			</style>
+
+			<div class='intro'>
+				<div class='container' data-container='2'>
+					<p class='visible' data-a data-stage='2'>It doesn't care where they sit in the DOM tree, or what children they have...</p>
+				</div>
+
+				<div class='container' data-container='3'>
+					<p data-b data-stage='3' style='transform: scale(0.5,1);'>...or if they've got existing transforms!</p>
+				</div>
+			</div>
 		</article>
 	</main>
 
@@ -198,8 +486,8 @@
 				if ( !button ) return;
 
 				var article = findParent( button, 'ARTICLE' );
-				var a = article.querySelector( '.a' );
-				var b = article.querySelector( '.b' );
+				var a = article.querySelector( '[data-a]' ) || article.querySelector( '.a' );
+				var b = article.querySelector( '[data-b]' ) || article.querySelector( '.b' );
 
 				var reverse = !!article.reverse;
 				var from = reverse ? b : a;
@@ -211,7 +499,7 @@
 
 				ramjet.show( a, b );
 
-				ramjet.transform( from, to, extend( {}, defaults, params, {
+				const transformer = ramjet.transform( from, to, extend( {}, defaults, params, {
 					done: function () {
 						ramjet.show( to );
 						button.disabled = false;
@@ -219,8 +507,49 @@
 					}
 				}));
 
+				setTimeout( () => {
+					transformer.pause();
+
+					setTimeout( () => {
+						transformer.play();
+					}, 500 );
+				}, 200 );
+
 				ramjet.hide( a, b );
 			});
+
+			window.rects = [];
+
+			window.draw = function ( x, y, width, height ) {
+				var div = document.createElement( 'div' );
+
+				div.style.position = 'absolute';
+				div.style.border = '2px solid purple';
+				div.style.boxSizing = 'border-box';
+
+				div.style.left = x + 'px';
+				div.style.top = ( y + window.scrollY ) + 'px';
+				div.style.width = width + 'px';
+				div.style.height = height + 'px';
+
+				document.body.appendChild( div );
+
+				rects.push( div );
+
+				return function () {
+					if ( ~rects.indexOf( div ) ) {
+						rects.splice( rects.indexOf( div ), 1 );
+					}
+					div.parentNode.removeChild( div );
+				};
+			};
+
+			window.clear = function () {
+				var i = rects.length;
+				while ( i-- ) {
+					rects[i].parentNode.removeChild( rects[i] );
+				}
+			}
 		}());
 	</script>
 </body>

@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+	<head>
+		<title>ramjet tests</title>
+
+		<style>
+			body {
+				font-family: 'arial';
+				max-width: 800px;
+				padding: 0 2em;
+				margin: 0 auto;
+				overflow-x: visible;
+			}
+
+			article {
+				position: relative;
+				width: 100%;
+				border-bottom: 1px solid #eee;
+			}
+
+			article::before, article::after {
+				content: ' ';
+				display: table;
+			}
+
+			article::after {
+				clear: both;
+			}
+
+			.controls {
+				display: block;
+			}
+
+			button {
+				padding: 1em 2em;
+				background-color: #eee;
+				border: none;
+				font-family: inherit;
+				font-size: inherit;
+				margin: 0 0 1em 0;
+				cursor: pointer;
+				color: #666;
+				outline: none;
+			}
+
+			button:hover {
+				background-color: #ddd;
+				color: #333;
+			}
+
+			button:disabled {
+				background-color: #eee;
+				color: #666;
+				opacity: 0.2;
+				cursor: default;
+			}
+
+			.test-area {
+				position: relative;
+			}
+
+			__STYLES__ {}
+		</style>
+
+		<script src='__RAMJET__'></script>
+	</head>
+
+	<body>
+		__TESTS__
+
+		<script>
+			[].forEach.call( document.querySelectorAll( 'article' ), function ( article ) {
+				var go = article.querySelector( '.go' );
+				var showAll = article.querySelector( '.show-all' );
+				var range = article.querySelector( 'input' );
+				var rangeValue = article.querySelector( '.range-value' );
+
+				var a = article.querySelector( '.a' ) || article.querySelector( '[data-a]' );
+				var b = article.querySelector( '.b' ) || article.querySelector( '[data-b]' );
+
+				var reversed;
+				var animatedTransformer;
+				var staticTransformer;
+
+				ramjet.hide( b );
+
+				go.addEventListener( 'click', function ( event ) {
+					var from = reversed ? b : a;
+					var to = reversed ? a : b;
+
+					go.disabled = true;
+
+					ramjet.show( a, b );
+
+					if ( staticTransformer ) staticTransformer.teardown();
+
+					animatedTransformer = ramjet.transform( from, to, {
+						duration: 1000,
+						done: function () {
+							go.disabled = false;
+							reversed = !reversed;
+							ramjet.show( to );
+						}
+					});
+
+					ramjet.hide( a, b );
+				});
+
+				showAll.addEventListener( 'click', function ( event ) {
+					ramjet.show( a, b );
+				});
+
+				range.addEventListener( 'input', function ( event ) {
+					if ( animatedTransformer ) animatedTransformer.teardown();
+
+					if ( !staticTransformer ) {
+						ramjet.show( a, b );
+						staticTransformer = ramjet.transform( a, b ).pause();
+						ramjet.hide( a, b );
+					}
+
+					staticTransformer.goto( +range.value / 100 );
+					rangeValue.textContent = range.value;
+				});
+			});
+		</script>
+	</body>
+</html>

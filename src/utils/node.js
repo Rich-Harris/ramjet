@@ -1,132 +1,50 @@
-import styleKeys from './styleKeys';
-import { svg, svgns } from './svg';
-
-export function cloneNode ( node, depth, overrideClone ) {
-	const clone = overrideClone ? overrideClone(node, depth) : node.cloneNode();
-
-  if (typeof clone === "undefined"){
-		return;
-	}
-
-	let style;
-	let len;
-	let i;
-	let clonedNode;
-
-	if ( node.nodeType === 1 ) {
-		style = window.getComputedStyle( node );
-
-		styleKeys.forEach( function ( prop ) {
-			clone.style[ prop ] = style[ prop ];
-		});
-
-		len = node.childNodes.length;
-		for ( i = 0; i < len; i += 1 ) {
-			clonedNode = cloneNode( node.childNodes[i], depth + 1, overrideClone );
-			if (clonedNode) {
-				clone.appendChild( clonedNode );
-			}
-		}
-	}
-
-	return clone;
-}
-
-export function wrapNode ( node, destinationIsFixed, overrideClone, appendToBody ) {
-	const isSvg = node.namespaceURI === svgns;
-
-	const { left, right, top, bottom } = node.getBoundingClientRect();
-	const style = window.getComputedStyle( node );
-	const clone = cloneNode( node, 0, overrideClone);
-
-	const wrapper = {
-		node, clone, isSvg,
-		cx: ( left + right ) / 2,
-		cy: ( top + bottom ) / 2,
-		width: right - left,
-		height: bottom - top,
-		transform: null,
-		borderRadius: null
-	};
-
-	if ( isSvg ) {
-		const ctm = node.getScreenCTM();
-		wrapper.transform = 'matrix(' + [ ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f ].join( ',' ) + ')';
-		wrapper.borderRadius = [ 0, 0, 0, 0 ];
-
-		svg.appendChild( clone );
-	} else {
-
-    if ( destinationIsFixed ){
-			// position relative to the viewport
-			clone.style.position = 'fixed';
-			clone.style.top = ( top - parseInt( style.marginTop, 10 )) + 'px';
-			clone.style.left = ( left - parseInt( style.marginLeft, 10 )) + 'px';
-		}
-		else {
-			const offsetParent = node.offsetParent;
-
-			if (offsetParent === null || offsetParent === document.body || appendToBody){ // parent is fixed, or I want to append the node to the body
-				// position relative to the document
-				const docElem = document.documentElement;
-				clone.style.position = 'absolute';
-				clone.style.top = (top + window.pageYOffset - docElem.clientTop - parseInt( style.marginTop, 10 )) + 'px';
-				clone.style.left = (left + window.pageXOffset - docElem.clientLeft - parseInt( style.marginLeft, 10 )) + 'px';
-			}
-			else {
-				//position relative to the parent
-				const offsetParentStyle = window.getComputedStyle( offsetParent );
-				const offsetParentBcr = offsetParent.getBoundingClientRect();
-
-				clone.style.position = 'absolute';
-				clone.style.top = ( top - parseInt( style.marginTop, 10 ) - ( offsetParentBcr.top - parseInt( offsetParentStyle.marginTop, 10 ) ) ) + 'px';
-				clone.style.left = ( left - parseInt( style.marginLeft, 10 ) - ( offsetParentBcr.left - parseInt( offsetParentStyle.marginLeft, 10 ) ) ) + 'px';
-			}
-		}
-
-		wrapper.transform = ''; // TODO...?
-		wrapper.borderRadius = [
-			parseFloat( style.borderTopLeftRadius ),
-			parseFloat( style.borderTopRightRadius ),
-			parseFloat( style.borderBottomRightRadius ),
-			parseFloat( style.borderBottomLeftRadius )
-		];
-
-		if(appendToBody){
-			document.body.appendChild( clone );
-		}
-		else {
-			node.parentNode.appendChild( clone );
-		}
-	}
-
-	return wrapper;
-}
+import { svgns } from './svg.js';
 
 export function hideNode ( node ) {
-	node.__ramjetOriginalTransition__ = node.style.transition;
-	node.style.transition = '';
+	node.__ramjetOriginalTransition__ = node.style.webkitTransition || node.style.transition;
+	node.__ramjetOriginalOpacity__ = node.style.opacity;
+
+	node.style.webkitTransition = node.style.transition = '';
 
 	node.style.opacity = 0;
 }
 
 export function showNode ( node ) {
-	node.style.transition = '';
-	node.style.opacity = 1;
+	if ( '__ramjetOriginalOpacity__' in node ) {
+		node.style.transition = '';
+		node.style.opacity = node.__ramjetOriginalOpacity__;
 
-	if ( node.__ramjetOriginalTransition__ ) {
-		setTimeout( () => {
-			node.style.transition = node.__ramjetOriginalTransition__;
-		});
+		if ( node.__ramjetOriginalTransition__ ) {
+			setTimeout( () => {
+				node.style.transition = node.__ramjetOriginalTransition__;
+			});
+		}
 	}
 }
 
-export function isNodeFixed ( node ) {
-	while (node !== null){
-		if (window.getComputedStyle(node).position === "fixed"){
-			return true;
+export function cloneNode ( node ) {
+	const clone = node.cloneNode();
+
+	const isSvg = node.parentNode && node.parentNode.namespaceURI === svgns;
+
+	if ( node.nodeType === 1 ) {
+		const width = node.style.width;
+		const height = node.style.height;
+
+		clone.setAttribute( 'style', window.getComputedStyle( node ).cssText );
+
+		if ( isSvg ) {
+			clone.style.width = width;
+			clone.style.height = height;
 		}
-		node = (node.namespaceURI === svgns) ? node.parentNode : node.offsetParent;
+
+		const len = node.childNodes.length;
+		let i;
+
+		for ( i = 0; i < len; i += 1 ) {
+			clone.appendChild( cloneNode( node.childNodes[i] ) );
+		}
 	}
-	return false;
+
+	return clone;
 }

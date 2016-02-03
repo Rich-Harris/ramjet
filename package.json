@@ -15,12 +15,19 @@
   "scripts": {
     "start": "gobble",
     "build": "gobble build -f dist",
-    "prepublish": "npm run build",
-    "test": "open http://localhost:4567/test.html; npm start"
+    "prepublish": "npm run lint && npm test",
+    "test": "babel-node test/test.js",
+    "lint": "eslint src",
+    "pretest": "npm run build && npm run create-viewer",
+    "create-viewer": "babel-node test/create-viewer.js"
   },
   "devDependencies": {
+    "babel-cli": "^6.4.5",
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-es2015-loose-rollup": "^7.0.0",
     "babel-preset-es2015-rollup": "^1.1.1",
     "eases": "^1.0.8",
+    "eslint": "^1.10.3",
     "gobble": "^0.10.2",
     "gobble-babel": "^5.5.8",
     "gobble-browserify": "^0.6.1",
@@ -29,10 +36,14 @@
     "gobble-ractive": "^0.2.0",
     "gobble-rollup": "^0.25.0",
     "gobble-uglifyjs": "^0.2.1",
+    "jimp": "^0.2.21",
+    "nightmare": "^2.1.3",
     "ractive": "^0.7.3",
     "ractive-events-tap": "^0.3.0",
     "ractive-transitions-fade": "^0.3.1",
-    "rollup-plugin-babel": "^2.3.9"
+    "rollup-plugin-babel": "^2.3.9",
+    "rollup-plugin-npm": "^1.3.0",
+    "sander": "^0.4.0"
   },
   "spm": {
     "main": "dist/ramjet.js",
@@ -42,5 +53,8 @@
       "src",
       "scripts"
     ]
+  },
+  "dependencies": {
+    "stacking-order": "^1.0.0"
   }
 }

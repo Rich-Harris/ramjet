@@ -1,44 +1,46 @@
-import { wrapNode, showNode, hideNode, isNodeFixed } from './utils/node';
-import TimerTransformer from './transformers/TimerTransformer';
-import KeyframeTransformer from './transformers/KeyframeTransformer';
-import { linear, easeIn, easeOut, easeInOut } from './easing';
-import { keyframesSupported } from './utils/detect';
-import { appendedSvg, appendSvg } from './utils/svg';
+import { compare } from 'stacking-order';
+import { showNode, hideNode } from './utils/node.js';
+import Wrapper from './Wrapper.js';
+import transformer from './transformer.js';
 
-export default {
-	transform ( fromNode, toNode, options = {} ) {
-		if ( typeof options === 'function' ) {
-			options = { done: options };
-		}
+export function transform ( fromNode, toNode, options = {} ) {
+	if ( typeof options === 'function' ) {
+		options = { done: options };
+	}
 
-		if ( !( 'duration' in options ) ) {
-			options.duration = 400;
-		}
+	if ( !( 'duration' in options ) ) {
+		options.duration = 400;
+	}
 
-    const appendToBody = !!options.appendToBody;
-		const destinationIsFixed = isNodeFixed(toNode);
-		const from = wrapNode( fromNode, destinationIsFixed, options.overrideClone, appendToBody);
-		const to = wrapNode( toNode, destinationIsFixed, options.overrideClone, appendToBody );
+	const from = new Wrapper( fromNode, options );
+	const to = new Wrapper( toNode, options );
 
-		if ( from.isSvg || to.isSvg && !appendedSvg ) {
-			appendSvg();
-		}
+	const order = compare( from._node, to._node );
 
-		if ( !keyframesSupported || options.useTimer || from.isSvg || to.isSvg ) {
-			return new TimerTransformer( from, to, options );
-		} else {
-			return new KeyframeTransformer( from, to, options );
-		}
-	},
+	from.setOpacity( 1 );
+	to.setOpacity( 0 );
 
-	hide ( ...nodes ) {
-		nodes.forEach( hideNode );
-	},
+	// in many cases, the stacking order of `from` and `to` is
+	// determined by their relative location in the document –
+	// so we need to preserve it
+	if ( order === 1 ) {
+		to.insert();
+		from.insert();
+	} else {
+		from.insert();
+		to.insert();
+	}
 
-	show ( ...nodes ) {
-		nodes.forEach( showNode );
-	},
+	return transformer( from, to, options );
+}
 
-	// expose some basic easing functions
-	linear, easeIn, easeOut, easeInOut
-};
+export function hide ( ...nodes ) {
+	nodes.forEach( hideNode );
+}
+
+export function show ( ...nodes ) {
+	nodes.forEach( showNode );
+}
+
+// expose some basic easing functions
+export { linear, easeIn, easeOut, easeInOut } from './easing.js';

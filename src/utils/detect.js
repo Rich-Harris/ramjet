@@ -2,7 +2,10 @@ const div = document.createElement( 'div' );
 
 let keyframesSupported = true;
 let TRANSFORM;
+let TRANSFORM_ORIGIN;
+let TRANSFORM_CSS;
 let KEYFRAMES;
+let ANIMATION;
 let ANIMATION_DIRECTION;
 let ANIMATION_DURATION;
 let ANIMATION_ITERATION_COUNT;
@@ -23,11 +26,19 @@ if (
 ) {
 	keyframesSupported = true;
 
-	TRANSFORM = 'transform' in div.style ? 'transform' : '-webkit-transform';
+	if ( 'webkitTransform' in div.style ) {
+		TRANSFORM = 'webkitTransform';
+		TRANSFORM_CSS = '-webkit-transform';
+		TRANSFORM_ORIGIN = 'webkitTransformOrigin';
+	} else {
+		TRANSFORM = TRANSFORM_CSS = 'transform';
+		TRANSFORM_ORIGIN = 'transformOrigin';
+	}
 
 	if ( 'animation' in div.style ) {
 		KEYFRAMES = '@keyframes';
 
+		ANIMATION                 = 'animation';
 		ANIMATION_DIRECTION       = 'animationDirection';
 		ANIMATION_DURATION        = 'animationDuration';
 		ANIMATION_ITERATION_COUNT = 'animationIterationCount';
@@ -38,6 +49,7 @@ if (
 	} else {
 		KEYFRAMES = '@-webkit-keyframes';
 
+		ANIMATION                 = 'webkitAnimation';
 		ANIMATION_DIRECTION       = 'webkitAnimationDirection';
 		ANIMATION_DURATION        = 'webkitAnimationDuration';
 		ANIMATION_ITERATION_COUNT = 'webkitAnimationIterationCount';
@@ -53,7 +65,10 @@ if (
 export {
 	keyframesSupported,
 	TRANSFORM,
+	TRANSFORM_ORIGIN,
+	TRANSFORM_CSS,
 	KEYFRAMES,
+	ANIMATION,
 	ANIMATION_DIRECTION,
 	ANIMATION_DURATION,
 	ANIMATION_ITERATION_COUNT,
