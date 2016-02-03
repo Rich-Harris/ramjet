@@ -42,7 +42,7 @@ export default function getBorderRadiusInterpolator ( a, b ) {
 
 	let borderRadius = {};
 
-	return function interpolator ( t ) {
+	return t => {
 		let x = ax( t );
 		let y = ay( t );
 

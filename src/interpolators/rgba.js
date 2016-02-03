@@ -9,7 +9,7 @@ export default function getRgbaInterpolator ( a, b, order ) {
 	let rgba = {};
 	let opacityAt = getOpacityInterpolator( a.alpha, b.alpha, order );
 
-	return function interpolator ( t ) {
+	return t => {
 		const opacity = opacityAt( t );
 
 		rgba.from = `rgba(${a.r},${a.g},${a.b},${opacity.from})`;

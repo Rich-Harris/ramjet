@@ -1,8 +1,8 @@
-import cloneNode from './cloneNode';
-import parseColor from '../utils/parseColor';
-import parseBorderRadius from '../utils/parseBorderRadius';
-import { svgns } from '../utils/svg';
-import { findTransformParent, findParentByTagName } from '../utils/findParent';
+import { cloneNode } from './utils/node.js';
+import parseColor from './utils/parseColor.js';
+import parseBorderRadius from './utils/parseBorderRadius.js';
+import { svgns } from './utils/svg.js';
+import { findTransformParent, findParentByTagName } from './utils/findParent.js';
 import {
 	ANIMATION,
 	ANIMATION_DIRECTION,
@@ -12,14 +12,14 @@ import {
 	ANIMATION_TIMING_FUNCTION,
 	TRANSFORM,
 	TRANSFORM_ORIGIN
-} from '../utils/detect';
+} from './utils/detect.js';
 import {
 	invert,
 	getCumulativeTransformMatrix,
 	getTransformMatrix,
 	multiply,
 	IDENTITY
-} from '../utils/matrix';
+} from './utils/matrix.js';
 
 function getBoundingClientRect ( node, invertedParentCTM ) {
 	const originalTransformOrigin = node.style[ TRANSFORM_ORIGIN ];
@@ -39,7 +39,7 @@ function getBoundingClientRect ( node, invertedParentCTM ) {
 	return bcr;
 }
 
-export default class HtmlWrapper {
+export default class Wrapper {
 	constructor ( node, options ) {
 		this.init( node, options );
 	}

@@ -1,6 +1,6 @@
-import { svgns } from './svg';
-import { TRANSFORM, TRANSFORM_ORIGIN } from './detect';
-import { findTransformParent } from './findParent';
+import { svgns } from './svg.js';
+import { TRANSFORM, TRANSFORM_ORIGIN } from './detect.js';
+import { findTransformParent } from './findParent.js';
 
 export const IDENTITY = [ 1, 0, 0, 1, 0, 0 ];
 
@@ -66,22 +66,10 @@ export function decompose ( [ a, b, c, d, e, f ] ) {
 
 export function parseMatrixTransformString ( transform ) {
 	if ( transform.slice( 0, 7 ) !== 'matrix(' ) {
-		throw new Error( 'Could not parse transform string (' + transform + ')' );
+		throw new Error( `Could not parse transform string (${transform})` );
 	}
 
 	return transform.slice( 7, -1 ).split( ' ' ).map( parseFloat );
-}
-
-export function parseTransformString ( transform ) {
-	const div = document.createElement( 'div' );
-	div.style.webkitTransform = div.style.transform = transform;
-
-	document.body.appendChild( div );
-	const style = getComputedStyle( div );
-	const matrix = parseMatrixTransformString( style[ TRANSFORM ] );
-	document.body.removeChild( div );
-
-	return matrix;
 }
 
 export function getCumulativeTransformMatrix ( node ) {

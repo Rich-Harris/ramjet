@@ -1,7 +1,7 @@
 export default function getOpacityInterpolator ( from, to, order ) {
 	let opacity = {};
 
-	return function interpolator ( t ) {
+	return t => {
 		const targetOpacity = ( to - from ) * t + from;
 
 		// Based on the blending formula here. (http://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending)

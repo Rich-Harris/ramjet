@@ -3,11 +3,13 @@ import { IDENTITY, decompose, multiply } from '../utils/matrix';
 function interpolateMatrices ( a, b ) {
 	let transform = [];
 
-	return function ( t ) {
-		a.forEach( ( from, i ) => {
+	return t => {
+		let i = a.length;
+		while ( i-- ) {
+			const from = a[i];
 			const to = b[i];
 			transform[i] = from + t * ( to - from );
-		});
+		}
 
 		return `matrix(${transform.join(',')})`;
 	};
@@ -32,13 +34,12 @@ function interpolateDecomposedTransforms ( a, b ) {
 	const translateX = interpolate( a.translateX, b.translateX );
 	const translateY = interpolate( a.translateY, b.translateY );
 
-	return function ( t ) {
+	return t => {
 		const transform = `translate(${translateX(t)}px, ${translateY(t)}px) rotate(${rotate(t)}rad) skewX(${skewX(t)}rad) scale(${scaleX(t)}, ${scaleY(t)})`;
 		return transform;
 	};
 }
 
-// TODO refactor this, I have no idea how it works
 export default function getTransformInterpolator ( a, b ) {
 	const scale_x = b.width / a.width;
 	const scale_y = b.height / a.height;

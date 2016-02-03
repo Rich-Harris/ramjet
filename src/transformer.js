@@ -1,16 +1,18 @@
 import { compare } from 'stacking-order';
-import getOpacityInterpolator from '../interpolators/opacity';
-import getRgbaInterpolator from '../interpolators/rgba';
-import getBorderRadiusInterpolator from '../interpolators/borderRadius';
-import getTransformInterpolator from '../interpolators/transform';
-import { linear } from '../easing';
+import getOpacityInterpolator from './interpolators/opacity.js';
+import getRgbaInterpolator from './interpolators/rgba.js';
+import getBorderRadiusInterpolator from './interpolators/borderRadius.js';
+import getTransformInterpolator from './interpolators/transform.js';
+import { linear } from './easing.js';
+import addCss from './utils/addCss.js';
+import getKeyframes from './utils/getKeyframes.js';
+import generateId from './utils/generateId.js';
 import {
-	TRANSFORM_CSS,
 	KEYFRAMES,
 	ANIMATION_END,
 	keyframesSupported
-} from '../utils/detect';
-import rAF from '../utils/rAF';
+} from './utils/detect.js';
+import rAF from './utils/rAF.js';
 
 export default function transformer ( from, to, options ) {
 	const duration = options.duration || 400;
@@ -149,7 +151,6 @@ export default function transformer ( from, to, options ) {
 		}
 	};
 
-
 	// handle animation end
 	if ( !useTimer ) {
 		let animating = 2;
@@ -168,80 +169,5 @@ export default function transformer ( from, to, options ) {
 		to._clone.addEventListener( ANIMATION_END, done );
 	}
 
-	transformer.play();
-
-	return transformer;
-}
-
-function generateId () {
-	return 'ramjet' + ~~( Math.random() * 1000000 );
-}
-
-function addCss ( css ) {
-	var styleElement = document.createElement( 'style' );
-	styleElement.type = 'text/css';
-
-	var head = document.getElementsByTagName( 'head' )[0];
-
-	// Internet Exploder won't let you use styleSheet.innerHTML - we have to
-	// use styleSheet.cssText instead
-	var styleSheet = styleElement.styleSheet;
-
-	if ( styleSheet ) {
-		styleSheet.cssText = css;
-	} else {
-		styleElement.innerHTML = css;
-	}
-
-	head.appendChild( styleElement );
-
-	return () => head.removeChild( styleElement );
-}
-
-function getKeyframes ( from, to, interpolators, easing, remaining, duration ) {
-	const numFrames = remaining / 16;
-
-	let fromKeyframes = '';
-	let toKeyframes = '';
-
-	function addKeyframes ( pc, t ) {
-		const opacity = interpolators.opacity( t );
-		const backgroundColor = interpolators.backgroundColor ? interpolators.backgroundColor( t ) : null;
-		const borderRadius = interpolators.borderRadius ? interpolators.borderRadius( t ) : null;
-		const transformFrom = interpolators.transformFrom( t );
-		const transformTo = interpolators.transformTo( 1 - t );
-
-		fromKeyframes += '\n' +
-			`${pc}% {` +
-				`opacity: ${opacity.from};` +
-				`${TRANSFORM_CSS}: ${transformFrom};` +
-				( backgroundColor ? `background-color: ${backgroundColor.from};` : '' ) +
-				( borderRadius ? `border-radius: ${borderRadius.from};` : '' ) +
-			`}`;
-
-		toKeyframes += '\n' +
-			`${pc}% {` +
-				`opacity: ${opacity.to};` +
-				`${TRANSFORM_CSS}: ${transformTo};` +
-				( backgroundColor ? `background-color: ${backgroundColor.to};` : '' ) +
-				( borderRadius ? `border-radius: ${borderRadius.to};` : '' ) +
-			`}`;
-	}
-
-	let i;
-	let startPos = 1 - ( remaining / duration );
-
-	for ( i = 0; i < numFrames; i += 1 ) {
-		const relPos = i / numFrames;
-		const absPos = startPos + ( ( remaining / duration ) * relPos );
-
-		const pc = 100 * relPos;
-		const t = easing( absPos );
-
-		addKeyframes( pc, t );
-	}
-
-	addKeyframes( 100, 1 );
-
-	return { fromKeyframes, toKeyframes };
+	return transformer.play();
 }
