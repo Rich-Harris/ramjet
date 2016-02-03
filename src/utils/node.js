@@ -1,3 +1,5 @@
+import { svgns } from './svg.js';
+
 export function hideNode ( node ) {
 	node.__ramjetOriginalTransition__ = node.style.webkitTransition || node.style.transition;
 	node.__ramjetOriginalOpacity__ = node.style.opacity;
@@ -23,8 +25,18 @@ export function showNode ( node ) {
 export function cloneNode ( node ) {
 	const clone = node.cloneNode();
 
+	const isSvg = node.parentNode && node.parentNode.namespaceURI === svgns;
+
 	if ( node.nodeType === 1 ) {
+		const width = node.style.width;
+		const height = node.style.height;
+
 		clone.setAttribute( 'style', window.getComputedStyle( node ).cssText );
+
+		if ( isSvg ) {
+			clone.style.width = width;
+			clone.style.height = height;
+		}
 
 		const len = node.childNodes.length;
 		let i;
