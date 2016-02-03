@@ -1,10 +1,16 @@
+sudo: false
 language: node_js
-before_script:
-- chmod a+x ./scripts/deploy-to-ghpages.sh
-script: sh ./scripts/deploy-to-ghpages.sh
+node_js:
+  - "stable"
 env:
   global:
-  - GH_REF: github.com/rich-harris/ramjet.git
-branches:
-  only:
-    - master
+    - BUILD_TIMEOUT=10000
+addons:
+  apt:
+    packages:
+      - xvfb
+install:
+  - export DISPLAY=':99.0'
+  - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+  - npm install
+script: npm test
