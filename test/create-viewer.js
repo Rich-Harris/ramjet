@@ -1,5 +1,5 @@
 import { resolve } from 'path';
-import { writeFileSync, mkdirSync } from 'fs';
+import { writeFileSync } from 'sander';
 import samples from './utils/samples.js';
 import * as templates from './utils/templates.js';
 
