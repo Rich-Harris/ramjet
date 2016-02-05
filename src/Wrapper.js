@@ -2,7 +2,7 @@ import { cloneNode } from './utils/node.js';
 import parseColor from './utils/parseColor.js';
 import parseBorderRadius from './utils/parseBorderRadius.js';
 import { svgns } from './utils/svg.js';
-import { findTransformParent, findParentByTagName } from './utils/findParent.js';
+import { findParentByTagName } from './utils/findParent.js';
 import {
 	ANIMATION,
 	ANIMATION_DIRECTION,
@@ -46,7 +46,6 @@ export default class Wrapper {
 
 	init ( node ) {
 		this._node = node;
-
 		this._clone = cloneNode( node );
 
 		const style = window.getComputedStyle( node );
@@ -63,12 +62,6 @@ export default class Wrapper {
 		const bcr = getBoundingClientRect( node, this.invertedParentCTM );
 		this.bcr = bcr;
 
-		const opacity = +( style.opacity );
-
-		const rgba = parseColor( style.backgroundColor );
-
-
-
 		// TODO create a flat array? easier to work with later?
 		const borderRadius = {
 			tl: parseBorderRadius( style.borderTopLeftRadius ),
@@ -78,8 +71,8 @@ export default class Wrapper {
 		};
 
 		this.borderRadius = borderRadius;
-		this.opacity = opacity;
-		this.rgba = rgba;
+		this.opacity = +( style.opacity );
+		this.rgba = parseColor( style.backgroundColor );
 
 		this.left = bcr.left;
 		this.top = bcr.top;
@@ -90,29 +83,30 @@ export default class Wrapper {
 	insert () {
 		const bcr = this.bcr;
 
+		const offsetParent = this._node.offsetParent;
+
 		let clone;
-		let container;
 
 		if ( this._node.namespaceURI === svgns ) { // TODO what if it's the <svg> itself, not a child?
 			const svg = findParentByTagName( this._node, 'svg' ); // TODO should be the namespace boundary - could be SVG inside SVG
-			container = findTransformParent( svg );
 
 			clone = svg.cloneNode( false );
 			clone.appendChild( this._clone ); // TODO what about transforms?
 		} else {
-			container = findTransformParent( this._node );
 			clone = this._clone;
 		}
 
-		const containerStyle = window.getComputedStyle( container );
-		const containerBcr = getBoundingClientRect( container, invert( getCumulativeTransformMatrix( container.parentNode ) ) );
+		const offsetParentStyle = window.getComputedStyle( offsetParent );
+		const offsetParentBcr = getBoundingClientRect( offsetParent, invert( getCumulativeTransformMatrix( offsetParent.parentNode ) ) );
 
 		clone.style.position = 'absolute';
 		clone.style[ TRANSFORM_ORIGIN ] = '0 0';
-		clone.style.top = ( bcr.top - parseInt( this.style.marginTop, 10 ) - ( containerBcr.top - parseInt( containerStyle.marginTop, 10 ) ) ) + 'px';
-		clone.style.left = ( bcr.left - parseInt( this.style.marginLeft, 10 ) - ( containerBcr.left - parseInt( containerStyle.marginLeft, 10 ) ) ) + 'px';
+		clone.style.top = ( bcr.top - parseInt( this.style.marginTop, 10 ) - ( offsetParentBcr.top - parseInt( offsetParentStyle.marginTop, 10 ) ) ) + 'px';
+		clone.style.left = ( bcr.left - parseInt( this.style.marginLeft, 10 ) - ( offsetParentBcr.left - parseInt( offsetParentStyle.marginLeft, 10 ) ) ) + 'px';
 
-		container.appendChild( clone );
+		// TODO we need to account for transforms *between* the offset parent and the node
+
+		offsetParent.appendChild( clone );
 	}
 
 	detach () {
