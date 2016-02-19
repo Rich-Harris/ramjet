@@ -110,7 +110,7 @@ ramjet.transform( element1, element2, {
 });
 ```
 
-By default the cloned nodes are appended to the parent to the original node. Inheriting the positioning and css inherited rules, they can behave in an unexpected way. For this reason you can use the flag `appendToBody` to append these nodes to the boby instead. I invite everyone to set this to true and open an issue if it doesn't work, it may become the default in one of the next releases.
+By default the cloned nodes are appended to the parent to the original node. Inheriting the positioning and css inherited rules, they can behave in an unexpected way. For this reason you can use the flag `appendToBody` to append these nodes to the body instead. I invite everyone to set this to true and open an issue if it doesn't work, it may become the default in one of the next releases.
 
 ## License
 
