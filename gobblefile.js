@@ -19,7 +19,6 @@ var lib = gobble([
 		entry: 'ramjet.js',
 		dest: 'ramjet.es6.js',
 		format: 'es6',
-		plugins: [ babel({ include: 'src/**' }), npm({ jsnext: true }) ],
 		sourceMap: true
 	})
 ]);
