@@ -1,1 +1,3 @@
 demo/* linguist-vendored
+demo/app/* linguist-vendored
+demo/files/* linguist-vendored
