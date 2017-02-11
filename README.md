@@ -1,5 +1,7 @@
 # ramjet
 
+[![CDNJS](https://img.shields.io/cdnjs/v/ramjet.js.svg)](https://cdnjs.com/libraries/ramjet.js)
+
 ![ramjet](https://cloud.githubusercontent.com/assets/1162160/7279487/5d668dea-e8ea-11e4-9b0d-a9ba2f1165cc.gif)
 
 
